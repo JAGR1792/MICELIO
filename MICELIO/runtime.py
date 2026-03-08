@@ -90,6 +90,13 @@ class BoundMethod:
                     raise MicelioRuntimeError("agregar() requiere 1 argumento")
                 self.obj.append(args[0])
                 return None
+            if self.name == "extender":
+                if len(args) != 1:
+                    raise MicelioRuntimeError("extender() requiere 1 argumento")
+                if not isinstance(args[0], list):
+                    raise MicelioRuntimeError("extender() requiere una lista")
+                self.obj.extend(args[0])
+                return None
             if self.name == "quitar":
                 if len(args) != 1:
                     raise MicelioRuntimeError("quitar() requiere 1 argumento")

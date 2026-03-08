@@ -29,7 +29,7 @@ compound_stmt
     | block
     ;
 
-var_decl : VAR ID '=' expr ;
+var_decl : VAR ID (',' ID)* ('=' expr (',' expr)*)? ;
 const_decl : CONST ID '=' expr ;
 assignment : ID '=' expr ;
 return_stmt : REGRESA expr? ;
@@ -39,19 +39,19 @@ import_stmt : IMPORTAR STRING (COMO ID)? ;
 leer_stmt : LEER ID ;
 imp_stmt : IMP expr ;
 
-if_stmt : SI '(' expr ')' block (SINO block)? ;
-switch_stmt : SEGUN '(' expr ')' '{' sep* case_block+ '}' ;
+if_stmt : SI '(' expr ')' sep* block (sep* SINO sep* block)? ;
+switch_stmt : SEGUN '(' expr ')' sep* '{' sep* case_block+ '}' ;
 case_block
     : CASO expr ':' sep* (statement sep*)*              #caseClause
     | DEFECTO ':' sep* (statement sep*)*                #defaultClause
     ;
-while_stmt : MIENTRAS '(' expr ')' block ;
+while_stmt : MIENTRAS '(' expr ')' sep* block ;
 for_stmt
-    : PARA ID '=' expr HASTA expr (INC expr)? block
-    | PARA ID EN expr block
+    : PARA ID '=' expr HASTA expr (INC expr)? sep* block
+    | PARA ID EN expr sep* block
     ;
 
-func_def : FUNCION ID '(' param_list? ')' block ;
+func_def : FUNCION ID '(' param_list? ')' sep* block ;
 param_list : ID (',' ID)* ;
 
 block : '{' sep* (statement sep*)* '}' ;
@@ -78,7 +78,7 @@ expr
     | expr Y expr                                                     #andExpr
     | expr O expr                                                     #orExpr
     | expr IN expr                                                    #inExpr
-    | expr PIPE expr                                                  #pipeExpr
+    | expr NEWLINE* PIPE NEWLINE* expr                                #pipeExpr
     | expr '.' ID                                                     #memberAccess
     ;
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import os
 
 from antlr4 import CommonTokenStream, InputStream
@@ -105,6 +106,32 @@ class EvalVisitor(MicelioVisitor):
         if not isinstance(value, (int, float)):
             raise MicelioRuntimeError(f"Operacion {op} requiere numeros")
 
+    def _is_numeric_matrix(self, value) -> bool:
+        if not isinstance(value, list) or not value:
+            return False
+        if not all(isinstance(row, list) and row for row in value):
+            return False
+        cols = len(value[0])
+        if cols == 0:
+            return False
+        for row in value:
+            if len(row) != cols:
+                return False
+            if not all(isinstance(cell, (int, float)) for cell in row):
+                return False
+        return True
+
+    def _matrix_add_sub(self, left, right, is_add: bool):
+        if len(left) != len(right) or len(left[0]) != len(right[0]):
+            raise MicelioRuntimeError("Dimensiones invalidas para suma/resta matricial")
+        out = []
+        for row_l, row_r in zip(left, right):
+            row = []
+            for a, b in zip(row_l, row_r):
+                row.append(a + b if is_add else a - b)
+            out.append(row)
+        return out
+
     def _resolve_callable(self, value):
         if isinstance(value, BoundMethod):
             return value
@@ -120,6 +147,13 @@ class EvalVisitor(MicelioVisitor):
             return fn.call(args, self._eval_in_env)
         return fn(*args)
 
+    def _decode_string_literal(self, raw: str) -> str:
+        try:
+            value = ast.literal_eval(raw)
+        except (SyntaxError, ValueError):
+            return raw[1:-1]
+        return value if isinstance(value, str) else str(value)
+
     def visitProgram(self, ctx: MicelioParser.ProgramContext):
         result = None
         for child in ctx.children:
@@ -131,10 +165,30 @@ class EvalVisitor(MicelioVisitor):
         return self.visitChildren(ctx)
 
     def visitVar_decl(self, ctx: MicelioParser.Var_declContext):
-        name = ctx.ID().getText()
-        value = self.visit(ctx.expr())
-        self.env.define(name, value)
-        return value
+        names = [ident.getText() for ident in ctx.ID()]
+        expr_nodes = ctx.expr()
+
+        if not expr_nodes:
+            for name in names:
+                self.env.define(name, None)
+            return None
+
+        if len(expr_nodes) == 1:
+            value = self.visit(expr_nodes[0])
+            for name in names:
+                self.env.define(name, value)
+            return value
+
+        if len(expr_nodes) != len(names):
+            raise MicelioRuntimeError(
+                "Cantidad de valores no coincide con cantidad de variables en declaracion"
+            )
+
+        last = None
+        for name, node in zip(names, expr_nodes):
+            last = self.visit(node)
+            self.env.define(name, last)
+        return last
 
     def visitConst_decl(self, ctx: MicelioParser.Const_declContext):
         name = ctx.ID().getText()
@@ -160,7 +214,7 @@ class EvalVisitor(MicelioVisitor):
 
     def visitImport_stmt(self, ctx: MicelioParser.Import_stmtContext):
         raw = ctx.STRING().getText()
-        path = bytes(raw[1:-1], "utf-8").decode("unicode_escape")
+        path = self._decode_string_literal(raw)
         module_name = os.path.splitext(os.path.basename(path))[0]
 
         module = self.modules.get(module_name)
@@ -326,7 +380,7 @@ class EvalVisitor(MicelioVisitor):
             return None
         if lit.STRING():
             raw = lit.STRING().getText()
-            return bytes(raw[1:-1], 'utf-8').decode('unicode_escape')
+            return self._decode_string_literal(raw)
         return None
 
     def visitIdExpr(self, ctx: MicelioParser.IdExprContext):
@@ -423,7 +477,15 @@ class EvalVisitor(MicelioVisitor):
     def visitAddSub(self, ctx: MicelioParser.AddSubContext):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
-        return left + right if ctx.op.text == '+' else left - right
+
+        if self._is_numeric_matrix(left) and self._is_numeric_matrix(right):
+            return self._matrix_add_sub(left, right, ctx.op.text == '+')
+
+        if ctx.op.text == '+':
+            if isinstance(left, str) or isinstance(right, str):
+                return str(left) + str(right)
+            return left + right
+        return left - right
 
     def visitPowExpr(self, ctx: MicelioParser.PowExprContext):
         left = self.visit(ctx.expr(0))
