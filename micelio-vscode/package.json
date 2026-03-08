@@ -1,0 +1,36 @@
+{
+  "name": "micelio-syntax",
+  "displayName": "Micelio Syntax",
+  "description": "Syntax highlighting and language configuration for Micelio (.mice)",
+  "version": "0.0.1",
+  "publisher": "micelio-local",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "micelio",
+        "aliases": [
+          "Micelio",
+          "micelio"
+        ],
+        "extensions": [
+          ".mice",
+          ".micelio"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "micelio",
+        "scopeName": "source.micelio",
+        "path": "./syntaxes/micelio.tmLanguage.json"
+      }
+    ]
+  }
+}

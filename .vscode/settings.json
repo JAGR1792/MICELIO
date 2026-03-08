@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "*.mice": "micelio",
+    "*.micelio": "micelio"
+  }
+}
