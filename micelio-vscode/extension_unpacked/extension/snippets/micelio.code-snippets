@@ -1,0 +1,41 @@
+{
+  "Pipe: composicion basica": {
+    "prefix": "pipe",
+    "body": [
+      "${1:datos}",
+      "  |> ${2:map}(funcion (${3:x}) { regresa ${4:x} })"
+    ],
+    "description": "Inserta una composicion base con operador |>"
+  },
+  "Pipe: map": {
+    "prefix": "pipe_map",
+    "body": [
+      "|> map(funcion (${1:x}) { regresa ${2:x} })"
+    ],
+    "description": "Inserta un tramo map para una tuberia |>"
+  },
+  "Pipe: filter": {
+    "prefix": "pipe_filter",
+    "body": [
+      "|> filter(funcion (${1:x}) { regresa ${2:x > 0} })"
+    ],
+    "description": "Inserta un tramo filter para una tuberia |>"
+  },
+  "Pipe: reduce": {
+    "prefix": "pipe_reduce",
+    "body": [
+      "|> reduce(funcion (${1:acc}, ${2:x}) { regresa ${3:acc + x} }, ${4:0})"
+    ],
+    "description": "Inserta un tramo reduce para una tuberia |>"
+  },
+  "Pipe: cadena completa": {
+    "prefix": "pipe_chain",
+    "body": [
+      "${1:datos}",
+      "  |> map(funcion (${2:x}) { regresa ${3:x} })",
+      "  |> filter(funcion (${2:x}) { regresa ${4:verdadero} })",
+      "  |> reduce(funcion (${5:acc}, ${2:x}) { regresa ${6:acc + x} }, ${7:0})"
+    ],
+    "description": "Inserta plantilla map/filter/reduce con |>"
+  }
+}
