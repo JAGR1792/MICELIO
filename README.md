@@ -1,38 +1,117 @@
 # MICELIO
 
-Lenguaje de programacion interpretado basado en ANTLR + Python, con enfoque didactico y soporte funcional.
+Lenguaje de programacion DLS, con enfoque didactico, funcional y orientado a evolucionar hacia casos de ciencia de datos y ML.
 
-## Estado actual
+## Vision del proyecto
 
-Incluye:
+Micelio busca ser un lenguaje en español que no sea solo "Python traducido", sino una experiencia propia:
 
-- Gramatica ANTLR del lenguaje (`MICELIO/Micelio.g4`)
-- Lexer/Parser/Visitor generados
-- Interprete por visitor (`MICELIO/eval_visitor.py`)
-- Runtime con entorno, funciones, control de flujo y builtins (`MICELIO/runtime.py`)
-- Importacion de modulos `.mice` desde archivos
-- Modulos estandar en `MICELIO/modulos_std/` (actualmente `math.mice`)
+- Sintaxis clara para aprender fundamentos de programacion.
+- Soporte funcional (map/filter/reduce + pipe `|>`).
+- Mensajes de error pedagogicos (que paso, por que, como arreglarlo).
+- Camino de crecimiento hacia modulos de algebra, estadistica y ML.
 
-## Estructura principal
+## Estado actual (main)
 
-- `MICELIO/`: implementacion del lenguaje
-- `MICELIO/modulos_std/`: modulos del lenguaje en archivos `.mice`
-- `README.md`: guia de uso del proyecto
+Hoy el proyecto incluye:
+
+- Gramatica ANTLR en `MICELIO/Micelio.g4`.
+- Lexer/Parser/Visitor generados en `MICELIO/`.
+- Interprete por Visitor en `MICELIO/eval_visitor.py`.
+- Runtime en `MICELIO/runtime.py`.
+- Entrada/salida, funciones, control de flujo y modulos.
+- Modulo estandar inicial: `MICELIO/modulos_std/math.mice`.
+- Soporte de desempaquetado:
+	- `var a, b = expr`
+	- `a, b = expr`
+	- `leer a, b` (entrada multiple en una linea)
+- Errores pedagogicos en CLI/archivo (`MICELIO/main.py`).
+
+## Estructura del repo
+
+- `MICELIO/`: implementacion principal del lenguaje.
+- `MICELIO/modulos_std/`: biblioteca estandar en `.mice`.
+- `micelio-vscode/`: extension de sintaxis para VS Code.
+- `Pruebas/`: prototipos y experimentos.
+- `main.tex`: especificacion extensa de lenguaje y vision tecnica.
+
+## Documentacion completa
+
+La referencia tecnica completa esta en `docs/`:
+
+- `docs/README.md`
+- `docs/lenguaje.md`
+- `docs/runtime.md`
+- `docs/errores-pedagogicos.md`
+- `docs/vscode-extension.md`
+- `docs/release.md`
+
+## Como esta hecho Micelio (arquitectura pedagogica)
+
+Micelio esta construido como un interprete clasico por etapas. Esta separacion no es solo tecnica: esta pensada para aprender compiladores e interpretes de forma didactica.
+
+1. Lexing y parsing con ANTLR.
+2. Arbol de sintaxis (parse tree) generado desde la gramatica.
+3. Evaluacion por Visitor (interpretacion semantica).
+4. Runtime con entorno, builtins y utilidades de tipos.
+
+Archivos clave:
+
+- `MICELIO/Micelio.g4`: define la sintaxis del lenguaje.
+- `MICELIO/MicelioLexer.py` y `MICELIO/MicelioParser.py`: generados por ANTLR.
+- `MICELIO/eval_visitor.py`: interpreta nodos del arbol.
+- `MICELIO/runtime.py`: entorno de ejecucion, builtins y representacion de valores.
+- `MICELIO/main.py`: entrada CLI/REPL, manejo de errores y preprocesado de azucar sintactico.
+
+## Flujo de ejecucion (de archivo `.mice` a resultado)
+
+Cuando ejecutas `python3 main.py programa.mice`, ocurre esto:
+
+1. Se lee el codigo fuente.
+2. Se aplica preprocesado para azucar sintactico compatible (ejemplo: `leer a, b` y `a, b = expr`).
+3. ANTLR tokeniza y parsea.
+4. Si hay errores de sintaxis, se muestran mensajes pedagogicos.
+5. El Visitor evalua sentencias/expresiones.
+6. Runtime resuelve variables, funciones, tipos y metodos.
+7. Se imprime salida con formato de Micelio.
+
+## Comportamiento actual del lenguaje (resumen util)
+
+- Tipado dinamico fuerte con conversiones explicitas.
+- Variables y constantes: `var`, `const`.
+- Control de flujo: `si`, `sino`, `mientras`, `para`, `segun`.
+- Funciones de primera clase y funciones anonimas.
+- Colecciones: lista, set, dict.
+- Programacion funcional:
+	- `map`, `filter`, `reduce`
+	- operador pipe `|>`
+- Entrada/salida:
+	- `leer variable`
+	- `leer a, b, c` (multiple en una linea)
+	- `imp expresion`
+- Desempaquetado:
+	- `var a, b = expr`
+	- `a, b = expr`
+
+Nota importante:
+
+- El desempaquetado requiere misma cantidad de variables y valores.
+- Algunos identificadores no pueden usarse como variables si son palabras reservadas (`y`, `o`, `si`, etc.).
 
 ## Requisitos
 
 - Python 3.10+
 - `antlr4-python3-runtime`
 
-Instalacion rapida:
+Instalacion minima:
 
 ```bash
 pip install antlr4-python3-runtime
 ```
 
-## Ejecutar programas Micelio
+## Ejecutar Micelio
 
-Desde la carpeta `MICELIO`:
+Desde `MICELIO/`:
 
 ```bash
 python3 main.py archivo.mice
@@ -45,41 +124,178 @@ cd MICELIO
 python3 main.py A.mice
 ```
 
-## Modulos estandar
+## Ejemplos rapidos
 
-Los modulos del lenguaje se colocan en:
+### 1) Pipe funcional
 
-- `MICELIO/modulos_std/`
+```mice
+var datos = [1, 2, 3, 4, 5]
 
-Importacion (ejemplo):
+var total = datos
+	|> map(funcion (x) { regresa x * 2 })
+	|> filter(funcion (x) { regresa x > 5 })
+	|> reduce(funcion (acc, x) { regresa acc + x }, 0)
+
+imp total
+```
+
+### 2) Entrada multiple y desempaquetado
+
+```mice
+var a, b
+leer a, b
+
+var x, y = [10, 20]
+a, b = [x, y]
+
+imp a + b
+```
+
+### 3) Leer una linea y partir texto
+
+```mice
+var linea
+leer linea
+
+var p1, p2 = linea.separar()
+imp p1 + " " + p2
+```
+
+## Biblioteca estandar actual
+
+### Modulo `math.mice`
+
+Ubicacion: `MICELIO/modulos_std/math.mice`
+
+Incluye (resumen):
+
+- Constantes: `PI`, `E`
+- Trigonometria: `seno`, `coseno`, `tangente`
+- Inversas: `arcoseno`, `arcocoseno`, `arcotangente`
+- Otras: `raiz`, `log`, `log10`, `exp`, `potencia`
+- Utilitarias: `abs`, `piso`, `techo`, `redondear`
+
+Importacion:
 
 ```mice
 importar "math.mice" como math
 imp math.seno(math.PI / 2)
 ```
 
-### Modulo Math (`MICELIO/modulos_std/math.mice`)
+## Errores pedagogicos
 
-Funciones incluidas:
+`main.py` muestra errores en formato guiado:
 
-- `PI`, `E`
-- `seno`, `coseno`, `tangente`
-- `arcoseno`, `arcocoseno`, `arcotangente`
-- `raiz`, `log`, `log10`, `exp`, `potencia`
-- `abs`, `piso`, `techo`, `redondear`
+- `Que paso`
+- `Donde` (linea/columna + marca)
+- `Por que pasa`
+- `Como arreglarlo`
 
-## Utilidades de texto en Micelio
+Esto aplica tanto para errores de sintaxis como de ejecucion.
 
-Metodo disponible en strings:
+Ejemplo de valor pedagogico:
 
-- `texto.separar()`
-- `texto.separar(separador)`
+- Si escribes `leer.separar()`, Micelio no solo marca error; tambien explica que `leer` es sentencia, no metodo, y sugiere una forma correcta.
 
-Tambien existe alias:
+## Extension de sintaxis de VS Code (Micelio Syntax)
 
-- `texto.split(...)`
+Ubicacion: `micelio-vscode/extension_unpacked/extension/`
 
-## Notas
+Incluye:
 
-- La rama `main` se mantiene enfocada en el lenguaje MICELIO funcional.
-- El tooling/editor (sintaxis de VS Code) vive en la rama `tooling/vscode-syntax`.
+- Resaltado de sintaxis para `.mice` y `.micelio`.
+- Configuracion de comentarios/pares.
+- Snippets de pipeline.
+- Continuacion automatica de `|>` con Enter.
+
+### Instalar en otra PC
+
+Opcion recomendada (`.vsix`):
+
+```bash
+cd micelio-vscode
+./build-vsix.sh
+code --install-extension micelio-syntax-0.0.4.vsix
+```
+
+Opcion local rapida:
+
+```bash
+cd micelio-vscode
+./install-local.sh
+```
+
+Despues: `Developer: Reload Window` en VS Code.
+
+## Instalador experimental (prueba ligera)
+
+Para un prototipo ligero de instalacion sin depender de Python del usuario final, ver:
+
+- `Pruebas/Arimetica_estable/installer/build-linux.sh`
+
+Este flujo genera un binario standalone y un paquete instalable Linux para la prueba aritmetica.
+
+## Estado vs especificacion (`main.tex`)
+
+`main.tex` describe la direccion completa del lenguaje. El codigo de `main` implementa una parte funcional y creciente de esa especificacion.
+
+Interpretacion recomendada:
+
+- `main.tex`: contrato de vision y alcance tecnico a largo plazo.
+- `README.md`: estado implementado y utilizable hoy.
+- Codigo en `MICELIO/`: fuente de verdad de comportamiento actual.
+
+## Ramas del proyecto
+
+- `main`: nucleo del lenguaje Micelio.
+- `tooling/vscode-syntax`: enfoque en extension/editor tooling.
+- `experiments/pruebas-legacy`: pruebas y acercamientos experimentales.
+
+## Limitaciones actuales
+
+- La especificacion extensa (`main.tex`) va por delante de algunas implementaciones.
+- No todo lo descrito en la vision de ML esta cerrado en runtime aun.
+- Hay funcionalidades aun en estado experimental (por ejemplo instaladores por plataforma).
+
+## Hoja de ruta sugerida (alineada con `main.tex`)
+
+Prioridad recomendada:
+
+1. `matriz.mice` (transpuesta, determinante, inversa, producto).
+2. `estadistica.mice` (media, varianza, normalizacion).
+3. `aleatorio.mice` (semilla, rand, muestreo reproducible).
+4. `ml_basico.mice` (activaciones, perdida, entrenamiento minimo).
+
+## Contribuir
+
+1. Crea una rama desde la rama objetivo.
+2. Implementa cambios pequenos y comprobables.
+3. Incluye ejemplo `.mice` reproducible cuando apliquen cambios de lenguaje.
+4. Si tocas extension VS Code, prueba tambien en `tooling/vscode-syntax`.
+
+## Guia rapida de aprendizaje (pedagogica)
+
+Ruta sugerida para nuevos usuarios:
+
+1. Ejecuta expresiones simples y `imp`.
+2. Aprende variables/constantes y control de flujo.
+3. Practica funciones anonimas + `map/filter/reduce`.
+4. Usa `|>` para leer pipelines de izquierda a derecha.
+5. Prueba `leer` simple y multiple.
+6. Usa desempaquetado para codigo mas claro.
+7. Importa `math.mice` y arma mini programas modulares.
+
+---
+
+## Siguiente paso natural: `docs/`
+
+Si el proyecto sigue creciendo, conviene separar esta documentacion en:
+
+- `README.md` corto para onboarding rapido.
+- `docs/lenguaje.md` (sintaxis y semantica).
+- `docs/runtime.md` (entorno, tipos, builtins).
+- `docs/errores-pedagogicos.md` (catalogo de errores y sugerencias).
+- `docs/vscode-extension.md` (instalacion y desarrollo de sintaxis).
+- `docs/release.md` (versionado, empaquetado, instaladores).
+
+Esa estructura mantiene la entrada amigable y la referencia tecnica completa.
