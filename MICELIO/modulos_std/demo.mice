@@ -1,0 +1,7 @@
+funcion dup(x) {
+    regresa x * 2
+}
+
+funcion saludar(nombre) {
+    regresa "Hola " + nombre
+}

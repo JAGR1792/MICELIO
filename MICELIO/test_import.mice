@@ -1,0 +1,4 @@
+importar "modulos_std/demo.mice" como demo
+
+imp demo.dup(21)
+imp demo.saludar("Antonio")

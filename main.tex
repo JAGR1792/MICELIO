@@ -1,0 +1,997 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amsmath, amssymb}
+\geometry{a4paper, margin=2.5cm}
+
+% Configuración de listings para código
+\lstdefinestyle{miceliostyle}{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{teal},
+    numberstyle=\tiny\color{gray},
+    numbers=left,
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=true,
+    escapeinside={\%*}{*)}
+}
+\lstset{style=miceliostyle}
+
+\title{Especificación Técnica del Lenguaje Micelio \\ \large Un lenguaje funcional para Deep Learning}
+\author{Proyecto de Construcción de DSL}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\Large \textit{“La grandeza que se oculta tras la simpleza que se muestra”}
+\end{center}
+
+\begin{abstract}
+Este documento constituye la especificación técnica del lenguaje de programación Micelio. Se describen en detalle su sintaxis, palabras reservadas, sistema de tipos, estructuras de control, enfoque funcional, biblioteca estándar (implementada desde cero) y gramática formal en ANTLR. El lenguaje está diseñado para ser simple, didáctico y con capacidades de Deep Learning, combinando un núcleo funcional con construcciones imperativas cuando es necesario.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Introducción Técnica}
+
+Micelio es un lenguaje interpretado, con tipado dinámico fuerte, que utiliza llaves para delimitar bloques y punto y coma opcional. Su sintaxis está inspirada en PSeInt (para facilitar el aprendizaje) y en lenguajes funcionales modernos. La implementación se realiza con ANTLR para generar el analizador léxico y sintáctico, y Python para la evaluación mediante el patrón Visitor. Todas las bibliotecas (matemáticas, matrices, gráficos, machine learning) se implementan desde cero, sin dependencias externas.
+
+\section{Palabras Reservadas y su Significado}
+
+La siguiente tabla enumera y explica todas las palabras reservadas de Micelio. Son la base del lenguaje y deben ser conocidas por todo programador.
+
+\begin{center}
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Palabra} & \textbf{Descripción} \\
+\hline
+\texttt{var} & Declara una variable mutable. Ej: \texttt{var x = 5} \\
+\hline
+\texttt{const} & Declara una constante inmutable. Ej: \texttt{const PI = 3.1416} \\
+\hline
+\texttt{funcion} & Define una función. Ej: \texttt{funcion suma(a, b) \{ regresa a + b \}} \\
+\hline
+\texttt{regresa} & Devuelve un valor desde una función. \\
+\hline
+\texttt{si} & Inicia una condición. Ej: \texttt{si (x > 0) \{ imp "positivo" \} sino \{ imp "negativo" \}} \\
+\hline
+\texttt{sino} & Parte alternativa de un \texttt{si}. \\
+\hline
+\texttt{segun} & Estructura de selección múltiple (switch). Ej: \texttt{segun (x) \{ caso 1: imp 'uno'; caso 2: imp 'dos'; defecto: imp 'otro' \}} \\
+\hline
+\texttt{caso} & Define un caso dentro de \texttt{segun}. \\
+\hline
+\texttt{defecto} & Caso por defecto en \texttt{segun}. \\
+\hline
+\texttt{para} & Bucle para. Ej: \texttt{para i = 0 hasta 10 \{ imp i \}} \\
+\hline
+\texttt{mientras} & Bucle mientras. Ej: \texttt{mientras (x < 10) \{ x = x + 1 \}} \\
+\hline
+\texttt{hasta} & Se usa en \texttt{para} para indicar el límite (inclusive). \\
+\hline
+\texttt{inc} & Incremento (opcional en \texttt{para}). Ej: \texttt{para i = 0 hasta 10 inc 2} \\
+\hline
+\texttt{romper} & Sale de un bucle. \\
+\hline
+\texttt{continuar} & Salta a la siguiente iteración. \\
+\hline
+\texttt{leer} & Lee un valor desde la consola. Ej: \texttt{leer x} \\
+\hline
+\texttt{imp} & Imprime en consola. Ej: \texttt{imp "Hola"} \\
+\hline
+\texttt{importar} & Importa otro archivo. Ej: \texttt{importar "math.mice"} o \texttt{importar "math.mice' como math} \\
+\hline
+\texttt{como} & Crea un alias para un módulo importado. \\
+\hline
+\texttt{verdadero} & Valor booleano verdadero. \\
+\hline
+\texttt{falso} & Valor booleano falso. \\
+\hline
+\texttt{nulo} & Valor nulo. \\
+\hline
+\texttt{set} & Crea un conjunto. Ej: \texttt{var s = set(1,2,3)} \\
+\hline
+\texttt{dict} & Crea un diccionario. Ej: \texttt{var d = dict('a':1, 'b':2)} \\
+\hline
+\texttt{matriz} & Crea una matriz. Ej: \texttt{var m = matriz([[1,2],[3,4]])} \\
+\hline
+\end{tabular}
+\end{center}
+\section{Sistema de Tipos}
+
+Micelio tiene tipado dinámico fuerte, lo que significa que las variables no tienen un tipo fijo declarado, pero el lenguaje verifica que las operaciones se realicen entre tipos compatibles, generando errores si no lo son (por ejemplo, no se puede sumar un número con un texto). Los tipos principales son:
+
+\begin{itemize}
+    \item \texttt{Número}: Representa tanto enteros como números de punto flotante. Internamente se almacenan como float de doble precisión. No hay distinción explícita entre entero y flotante; el lenguaje maneja automáticamente la conversión cuando es necesario (por ejemplo, en divisiones). Ejemplos: \texttt{5}, \texttt{-3}, \texttt{2.5}, \texttt{0.001}. Las operaciones aritméticas (\texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{\%}, \texttt{**}) están definidas para números.
+
+    \item \texttt{Booleano}: Valores lógicos que pueden ser \texttt{verdadero} o \texttt{falso}. Se utilizan en condiciones y operaciones lógicas. Los operadores \texttt{y}, \texttt{o}, \texttt{no} trabajan con booleanos. También se pueden obtener como resultado de comparaciones (\texttt{==}, \texttt{!=}, \texttt{<}, etc.).
+
+    \item \texttt{Texto}: Cadenas de caracteres delimitadas por comillas dobles. Ejemplos: \texttt{"Hola mundo"}, \texttt{"123"}. Se pueden concatenar con el operador \texttt{+} y comparar con operadores de comparación (orden lexicográfico). La longitud se obtiene con la función \texttt{longitud()}. Se puede acceder a caracteres individuales mediante índices: \texttt{texto[0]}.
+
+    \item \texttt{Lista}: Colección ordenada y mutable de elementos, que pueden ser de diferentes tipos. Se crean con corchetes: \texttt{[1, "dos", verdadero]}. Las listas permiten acceso por índice (empezando en 0), asignación, y tienen métodos como \texttt{agregar()}, \texttt{quitar()}, \texttt{insertar()}, etc. También soportan operaciones funcionales como \texttt{map}, \texttt{filter}, \texttt{reduce} (ver sección de programación funcional). Ejemplo:
+    \begin{lstlisting}
+var lista = [10, 20, 30]
+lista[1] = 25
+lista.agregar(40)   # ahora [10,25,30,40]
+    \end{lstlisting}
+
+    \item \texttt{Conjunto}: Colección no ordenada de elementos únicos. Se crean con la palabra reservada \texttt{set}: \texttt{var s = set(1,2,3,3)} da como resultado \texttt{\{1,2,3\}}. Los conjuntos soportan operaciones de teoría de conjuntos: unión, intersección, diferencia, y pertenencia (operador \texttt{in}). Son mutables: se pueden agregar o quitar elementos con \texttt{agregar()} y \texttt{quitar()}. Ejemplo:
+    \begin{lstlisting}
+var s = set(1,2,3)
+s.agregar(4)
+imp 2 in s   # verdadero
+    \end{lstlisting}
+
+    \item \texttt{Diccionario}: Colección de pares clave-valor, similar a los mapas u objetos en otros lenguajes. Se crean con \texttt{dict(clave: valor, ...)} o con llaves: \texttt{\{"nombre": "Ana", "edad": 30\}}. Las claves pueden ser de cualquier tipo inmutable (número, texto, booleano). Se accede a los valores mediante corchetes: \texttt{d["nombre"]}. Los diccionarios son mutables. Ejemplo:
+    \begin{lstlisting}
+var d = dict("x":10, "y":20)
+d["z"] = 30
+imp d.claves()   # ["x","y","z"]
+    \end{lstlisting}
+
+    \item \texttt{Matriz}: Tipo especializado para álgebra lineal. Internamente es una lista de listas de números, pero con operaciones sobrecargadas para multiplicación matricial, suma, etc. Se crean con la función \texttt{matriz()} o directamente con listas anidadas (el intérprete las promociona a matriz si se usan en contexto matricial). Ejemplo: \texttt{var m = matriz([[1,2],[3,4]])}. Soporta operaciones como \texttt{+}, \texttt{-}, \texttt{*} (multiplicación matricial), \texttt{.*} (multiplicación elemento a elemento), y funciones como \texttt{transpuesta()}, \texttt{inversa()}, \texttt{determinante()}, etc. Las matrices son inmutables en cuanto a tamaño, pero sus elementos pueden modificarse si se accede por índice.
+
+    \item \texttt{Función}: Las funciones son objetos de primera clase. Pueden ser asignadas a variables, pasadas como argumento y devueltas. Se definen con la palabra \texttt{funcion}. El tipo función no tiene una representación directa en código, pero existe en el sistema de tipos. Ejemplo:
+    \begin{lstlisting}
+var suma = funcion (a,b) { regresa a + b }
+    \end{lstlisting}
+
+    \item \texttt{Nulo}: Representa la ausencia de valor. Solo existe un valor de este tipo: \texttt{nulo}. Es útil para inicializar variables o como retorno por defecto de funciones que no usan \texttt{regresa}. Por ejemplo, si una función no tiene \texttt{regresa}, devuelve \texttt{nulo}.
+\end{itemize}
+
+\subsection{Conversiones entre tipos y sistemas de numeración}
+
+Micelio no realiza conversiones automáticas implícitas (tipado fuerte). Por ejemplo, no se permite sumar un número con un texto; se debe convertir explícitamente usando funciones de conversión. Esto garantiza que el programador tenga control total sobre las transformaciones de datos. A continuación se detallan las funciones de conversión disponibles, con especial énfasis en el manejo de diferentes bases numéricas, una característica poderosa inspirada en Python pero ampliada para ofrecer flexibilidad total.
+
+\subsubsection{Funciones básicas de conversión}
+
+Estas funciones están disponibles en la biblioteca estándar (módulo \texttt{Convert} o como funciones globales):
+
+\begin{itemize}
+    \item \texttt{aNumero(valor, base=10)}: Convierte el \texttt{valor} a un número. Si \texttt{valor} es un texto, interpreta el texto como un número en la base especificada (por defecto base 10). Si \texttt{valor} es booleano, \texttt{verdadero} se convierte en 1 y \texttt{falso} en 0. Si \texttt{valor} ya es un número, lo devuelve sin cambios (o lo interpreta en la base indicada si es posible). Ejemplos:
+    \begin{lstlisting}
+aNumero("123")        # 123 (decimal)
+aNumero("1010", 2)    # 10 (binario a decimal)
+aNumero("FF", 16)     # 255 (hexadecimal a decimal)
+aNumero("777", 8)     # 511 (octal a decimal)
+aNumero(verdadero)    # 1
+    \end{lstlisting}
+
+    \item \texttt{aTexto(valor, base=10)}: Convierte cualquier valor a su representación textual. Si se proporciona la \texttt{base}, convierte un número a una cadena en esa base (entre 2 y 36). Ejemplos:
+    \begin{lstlisting}
+aTexto(123)           # "123"
+aTexto(255, 16)       # "ff" (hexadecimal, minusculas)
+aTexto(10, 2)         # "1010" (binario)
+aTexto(verdadero)     # "verdadero"
+    \end{lstlisting}
+
+    \item \texttt{aBooleano(valor)}: Convierte a booleano siguiendo reglas similares a Python:
+    \begin{itemize}
+        \item Para números: \texttt{0} es \texttt{falso}, cualquier otro número es \texttt{verdadero}.
+        \item Para textos: cadena vacía (\texttt{""}) es \texttt{falso}, cualquier otro texto es \texttt{verdadero}.
+        \item Para listas, conjuntos, diccionarios: vacíos son \texttt{falso}, no vacíos son \texttt{verdadero}.
+        \item \texttt{nulo} es \texttt{falso}.
+    \end{itemize}
+    \begin{lstlisting}
+aBooleano(0)          # falso
+aBooleano(5)          # verdadero
+aBooleano("")         # falso
+aBooleano("Hola")     # verdadero
+aBooleano([])         # falso
+    \end{lstlisting}
+\end{itemize}
+
+\subsubsection{Funciones especializadas para cambios de base}
+
+Además de las funciones básicas con parámetro \texttt{base}, Micelio proporciona funciones específicas para conversiones entre bases, similares a las de Python pero extendidas:
+
+\begin{itemize}
+    \item \texttt{aBinario(numero)}: Convierte un número a su representación binaria (como texto). Equivalente a \texttt{aTexto(numero, 2)}. Ejemplo: \texttt{aBinario(10)} devuelve \texttt{"1010"}.
+    
+    \item \texttt{aOctal(numero)}: Convierte a octal (base 8). Ejemplo: \texttt{aOctal(64)} devuelve \texttt{"100"}.
+    
+    \item \texttt{aHexadecimal(numero)}: Convierte a hexadecimal (base 16), usando letras minúsculas. Ejemplo: \texttt{aHexadecimal(255)} devuelve \texttt{"ff"}.
+    
+    \item \texttt{aBase(numero, base)}: Convierte un número a cualquier base entre 2 y 36. Es una versión más general de las anteriores. Ejemplo: \texttt{aBase(100, 5)} devuelve \texttt{"400"} (100 en base 5).
+\end{itemize}
+
+\subsubsection{Conversión desde texto en cualquier base}
+
+Para el camino inverso (texto a número), la función \texttt{aNumero} ya acepta el parámetro \texttt{base}. Pero también existen versiones específicas para mayor claridad:
+
+\begin{itemize}
+    \item \texttt{desdeBinario(texto)}: Interpreta \texttt{texto} como binario. Ejemplo: \texttt{desdeBinario("1010")} devuelve 10.
+    \item \texttt{desdeOctal(texto)}: Interpreta como octal. Ejemplo: \texttt{desdeOctal("12")} devuelve 10.
+    \item \texttt{desdeHexadecimal(texto)}: Interpreta como hexadecimal (acepta mayúsculas o minúsculas). Ejemplo: \texttt{desdeHexadecimal('A')} devuelve 10.
+    \item \texttt{desdeBase(texto, base)}: Interpreta \texttt{texto} en la base indicada. Ejemplo: \texttt{desdeBase("400", 5)} devuelve 100.
+\end{itemize}
+
+\subsubsection{Implementación de conversión a base arbitraria}
+
+La función \texttt{aBase} está implementada internamente usando un algoritmo de divisiones sucesivas, similar a este (en pseudocódigo):
+
+\begin{lstlisting}[language=Python]
+funcion aBase(numero, base) {
+    si (numero == 0) { regresa "0" }
+    var digitos = "0123456789abcdefghijklmnopqrstuvwxyz"
+    var resultado = ""
+    var n = numero
+    mientras (n > 0) {
+        var residuo = n \% base
+        resultado = digitos[residuo] + resultado
+        n = n / base  # division entera
+    }
+    regresa resultado
+}
+\end{lstlisting}
+
+Esta implementación maneja bases hasta 36 (dígitos 0-9 y a-z). Si se necesitan bases mayores, se puede extender el conjunto de dígitos (por ejemplo, usando letras mayúsculas u otros caracteres Unicode), pero en la práctica 36 es suficiente para la mayoría de aplicaciones.
+
+\subsubsection{Manejo de números negativos}
+
+Todas las funciones de conversión respetan el signo. Por ejemplo:
+\begin{lstlisting}
+aTexto(-255, 16)      # "-ff"
+aNumero("-ff", 16)    # -255
+\end{lstlisting}
+
+Para obtener representaciones sin signo (complemento a dos), se puede usar la función \texttt{aBaseComplemento(numero, base, bits)} que interpreta el número como un entero con signo en complemento a dos con un ancho de \texttt{bits} bits. Ejemplo:
+\begin{lstlisting}
+aBaseComplemento(-1, 2, 8)   # "11111111"  (8 bits)
+\end{lstlisting}
+
+\subsubsection{Conversiones elegantes y usos avanzados}
+
+\begin{itemize}
+    \item \textbf{Conversión automática según prefijo}: Al igual que Python acepta prefijos como \texttt{0b}, \texttt{0o}, \texttt{0x} para literales numéricos, Micelio permite que \texttt{aNumero} detecte automáticamente la base si el texto tiene prefijo:
+    \begin{lstlisting}
+aNumero("0b1010")    # 10 (detecta binario)
+aNumero("0o12")      # 10 (detecta octal)
+aNumero("0xA")       # 10 (detecta hexadecimal)
+aNumero("123")       # 123 (decimal por defecto)
+    \end{lstlisting}
+    
+    \item \textbf{Conversión a cualquier base con formato}: La función \texttt{aTexto} acepta un parámetro adicional para controlar mayúsculas/minúsculas en bases >10:
+    \begin{lstlisting}
+aTexto(255, 16, mayusculas=verdadero)   # "FF"
+    \end{lstlisting}
+    
+    \item \textbf{Conversión de fracciones}: Para números con parte fraccionaria, existe \texttt{aBaseFraccion(numero, base, precision)} que convierte un número real a su representación en otra base con una precisión determinada. Ejemplo:
+    \begin{lstlisting}
+aBaseFraccion(0.5, 2)        # "0.1" (binario)
+aBaseFraccion(0.1, 3, 5)     # "0.00220" (aproximacion)
+    \end{lstlisting}
+    
+    \item \textbf{Conversión de bases no estándar}: Se pueden usar dígitos personalizados con la función \texttt{aBaseConDigitos(numero, digitos)} donde \texttt{digitos} es un texto que define los símbolos para cada valor (la longitud del texto determina la base). Ejemplo:
+    \begin{lstlisting}
+aBaseConDigitos(10, "01")              # "1010" (binario con 0/1)
+aBaseConDigitos(10, "abcdefghij")      # "ba" (base 10 con letras)
+    \end{lstlisting}
+\end{itemize}
+
+\subsubsection{Resumen de funciones de conversión}
+
+\begin{center}
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Función} & \textbf{Descripción} & \textbf{Ejemplo} \\
+\hline
+\texttt{aNumero(valor, base)} & Convierte a número (base opcional) & \texttt{aNumero("FF",16)} → 255 \\
+\texttt{aTexto(valor, base)} & Convierte a texto (base opcional) & \texttt{aTexto(255,16)} → "ff" \\
+\texttt{aBinario(numero)} & A binario (base 2) & \texttt{aBinario(10)} → "1010" \\
+\texttt{aOctal(numero)} & A octal (base 8) & \texttt{aOctal(64)} → "100" \\
+\texttt{aHexadecimal(numero)} & A hexadecimal & \texttt{aHexadecimal(255)} → "ff" \\
+\texttt{aBase(numero, base)} & A cualquier base 2-36 & \texttt{aBase(100,5)} → "400" \\
+\texttt{desdeBinario(texto)} & Desde binario & \texttt{desdeBinario("1010")} → 10 \\
+\texttt{desdeOctal(texto)} & Desde octal & \texttt{desdeOctal("12")} → 10 \\
+\texttt{desdeHexadecimal(texto)} & Desde hex & \texttt{desdeHexadecimal("A")} → 10 \\
+\texttt{desdeBase(texto, base)} & Desde cualquier base & \texttt{desdeBase("400",5)} → 100 \\
+\texttt{aBaseComplemento(n,b,bits)} & Complemento a dos & \texttt{aBaseComplemento(-1,2,8)} → "11111111" \\
+\texttt{aBaseFraccion(n,b,p)} & Fracción en otra base & \texttt{aBaseFraccion(0.5,2)} → "0.1" \\
+\texttt{aBaseConDigitos(n,dig)} & Base con dígitos propios & \texttt{aBaseConDigitos(10,"ab")} → "baa" \\
+\hline
+\end{tabular}
+\end{center}
+
+Este conjunto de funciones proporciona una flexibilidad comparable a lenguajes como Python, pero con extensiones que permiten trabajar cómodamente con cualquier base numérica, lo cual es especialmente útil en aplicaciones de criptografía, matemáticas, computación gráfica y, por supuesto, Deep Learning (donde a veces se manipulan representaciones internas de datos).
+
+
+\subsection{Operadores comunes}
+\begin{itemize}
+    \item \textbf{Aritméticos}: \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{\%}, \texttt{**}.
+    \item \textbf{Comparación}: \texttt{==}, \texttt{!=}, \texttt{<}, \texttt{<=}, \texttt{>}, \texttt{>=}. Funcionan con números, textos y booleanos.
+    \item \textbf{Lógicos}: \texttt{y}, \texttt{o}, \texttt{no}. Evalúan en cortocircuito.
+    \item \textbf{Pertenencia}: \texttt{in} para listas, conjuntos y diccionarios (en diccionarios verifica si la clave existe).
+    \item \textbf{Incremento/decremento}: \texttt{++var}, \texttt{var++}, \texttt{--var}, \texttt{var--} (solo en variables mutables).
+\end{itemize}
+
+\section{Estructuras de Control}
+
+Las estructuras de control permiten modificar el flujo de ejecución de un programa. Micelio ofrece las siguientes:
+
+\subsection{Condicional \texttt{si}}
+Permite ejecutar un bloque de código si se cumple una condición, y opcionalmente otro bloque si no se cumple.
+\begin{lstlisting}
+si (condicion) {
+    // bloque que se ejecuta si la condicion es verdadera
+} sino {
+    // bloque que se ejecuta si la condicion es falsa
+}
+\end{lstlisting}
+La parte \texttt{sino} es opcional. La condición debe ser una expresión que devuelva un valor booleano. Si se necesita evaluar múltiples condiciones, se pueden anidar \texttt{si} dentro de \texttt{sino} (no hay \texttt{sino si} directo, pero se puede simular):
+\begin{lstlisting}
+si (x > 0) {
+    imp "positivo"
+} sino {
+    si (x < 0) {
+        imp "negativo"
+    } sino {
+        imp "cero"
+    }
+}
+\end{lstlisting}
+
+\subsection{Selección múltiple \texttt{segun}}
+Es una estructura que permite elegir entre múltiples opciones basadas en el valor de una expresión. Es similar al \texttt{switch} de otros lenguajes.
+\begin{lstlisting}
+segun (variable) {
+    caso valor1:
+        // acciones para valor1
+    caso valor2:
+        // acciones para valor2
+    defecto:
+        // acciones por defecto (opcional)
+}
+\end{lstlisting}
+Los casos se evalúan en orden. A diferencia de otros lenguajes, \textbf{no hay "break" automático}: después de ejecutar un caso, continúa con el siguiente (efecto "fall through"). Para salir anticipadamente, se puede usar \texttt{romper} dentro de un caso. El caso \texttt{defecto} es opcional y se ejecuta si ningún otro coincide.
+
+\begin{lstlisting}
+segun (opcion) {
+    caso 1:
+        imp "uno"
+        romper   # sale del segun
+    caso 2:
+        imp "dos"
+    caso 3:
+        imp "tres"
+    defecto:
+        imp "otro"
+}
+\end{lstlisting}
+
+\subsection{Bucle \texttt{para}}
+El bucle \texttt{para} itera sobre un rango numérico. Es útil cuando se conoce de antemano el número de iteraciones.
+\begin{lstlisting}
+para variable = inicio hasta fin inc paso {
+    // bloque
+}
+\end{lstlisting}
+\begin{itemize}
+    \item \texttt{variable}: variable que tomará los valores del rango (debe declararse previamente o se crea automáticamente en el ámbito del bucle).
+    \item \texttt{inicio}: valor inicial (inclusive).
+    \item \texttt{fin}: valor final (inclusive).
+    \item \texttt{inc paso}: opcional, indica el incremento en cada iteración (por defecto 1). Puede ser positivo o negativo.
+\end{itemize}
+Ejemplos:
+\begin{lstlisting}
+para i = 1 hasta 5 {
+    imp i   # imprime 1,2,3,4,5
+}
+para i = 0 hasta 10 inc 2 {
+    imp i   # 0,2,4,6,8,10
+}
+para i = 5 hasta 1 inc -1 {
+    imp i   # 5,4,3,2,1
+}
+\end{lstlisting}
+
+\subsection{Bucle \texttt{mientras}}
+Ejecuta un bloque repetidamente mientras se cumpla una condición. La condición se evalúa antes de cada iteración.
+\begin{lstlisting}
+mientras (condicion) {
+    // bloque
+}
+\end{lstlisting}
+Si la condición es falsa al inicio, el bloque no se ejecuta nunca. Es útil cuando no se conoce el número de iteraciones de antemano.
+\begin{lstlisting}
+var i = 0
+mientras (i < 5) {
+    imp i
+    i = i + 1
+}
+\end{lstlisting}
+
+\subsection{Control de bucles: \texttt{romper} y \texttt{continuar}}
+Dentro de un bucle (\texttt{para} o \texttt{mientras}), se pueden usar:
+\begin{itemize}
+    \item \texttt{romper}: termina el bucle inmediatamente, saltando a la siguiente instrucción después del bucle.
+    \item \texttt{continuar}: salta a la siguiente iteración, omitiendo el resto del bloque actual.
+\end{itemize}
+\begin{lstlisting}
+para i = 1 hasta 10 {
+    si (i == 5) {
+        romper      # sale del bucle cuando i=5
+    }
+    si (i \% 2 == 0) {
+        continuar   # salta los pares (no los imprime)
+    }
+    imp i
+}
+# imprime: 1,3
+\end{lstlisting}
+
+\subsection{Consideraciones}
+Las estructuras de control pueden anidarse unas dentro de otras sin límite (salvo la memoria disponible). Los bloques se delimitan con llaves \texttt{\{\}} y pueden contener cualquier número de sentencias. El punto y coma es opcional al final de cada sentencia, pero se recomienda usarlo para claridad.
+
+
+\section{Funciones y Paradigma Funcional}
+
+\subsection{Definición de funciones}
+\begin{lstlisting}
+funcion nombre(param1, param2) {
+    // cuerpo
+    regresa expresion
+}
+\end{lstlisting}
+Si no se usa \texttt{regresa}, la función devuelve \texttt{nulo}.
+
+\subsection{El paradigma funcional en Micelio}
+
+La programación funcional es un estilo que trata a las funciones como ciudadanos de primera clase, evita los efectos secundarios y favorece la composición de operaciones. Micelio incorpora este paradigma de manera natural, permitiendo escribir código más claro, modular y fácil de probar. A continuación explicamos cada concepto fundamental.
+
+\subsubsection*{Funciones como ciudadanos de primera clase}
+Esto significa que las funciones pueden ser tratadas como cualquier otro valor: se pueden asignar a variables, pasar como argumentos a otras funciones y devolverse como resultados. En Micelio, esto es posible porque las funciones son objetos.
+
+\begin{lstlisting}
+var doble = funcion (x) { regresa x * 2 }   # asignamos una funcion anonima a la variable doble
+var aplicar = funcion (f, valor) { regresa f(valor) }  # funcion que recibe otra funcion
+aplicar(doble, 5)  # 10
+\end{lstlisting}
+
+\subsubsection*{Funciones anónimas (lambdas)}
+Una función anónima es una función sin nombre, útil cuando necesitas una función pequeña y desechable, por ejemplo para pasarla a \texttt{map} o \texttt{filter}. En Micelio se crean con la palabra \texttt{funcion} sin nombre. Es equivalente a las \texttt{lambda} de Python o las funciones flecha de JavaScript.
+
+\begin{lstlisting}
+var cuadrados = map(funcion (x) { regresa x * x }, [1,2,3,4])  # [1,4,9,16]
+\end{lstlisting}
+
+\subsubsection*{Funciones de orden superior}
+Son funciones que operan sobre otras funciones, ya sea recibiéndolas como argumentos o devolviéndolas. Las más comunes son \texttt{map}, \texttt{filter} y \texttt{reduce}. En Micelio, estas funciones están disponibles en la biblioteca estándar (módulo \texttt{Lista} o como funciones globales). Su sintaxis es similar a la de Python: \texttt{map(funcion, iterable)}.
+
+\begin{itemize}
+    \item \textbf{map}: Aplica una función a cada elemento de un iterable y devuelve una lista con los resultados.
+\begin{lstlisting}
+var numeros = [1,2,3,4,5]
+var cuadrados = map(funcion (x) { regresa x * x }, numeros)  # [1,4,9,16,25]
+\end{lstlisting}
+
+    \item \textbf{filter}: Filtra los elementos de un iterable según una condición (función que devuelve booleano).
+\begin{lstlisting}
+var pares = filter(funcion (x) { regresa x \% 2 == 0 }, numeros)  # [2,4]
+\end{lstlisting}
+
+    \item \textbf{reduce}: Acumula los elementos de un iterable aplicando una función que combina dos elementos. Requiere un valor inicial.
+\begin{lstlisting}
+var suma = reduce(funcion (acc, x) { regresa acc + x }, numeros, 0)  # 15
+\end{lstlisting}
+\end{itemize}
+
+\subsubsection*{Operador pipe (\texttt{|>})}
+El operador pipe permite encadenar funciones de forma legible, pasando el resultado de la izquierda como argumento a la función de la derecha. Es muy útil para secuencias de transformaciones.
+
+\begin{lstlisting}
+var resultado = [1,2,3,4,5]
+                |> map(funcion (x) { x * 2 })
+                |> filter(funcion (x) { x > 5 })
+                |> reduce(funcion (a,b) { a + b }, 0)
+# resultado: (2,4,6,8,10) -> filter -> (6,8,10) -> reduce -> 24
+\end{lstlisting}
+
+\subsubsection*{Inmutabilidad}
+En programación funcional, se evita modificar los datos existentes. En Micelio, puedes declarar constantes con \texttt{const} para garantizar que no cambien. Aunque también existen variables mutables con \texttt{var}, se recomienda usar \texttt{const} siempre que sea posible.
+
+\begin{lstlisting}
+const PI = 3.1416
+var radio = 5   # mutable, pero podria ser const si no cambia
+radio = 6       # permitido
+PI = 3.14       # error
+\end{lstlisting}
+
+\subsubsection*{Recursión}
+La recursión es una técnica donde una función se llama a sí misma para resolver un problema. Es fundamental en el paradigma funcional, ya que evita bucles imperativos. Micelio soporta recursión (siempre que no se desborde la pila).
+
+\begin{lstlisting}
+funcion factorial(n) {
+    si (n <= 1) {
+        regresa 1
+    } sino {
+        regresa n * factorial(n - 1)
+    }
+}
+factorial(5)  # 120
+\end{lstlisting}
+
+\subsubsection*{Parámetros variables: *args y **kwargs}
+A veces necesitas funciones que acepten un número variable de argumentos. En Micelio, al igual que en Python, puedes usar \texttt{*args} para recibir una lista de argumentos posicionales y \texttt{**kwargs} para recibir un diccionario de argumentos con nombre. Esto es muy útil para crear funciones flexibles.
+
+\begin{itemize}
+    \item \texttt{*args}: recoge los argumentos adicionales en una lista.
+\begin{lstlisting}
+funcion suma_varios(*numeros) {
+    var total = 0
+    para n en numeros {
+        total = total + n
+    }
+    regresa total
+}
+suma_varios(1,2,3,4)  # 10
+\end{lstlisting}
+
+    \item \texttt{**kwargs}: recoge los argumentos con nombre en un diccionario.
+\begin{lstlisting}
+funcion mostrar_opciones(**opciones) {
+    para clave en dict.claves(opciones) {
+        imp clave + ": " + opciones[clave]
+    }
+}
+mostrar_opciones(color="rojo", tamano=10, activo=verdadero)
+# color: rojo
+# tamano: 10
+# activo: verdadero
+\end{lstlisting}
+
+    \item Puedes combinar ambos, junto con parámetros normales.
+\begin{lstlisting}
+funcion ejemplo(normal, *args, **kwargs) {
+    imp "normal: " + normal
+    imp "args: " + args
+    imp "kwargs: " + kwargs
+}
+ejemplo(5, 1,2,3, x=10, y=20)
+# normal: 5
+# args: [1,2,3]
+# kwargs: {"x":10, "y":20}
+\end{lstlisting}
+\end{itemize}
+
+\subsubsection*{Resumen de características funcionales en Micelio}
+
+\begin{itemize}
+    \item Funciones como valores (se pueden asignar, pasar y retornar).
+    \item Funciones anónimas (lambdas) con \texttt{funcion}.
+    \item Funciones de orden superior: \texttt{map}, \texttt{filter}, \texttt{reduce} (estilo Python).
+    \item Operador pipe \texttt{|>} para composición.
+    \item Inmutabilidad con \texttt{const}.
+    \item Recursión permitida.
+    \item Parámetros variables \texttt{*args} y \texttt{**kwargs} para flexibilidad.
+\end{itemize}
+
+Estas herramientas permiten escribir código más expresivo y cercano a las matemáticas, facilitando la implementación de algoritmos de Deep Learning y otras tareas complejas.
+\section{Operadores}
+
+\subsection{Aritméticos}
+\texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{\%}, \texttt{**}
+
+\subsection{Comparación}
+\texttt{==}, \texttt{!=}, \texttt{<}, \texttt{<=}, \texttt{>}, \texttt{>=}
+
+\subsection{Lógicos}
+\texttt{y}, \texttt{o}, \texttt{no}
+
+\subsection{Incremento/decremento}
+\texttt{++var}, \texttt{var++}, \texttt{--var}, \texttt{var--} (solo en variables mutables)
+
+\subsection{Pertenencia}
+\texttt{in} para listas, conjuntos y diccionarios.
+
+\subsection{Matriciales}
+Sobrecarga: \texttt{+}, \texttt{-} (elemento a elemento), \texttt{*} (multiplicación matricial), \texttt{.*} (elemento a elemento), \texttt{**} (potencia matricial).
+
+\section{Módulos e Importación}
+
+\begin{lstlisting}
+importar "ruta/archivo.mice"                # inclusión directa
+importar "ruta/archivo.mice" como modulo    # con espacio de nombres
+\end{lstlisting}
+Luego se accede con \texttt{modulo.funcion()}.
+
+\section{Biblioteca Estándar (Implementada desde Cero)}
+
+La biblioteca estándar de Micelio es un conjunto de módulos que proporcionan funcionalidades esenciales para el desarrollo de aplicaciones de Deep Learning, manejo de datos, operaciones matemáticas y gráficos. Todas las funciones están implementadas desde cero, sin utilizar bibliotecas externas como \texttt{math}, \texttt{numpy} o \texttt{matplotlib}. Esto garantiza la autonomía del lenguaje y permite comprender los algoritmos subyacentes. La implementación se realiza en Python (o en el propio Micelio) y se integra en el entorno global mediante el visitor.
+
+A continuación se detalla cada módulo, sus funciones, el alcance y ejemplos de uso.
+
+\subsection{Módulo Math}
+
+Este módulo contiene funciones matemáticas elementales y avanzadas, implementadas mediante series de Taylor, aproximaciones numéricas o algoritmos clásicos. Todas las funciones trabajan con números (enteros o flotantes) y devuelven un número.
+
+\subsubsection*{Funciones}
+\begin{itemize}
+    \item \texttt{seno(x)}: Calcula el seno de \texttt{x} (en radianes) usando la serie de Taylor: 
+    \[ \sin(x) = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!} + \cdots \]
+    \item \texttt{coseno(x)}: Calcula el coseno de \texttt{x} mediante serie de Taylor:
+    \[ \cos(x) = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \cdots \]
+    \item \texttt{tangente(x)}: Calcula la tangente como \texttt{seno(x)/coseno(x)}.
+    \item \texttt{arcoseno(x)}: Calcula el arco seno mediante serie de Taylor o método de Newton.
+    \item \texttt{arcocoseno(x)}: Similar al anterior.
+    \item \texttt{arcotangente(x)}: Serie de Taylor para \arctan(x).
+    \item \texttt{raiz(x)}: Raíz cuadrada usando el método de Newton (iteraciones hasta convergencia).
+    \item \texttt{log(x)}: Logaritmo natural mediante serie de Taylor o algoritmo de la media aritmético-geométrica.
+    \item \texttt{log10(x)}: Logaritmo base 10, usando \texttt{log(x)/log(10)}.
+    \item \texttt{exp(x)}: Exponencial mediante serie de Taylor: 
+    \[ e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots \]
+    \item \texttt{potencia(x, y)}: Calcula \texttt{x} elevado a \texttt{y}. Para exponentes enteros usa multiplicación repetida; para reales usa \texttt{exp(y * log(x))}.
+    \item \texttt{abs(x)}: Valor absoluto.
+    \item \texttt{piso(x)}: Parte entera (redondeo hacia abajo).
+    \item \texttt{techo(x)}: Redondeo hacia arriba.
+    \item \texttt{redondear(x)}: Redondeo al entero más cercano.
+\end{itemize}
+
+\subsubsection*{Ejemplo de uso}
+\begin{lstlisting}
+importar "math.mice" como math
+var angulo = 3.1416 / 2  # 90 grados
+math.seno(angulo)        # ~1.0
+math.raiz(25)            # 5.0
+\end{lstlisting}
+
+\subsection{Módulo Matriz}
+
+Proporciona el tipo \texttt{Matriz} y operaciones para álgebra lineal, fundamentales en Deep Learning. Las matrices se representan internamente como listas de listas de números. Las operaciones se implementan con algoritmos estándar (eliminación gaussiana, multiplicación de matrices, etc.).
+
+\subsubsection*{Funciones}
+\begin{itemize}
+    \item \texttt{ceros(filas, columnas)}: Crea una matriz de ceros de dimensiones \texttt{filas} x \texttt{columnas}.
+    \item \texttt{unos(filas, columnas)}: Matriz de unos.
+    \item \texttt{identidad(n)}: Matriz identidad de tamaño \texttt{n} x \texttt{n}.
+    \item \texttt{aleatoria(filas, columnas)}: Matriz con valores aleatorios entre 0 y 1 (usando generador propio).
+    \item \texttt{transpuesta(m)}: Devuelve la transpuesta de la matriz \texttt{m}.
+    \item \texttt{inversa(m)}: Calcula la inversa de una matriz cuadrada mediante eliminación Gauss-Jordan. Lanza error si no es invertible.
+    \item \texttt{determinante(m)}: Calcula el determinante usando eliminación gaussiana (producto de pivotes).
+    \item \texttt{redimensionar(m, filas, columnas)}: Cambia la forma de la matriz (debe tener el mismo número total de elementos).
+    \item \texttt{aplicar(m, funcion)}: Aplica una función a cada elemento de la matriz (útil para operaciones elemento a elemento).
+    \item \texttt{map(f, m)}: Alias de \texttt{aplicar}, permite estilo funcional.
+    \item \texttt{multiplicar(A, B)}: Multiplicación matricial (producto punto). También sobrecargado con operador \texttt{*}.
+    \item \texttt{suma(A, B)}: Suma elemento a elemento (operador \texttt{+}).
+    \item \texttt{resta(A, B)}: Resta elemento a elemento (operador \texttt{-}).
+    \item \texttt{producto\_elemento(A, B)}: Multiplicación elemento a elemento (operador \texttt{.*}).
+    \item \texttt{potencia\_matriz(m, n)}: Potencia matricial (solo para matrices cuadradas, usando multiplicación repetida o exponenciación binaria).
+\end{itemize}
+
+\subsubsection*{Ejemplo de uso}
+\begin{lstlisting}
+importar "matriz.mice" como mat
+var A = [[1,2],[3,4]]
+var B = [[5,6],[7,8]]
+var C = A * B        # multiplicacion matricial
+var D = A .* B       # multiplicacion elemento a elemento
+var invA = mat.inversa(A)
+imp mat.determinante(A)
+\end{lstlisting}
+
+\subsection{Módulo Grafico}
+
+Permite generar gráficos básicos (líneas, dispersión, histogramas) y guardarlos en formato PNG. La implementación dibuja píxel a píxel o genera archivos PPM que luego se convierten a PNG (o se usa una biblioteca ligera como PIL, pero en el contexto de "desde cero" se puede implementar un escritor de imágenes simple).
+
+\subsubsection*{Funciones}
+\begin{itemize}
+    \item \texttt{lineas(x, y)}: Dibuja un gráfico de líneas a partir de dos listas de coordenadas \texttt{x} e \texttt{y} (deben tener la misma longitud). Los puntos se conectan con segmentos.
+    \item \texttt{dispersion(x, y)}: Gráfico de dispersión (puntos sin líneas).
+    \item \texttt{histograma(datos, bins)}: Calcula y dibuja un histograma de los datos, divididos en \texttt{bins} intervalos.
+    \item \texttt{mostrar()}: Abre una ventana con el gráfico actual (depende del sistema operativo; en implementación inicial puede guardar y abrir el archivo).
+    \item \texttt{guardar(archivo)}: Guarda el gráfico actual en un archivo (por ejemplo, \texttt{grafico.png}).
+    \item \texttt{titulo(texto)}: Asigna un título al gráfico.
+    \item \texttt{etiquetas(xlabel, ylabel)}: Etiquetas para los ejes.
+\end{itemize}
+
+La implementación incluye un sistema de coordenadas que mapea los valores de los datos a píxeles en una imagen de tamaño fijo. Para la generación de PNG, se puede usar una biblioteca externa ligera (como \texttt{pypng}) o generar un archivo PPM y luego convertirlo con una herramienta externa. En el espíritu de "desde cero", se podría implementar un escritor de PPM (formato de texto simple) y luego usar un convertidor.
+
+\subsubsection*{Ejemplo de uso}
+\begin{lstlisting}
+importar "grafico.mice" como plot
+var x = [0,1,2,3,4,5]
+var y = [0,1,4,9,16,25]
+plot.lineas(x, y)
+plot.titulo("Cuadrados")
+plot.etiquetas("x", "y")
+plot.guardar("cuadrados.png")
+\end{lstlisting}
+
+\subsection{Módulo Archivo}
+
+Proporciona operaciones de entrada/salida para archivos de texto y CSV. Se implementa utilizando las funciones nativas de Python para manejo de archivos (ya que el intérprete está en Python), pero encapsuladas para que el usuario de Micelio no tenga acceso directo a ellas.
+
+\subsubsection*{Funciones}
+\begin{itemize}
+    \item \texttt{leer(archivo)}: Lee todo el contenido de un archivo de texto y lo devuelve como cadena.
+    \item \texttt{escribir(archivo, contenido)}: Escribe una cadena en un archivo (sobrescribe si existe).
+    \item \texttt{leer\_csv(archivo)}: Lee un archivo CSV y devuelve una lista de listas, donde cada sublista representa una fila y los valores son cadenas (el usuario debe convertir a número si es necesario).
+    \item \texttt{escribir\_csv(archivo, datos)}: Escribe una lista de listas en formato CSV (con comas como separadores y comillas si es necesario).
+    \item \texttt{anexar(archivo, contenido)}: Añade contenido al final de un archivo.
+\end{itemize}
+
+\subsubsection*{Ejemplo de uso}
+\begin{lstlisting}
+importar "archivo.mice" como file
+var datos = file.leer_csv("datos.csv")
+para fila en datos {
+    imp fila[0]  # primera columna
+}
+var nuevo = [["nombre", "edad"], ["Ana", 30], ["Luis", 25]]
+file.escribir_csv("salida.csv", nuevo)
+\end{lstlisting}
+
+\subsection{Módulo ML (Machine Learning)}
+
+Este es el módulo central para Deep Learning. Implementa algoritmos de aprendizaje supervisado y no supervisado desde cero, incluyendo regresión lineal, logística, perceptrón multicapa y k-means. Todos los algoritmos se basan en descenso de gradiente y retropropagación implementados manualmente.
+
+\subsubsection*{Funciones}
+\begin{itemize}
+    \item \texttt{regresion\_lineal(X, y)}: Entrena un modelo de regresión lineal usando la ecuación normal o gradiente descendente. \texttt{X} es una matriz de características (cada fila una muestra, cada columna una característica), \texttt{y} es un vector de valores objetivo. Devuelve un modelo (estructura con coeficientes).
+    \item \texttt{regresion\_logistica(X, y)}: Entrena un modelo de regresión logística para clasificación binaria. Usa función sigmoide y gradiente descendente. Devuelve modelo.
+    \item \texttt{perceptron\_multicapa(capas, activacion)}: Crea una red neuronal multicapa. \texttt{capas} es una lista con el número de neuronas en cada capa (por ejemplo, [4, 10, 3] para 4 entradas, 10 ocultas, 3 salidas). \texttt{activacion} puede ser \texttt{"relu"}, \texttt{"sigmoid"}, \texttt{"tanh"}. Devuelve un modelo (estructura con pesos inicializados aleatoriamente).
+    \item \texttt{entrenar(modelo, X, y, epocas, tasa)}: Entrena el modelo con los datos \texttt{X} e \texttt{y} durante \texttt{epocas} iteraciones, usando la tasa de aprendizaje \texttt{tasa}. Implementa retropropagación y actualización de pesos. Para clasificación multicapa, se usa softmax en la última capa y cross-entropy.
+    \item \texttt{predecir(modelo, X)}: Devuelve las predicciones del modelo para los datos \texttt{X}. Para clasificación, devuelve la clase con mayor probabilidad.
+    \item \texttt{predecir\_proba(modelo, X)}: Devuelve las probabilidades (útil para regresión logística o softmax).
+    \item \texttt{kmeans(datos, k)}: Aplica el algoritmo k-means para agrupar los datos en \texttt{k} clusters. Devuelve los centroides y las etiquetas de cada punto.
+    \item \texttt{historial\_perdida(modelo)}: Devuelve la lista de valores de pérdida durante el entrenamiento (para graficar).
+\end{itemize}
+
+La implementación incluye:
+\begin{itemize}
+    \item Funciones de activación: sigmoide, relu, tanh, softmax (implementadas con operaciones matemáticas básicas).
+    \item Inicialización de pesos (aleatoria pequeña).
+    \item Gradiente descendente por lotes (batch) o mini-batch (según se configure).
+    \item Cálculo de la pérdida (error cuadrático medio para regresión, entropía cruzada para clasificación).
+\end{itemize}
+
+\subsubsection*{Ejemplo de uso}
+\begin{lstlisting}
+importar "ml.mice" como ml
+var X = [[0,0], [0,1], [1,0], [1,1]]
+var y = [0, 1, 1, 0]  # XOR
+var modelo = ml.perceptron_multicapa([2, 4, 1], "relu")
+ml.entrenar(modelo, X, y, 1000, 0.1)
+var pred = ml.predecir(modelo, [[0,0], [1,1]])
+imp pred  # [0,0]? (debería aproximarse a 0 y 0)
+\end{lstlisting}
+
+\subsection{Módulo Set}
+
+Operaciones con conjuntos (estructura de datos que almacena elementos únicos sin orden). Los conjuntos se crean con \texttt{set()}. Las funciones de este módulo permiten operaciones típicas de teoría de conjuntos.
+
+\subsubsection*{Funciones}
+\begin{itemize}
+    \item \texttt{union(s1, s2)}: Devuelve un nuevo conjunto con los elementos de \texttt{s1} y \texttt{s2}.
+    \item \texttt{interseccion(s1, s2)}: Elementos comunes a ambos conjuntos.
+    \item \texttt{diferencia(s1, s2)}: Elementos de \texttt{s1} que no están en \texttt{s2}.
+    \item \texttt{subconjunto(s1, s2)}: Devuelve \texttt{verdadero} si todos los elementos de \texttt{s1} están en \texttt{s2}.
+    \item \texttt{agregar(s, elem)}: Añade un elemento al conjunto (modifica el original si es mutable).
+    \item \texttt{quitar(s, elem)}: Elimina un elemento.
+    \item \texttt{contiene(s, elem)}: Verifica si un elemento pertenece al conjunto (operador \texttt{in}).
+\end{itemize}
+
+\subsubsection*{Ejemplo de uso}
+\begin{lstlisting}
+var s1 = set(1,2,3)
+var s2 = set(3,4,5)
+var u = set.union(s1, s2)  # {1,2,3,4,5}
+imp u
+\end{lstlisting}
+
+\subsection{Módulo Dict}
+
+Proporciona utilidades para trabajar con diccionarios (mapas clave-valor). Los diccionarios se crean con \texttt{dict()} o llaves.
+
+\subsubsection*{Funciones}
+\begin{itemize}
+    \item \texttt{claves(d)}: Devuelve una lista con las claves del diccionario.
+    \item \texttt{valores(d)}: Lista de valores.
+    \item \texttt{items(d)}: Lista de pares (clave, valor) como tuplas.
+    \item \texttt{merge(d1, d2)}: Combina dos diccionarios (si hay claves repetidas, prevalece el valor de \texttt{d2}).
+    \item \texttt{obtener(d, clave, defecto)}: Devuelve el valor asociado a \texttt{clave} o \texttt{defecto} si no existe.
+    \item \texttt{map\_valores(d, funcion)}: Aplica una función a cada valor y devuelve un nuevo diccionario con las mismas claves.
+\end{itemize}
+
+\subsubsection*{Ejemplo de uso}
+\begin{lstlisting}
+var d = dict("a":1, "b":2)
+var claves = dict.claves(d)  # ["a","b"]
+var d2 = dict.merge(d, {"b":3, "c":4})  # {"a":1,"b":3,"c":4}
+\end{lstlisting}
+
+\subsection*{Alcance de la Biblioteca Estándar}
+
+La biblioteca estándar de Micelio cubre todos los requisitos del proyecto:
+\begin{itemize}
+    \item \textbf{Operaciones matemáticas}: Módulo Math con funciones trigonométricas, raíces, logaritmos, etc.
+    \item \textbf{Operaciones con matrices}: Módulo Matriz con suma, resta, multiplicación, inversa, transpuesta, determinante.
+    \item \textbf{Estructuras de datos}: Listas, conjuntos, diccionarios, matrices.
+    \item \textbf{Gráficos}: Módulo Gráfico para visualización de datos.
+    \item \textbf{Manejo de archivos}: Lectura/escritura de texto y CSV.
+    \item \textbf{Machine Learning}: Regresión lineal, logística, perceptrón multicapa, clustering k-means.
+    \item \textbf{Enfoque funcional}: Funciones como \texttt{map}, \texttt{filter}, \texttt{reduce} en listas y matrices, operador pipe, etc.
+\end{itemize}
+
+Todas las implementaciones son autónomas y no dependen de bibliotecas externas, lo que garantiza que el lenguaje pueda ejecutarse en cualquier entorno con Python estándar. Además, al estar implementadas en el propio Micelio (o en Python pero accesibles desde Micelio), los usuarios pueden inspeccionar y modificar el código si lo desean.
+
+
+
+\section{Gramática ANTLR (Completa)}
+
+A continuación se presenta la gramática completa del lenguaje en notación ANTLR. Esta gramática es el punto de partida para generar el lexer y parser.
+
+\begin{lstlisting}[language=ANTLR, basicstyle=\ttfamily\small]
+grammar Micelio;
+
+@header {
+package micelio.parser;
+}
+
+program : (statement | NEWLINE)* EOF;
+
+statement : simple_stmt | compound_stmt;
+
+simple_stmt : (assignment | expr | return_stmt | break_stmt | continue_stmt | import_stmt | leer_stmt | imp_stmt) (';'? | NEWLINE);
+
+compound_stmt : if_stmt | switch_stmt | while_stmt | for_stmt | func_def | block ;
+
+assignment : (VAR | CONST) ID '=' expr ;
+return_stmt : REGRESA expr? ;
+break_stmt : ROMPER ;
+continue_stmt : CONTINUAR ;
+import_stmt : IMPORTAR STRING (COMO ID)? ;
+leer_stmt : LEER ID ;
+imp_stmt : IMP expr ;
+
+if_stmt : SI '(' expr ')' block (SINO block)? ;
+switch_stmt : SEGUN '(' expr ')' '{' case_block+ '}' ;
+case_block : CASO expr ':' statement* (ROMPER)? | DEFECTO ':' statement* ;
+while_stmt : MIENTRAS '(' expr ')' block ;
+for_stmt : PARA ID '=' expr HASTA expr (INC expr)? block ;
+
+func_def : FUNCION ID '(' param_list? ')' block ;
+param_list : ID (',' ID)* ;
+
+block : '{' statement* '}' ;
+
+expr : literal                                                         #literalExpr
+     | ID                                                             #idExpr
+     | '(' expr ')'                                                   #parenExpr
+     | '[' (expr (',' expr)*)? ']'                                    #listExpr
+     | SET '(' expr (',' expr)* ')'                                   #setExpr
+     | DICT '(' keyValue (',' keyValue)* ')'                          #dictExpr
+     | '{' keyValue (',' keyValue)* '}'                               #mapLiteral
+     | expr '[' expr ']'                                              #indexExpr
+     | expr '(' exprList? ')'                                         #callExpr
+     | op=('++' | '--') expr                                          #preIncDec
+     | expr op=('++' | '--')                                          #postIncDec
+     | '-' expr                                                       #unaryMinus
+     | NO expr                                                        #notExpr
+     | expr op=(MUL | DIV | MOD) expr                                 #mulDivMod
+     | expr op=(PLUS | MINUS) expr                                    #addSub
+     | expr op=(POW | DOTMUL) expr                                    #powDotMul
+     | expr op=(EQ | NE | LT | LE | GT | GE) expr                     #comparison
+     | expr Y expr                                                    #andExpr
+     | expr O expr                                                    #orExpr
+     | expr IN expr                                                   #inExpr
+     | expr PIPE expr                                                 #pipeExpr
+     | expr '.' ID                                                    #memberAccess
+     ;
+
+keyValue : expr ':' expr ;
+exprList : expr (',' expr)* ;
+
+literal : NUMBER | STRING | BOOL | NULL ;
+
+// Palabras reservadas
+VAR : 'var' ;
+CONST : 'const' ;
+FUNCION : 'funcion' ;
+REGRESA : 'regresa' ;
+SI : 'si' ;
+SINO : 'sino' ;
+SEGUN : 'segun' ;
+CASO : 'caso' ;
+DEFECTO : 'defecto' ;
+PARA : 'para' ;
+HASTA : 'hasta' ;
+INC : 'inc' ;
+MIENTRAS : 'mientras' ;
+ROMPER : 'romper' ;
+CONTINUAR : 'continuar' ;
+LEER : 'leer' ;
+IMP : 'imp' ;
+IMPORTAR : 'importar' ;
+COMO : 'como' ;
+SET : 'set' ;
+DICT : 'dict' ;
+BOOL : 'verdadero' | 'falso' ;
+NULL : 'nulo' ;
+Y : 'y' ;
+O : 'o' ;
+NO : 'no' ;
+IN : 'in' ;
+PIPE : '|>' ;
+DOTMUL : '.*' ;
+
+// Operadores
+PLUS : '+' ;
+MINUS : '-' ;
+MUL : '*' ;
+DIV : '/' ;
+MOD : '%' ;
+POW : '**' ;
+EQ : '==' ;
+NE : '!=' ;
+LT : '<' ;
+LE : '<=' ;
+GT : '>' ;
+GE : '>=' ;
+
+// Tokens auxiliares
+NUMBER : [0-9]+ ('.' [0-9]+)? ;
+STRING : '"' ( '\\' . | ~["\\] )* '"' ;
+ID : [a-zA-Z_][a-zA-Z0-9_]* ;
+COMMENT : '#' ~[\r\n]* -> skip ;
+NEWLINE : '\r'? '\n' ;
+WS : [ \t]+ -> skip ;
+\end{lstlisting}
+
+\section{Implementación con Patrón Visitor}
+
+La evaluación se realiza mediante un visitor que recorre el AST y ejecuta las acciones. Se define una clase \texttt{EvalVisitor} que hereda de \texttt{MicelioBaseVisitor}. Cada nodo del AST se visita y se devuelve un objeto que representa el valor (envuelto en clases Python como \texttt{Numero}, \texttt{Lista}, \texttt{Funcion}, etc.). El entorno mantiene una pila de ámbitos con variables y funciones.
+
+\section{Ejemplo de Código en Micelio}
+
+\begin{lstlisting}
+# Importar modulos
+importar "math.mice" como math
+importar "matriz.mice" como mat
+
+# Definir funcion recursiva
+funcion fibonacci(n) {
+    si (n <= 1) { regresa n }
+    sino { regresa fibonacci(n-1) + fibonacci(n-2) }
+}
+
+# Usar lambda y map
+var lista = [1,2,3,4,5]
+var cuadrados = lista.map(funcion (x) { x * x })
+imp cuadrados
+
+# Operador pipe
+var sumaPares = lista
+                |> filter(funcion (x) { x \% 2 == 0 })
+                |> reduce(funcion (a,b) { a + b }, 0)
+imp sumaPares
+
+# Matrices
+var A = [[1,2],[3,4]]
+var B = [[5,6],[7,8]]
+var C = A * B   # multiplicacion matricial
+imp C
+\end{lstlisting}
+
+
+\end{document}
