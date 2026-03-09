@@ -1,9 +1,0 @@
-var frase = "uno,dos,tres"
-var partes = frase.separar(",")
-imp partes
-
-var texto = "hola mundo micelio"
-imp texto.separar()
-
-# Alias por compatibilidad
-imp frase.split(",")

@@ -38,6 +38,35 @@ Con soporte de scopes anidados (`parent`).
 - Conversiones: `aNumero`, `aTexto`, `aBooleano`
 - Bases numericas: `aBinario`, `aOctal`, `aHexadecimal`, `aBase`, `desdeBase`, etc.
 
+## Modulo grafico (desde cero)
+
+La logica publica de `grafico` ahora vive en `MICELIO/modulos_std/grafico.mice`.
+El runtime solo aporta primitivas internas (prefijo `__grafico_`) para:
+
+- crear/reiniciar lienzo
+- dibujar pixeles/ejes
+- guardar PPM
+
+De esta forma, la API que importa el usuario es modulo estandar (`importar "grafico.mice"`) y no funciones globales del runtime.
+
+- Implementa renderizado pixel a pixel en memoria.
+- Exporta imagenes en formato `PPM` (`P3`) con `guardar(ruta)`.
+- Si se pasa una ruta `.png`, se guarda como `.ppm` equivalente para mantener implementacion 100% propia.
+
+Funciones disponibles:
+
+- `lineas(x, y)`
+- `dispersion(x, y)`
+- `histograma(datos, bins)`
+- `titulo(texto)`
+- `etiquetas(xlabel, ylabel)`
+- `guardar(ruta)`
+- `mostrar()`
+
+Archivo de referencia del modulo estandar:
+
+- `MICELIO/modulos_std/grafico.mice`
+
 ## Azucar sintactico soportado
 
 Desde `main.py` se preprocesan patrones antes de parsear:

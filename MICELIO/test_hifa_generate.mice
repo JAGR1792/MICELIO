@@ -1,0 +1,4 @@
+importar "hifa.mice" como hifa
+
+var ok = hifa.generar_demo("hifa_demo_test")
+imp "Hifa demo generado: " + aTexto(ok)

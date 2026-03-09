@@ -99,6 +99,7 @@ class EvalVisitor(MicelioVisitor):
         builtins["reduce"] = _reduce
         builtins["__asignar_multi"] = _asignar_multi
         builtins["__leer_multi"] = _leer_multi
+        builtins["__script_dir"] = lambda: self.current_dir
 
         if "lista" in self.modules:
             self.modules["lista"]["map"] = _map

@@ -1,0 +1,14 @@
+# Placeholder del modulo Set
+
+funcion _pendiente(nombre) {
+    imp "[set] Funcion no implementada: " + nombre
+    regresa nulo
+}
+
+funcion union(a, b) { regresa _pendiente("union") }
+funcion interseccion(a, b) { regresa _pendiente("interseccion") }
+funcion diferencia(a, b) { regresa _pendiente("diferencia") }
+funcion subconjunto(a, b) { regresa _pendiente("subconjunto") }
+funcion agregar(s, elem) { regresa _pendiente("agregar") }
+funcion quitar(s, elem) { regresa _pendiente("quitar") }
+funcion contiene(s, elem) { regresa _pendiente("contiene") }

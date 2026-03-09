@@ -1,0 +1,122 @@
+# Hifa: microframework web inspirado en Flask, implementado sin libs externas de Python
+
+funcion crear(nombre) {
+    regresa __hifa_crear(nombre)
+}
+
+funcion _resolver_ruta(ruta) {
+    var txt = aTexto(ruta)
+    si (longitud(txt) > 0 y txt[0] == "/") {
+        regresa txt
+    }
+    regresa __script_dir() + "/" + txt
+}
+
+funcion estaticos(app, carpeta) {
+    regresa __hifa_estaticos(app, _resolver_ruta(carpeta))
+}
+
+funcion plantillas(app, carpeta) {
+    regresa __hifa_plantillas(app, _resolver_ruta(carpeta))
+}
+
+funcion ruta_texto(app, metodo, ruta, contenido, content_type) {
+    regresa __hifa_ruta_texto(app, metodo, ruta, contenido, content_type, 200)
+}
+
+funcion ruta_texto_estado(app, metodo, ruta, contenido, content_type, estado) {
+    regresa __hifa_ruta_texto(app, metodo, ruta, contenido, content_type, estado)
+}
+
+funcion ruta_json(app, metodo, ruta, datos) {
+    regresa __hifa_ruta_json(app, metodo, ruta, datos, 200)
+}
+
+funcion ruta_json_estado(app, metodo, ruta, datos, estado) {
+    regresa __hifa_ruta_json(app, metodo, ruta, datos, estado)
+}
+
+funcion ruta_template(app, metodo, ruta, archivo, contexto) {
+    regresa __hifa_ruta_template(app, metodo, ruta, archivo, contexto, 200)
+}
+
+funcion ruta_template_estado(app, metodo, ruta, archivo, contexto, estado) {
+    regresa __hifa_ruta_template(app, metodo, ruta, archivo, contexto, estado)
+}
+
+funcion ruta_archivo(app, metodo, ruta, archivo_local, content_type) {
+    regresa __hifa_ruta_archivo(app, metodo, ruta, _resolver_ruta(archivo_local), content_type, 200)
+}
+
+funcion ruta_archivo_estado(app, metodo, ruta, archivo_local, content_type, estado) {
+    regresa __hifa_ruta_archivo(app, metodo, ruta, _resolver_ruta(archivo_local), content_type, estado)
+}
+
+funcion redireccion(app, metodo, ruta, destino) {
+    regresa __hifa_ruta_redirect(app, metodo, ruta, destino, 302)
+}
+
+funcion redireccion_estado(app, metodo, ruta, destino, estado) {
+    regresa __hifa_ruta_redirect(app, metodo, ruta, destino, estado)
+}
+
+funcion not_found_texto(app, contenido) {
+    regresa __hifa_not_found_text(app, contenido, "text/html; charset=utf-8")
+}
+
+funcion not_found_json(app, datos) {
+    regresa __hifa_not_found_json(app, datos)
+}
+
+# Helpers estilo Flask
+funcion get_texto(app, ruta, contenido) {
+    regresa ruta_texto(app, "GET", ruta, contenido, "text/html; charset=utf-8")
+}
+
+funcion post_texto(app, ruta, contenido) {
+    regresa ruta_texto(app, "POST", ruta, contenido, "text/html; charset=utf-8")
+}
+
+funcion put_texto(app, ruta, contenido) {
+    regresa ruta_texto(app, "PUT", ruta, contenido, "text/html; charset=utf-8")
+}
+
+funcion delete_texto(app, ruta, contenido) {
+    regresa ruta_texto(app, "DELETE", ruta, contenido, "text/html; charset=utf-8")
+}
+
+funcion get_json(app, ruta, datos) {
+    regresa ruta_json(app, "GET", ruta, datos)
+}
+
+funcion get_template(app, ruta, archivo, contexto) {
+    regresa ruta_template(app, "GET", ruta, archivo, contexto)
+}
+
+funcion post_json(app, ruta, datos) {
+    regresa ruta_json(app, "POST", ruta, datos)
+}
+
+funcion put_json(app, ruta, datos) {
+    regresa ruta_json(app, "PUT", ruta, datos)
+}
+
+funcion delete_json(app, ruta, datos) {
+    regresa ruta_json(app, "DELETE", ruta, datos)
+}
+
+funcion rutas(app) {
+    regresa __hifa_listar_rutas(app)
+}
+
+funcion iniciar(app, host, puerto) {
+    regresa __hifa_iniciar(app, host, puerto, falso)
+}
+
+funcion iniciar_con_navegador(app, host, puerto) {
+    regresa __hifa_iniciar(app, host, puerto, verdadero)
+}
+
+funcion generar_demo(ruta) {
+    regresa __hifa_generar_demo(ruta)
+}

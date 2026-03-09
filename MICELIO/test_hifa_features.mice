@@ -1,0 +1,8 @@
+importar "hifa.mice" como hifa
+
+var app = hifa.crear("features")
+hifa.get_json(app, "/api/ping", {"ok": verdadero, "name": "hifa"})
+hifa.redireccion(app, "GET", "/", "/api/ping")
+hifa.not_found_json(app, {"ok": falso, "error": "no existe"})
+
+imp hifa.rutas(app)

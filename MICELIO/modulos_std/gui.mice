@@ -1,0 +1,326 @@
+# Modulo GUI para Micelio (mini framework sobre primitivas __gui_* del runtime)
+
+const _GUI_TITULO = "Micelio GUI"
+
+funcion alerta(mensaje) {
+    __gui_alert(mensaje, _GUI_TITULO)
+    regresa nulo
+}
+
+funcion confirmar(mensaje) {
+    regresa __gui_confirm(mensaje, _GUI_TITULO)
+}
+
+funcion pedir_texto(prompt, valor_defecto) {
+    regresa __gui_input(prompt, valor_defecto, _GUI_TITULO)
+}
+
+funcion abrir_archivo() {
+    regresa __gui_open_file("Abrir archivo")
+}
+
+funcion guardar_archivo_como(nombre_sugerido) {
+    regresa __gui_save_file("Guardar archivo", nombre_sugerido)
+}
+
+funcion mostrar_imagen(ruta, titulo) {
+    regresa __gui_show_image(ruta, titulo)
+}
+
+funcion estilo(nombre) {
+    regresa __gui_set_theme(nombre)
+}
+
+funcion estilo_actual() {
+    regresa __gui_get_theme()
+}
+
+funcion estilos_disponibles() {
+    regresa __gui_list_themes()
+}
+
+funcion mensaje_exito(titulo, mensaje) {
+    alerta("[OK] " + aTexto(titulo) + "\n" + aTexto(mensaje))
+    regresa nulo
+}
+
+funcion mensaje_error(titulo, mensaje) {
+    alerta("[ERROR] " + aTexto(titulo) + "\n" + aTexto(mensaje))
+    regresa nulo
+}
+
+funcion mensaje_info(titulo, mensaje) {
+    alerta("[INFO] " + aTexto(titulo) + "\n" + aTexto(mensaje))
+    regresa nulo
+}
+
+funcion calculadora_ux() {
+    regresa __gui_calc_window("Micelio Calculadora", 420, 620, verdadero)
+}
+
+funcion calculadora_ux_tamano(ancho, alto) {
+    regresa __gui_calc_window("Micelio Calculadora", ancho, alto, verdadero)
+}
+
+funcion calculadora_ux_estilo(nombre_estilo) {
+    estilo(nombre_estilo)
+    regresa __gui_calc_window("Micelio Calculadora", 420, 620, verdadero)
+}
+
+# ----- Componentes base (estilo mini toolkit) -----
+
+funcion accion(id, etiqueta, descripcion) {
+    regresa [aTexto(id), aTexto(etiqueta), aTexto(descripcion)]
+}
+
+funcion crear_menu(titulo, descripcion) {
+    regresa [aTexto(titulo), aTexto(descripcion), []]
+}
+
+funcion menu_agregar(menu, item) {
+    menu[2].agregar(item)
+    regresa menu
+}
+
+funcion _menu_texto(menu) {
+    var txt = menu[0] + "\n\n" + menu[1] + "\n"
+    var i = 0
+    mientras (i < longitud(menu[2])) {
+        var it = menu[2][i]
+        txt = txt + "\n" + it[0] + ") " + it[1]
+        si (it[2] != "") {
+            txt = txt + "\n   " + it[2]
+        }
+        i = i + 1
+    }
+    txt = txt + "\n\nq) Salir"
+    regresa txt
+}
+
+funcion menu_seleccionar(menu, valor_defecto) {
+    var entrada = pedir_texto(_menu_texto(menu), valor_defecto)
+    si (entrada == nulo) {
+        regresa "q"
+    }
+    regresa aTexto(entrada)
+}
+
+funcion _es_numero_texto(valor) {
+    si (valor == nulo) {
+        regresa falso
+    }
+
+    var t = aTexto(valor)
+    si (longitud(t) == 0) {
+        regresa falso
+    }
+
+    var i = 0
+    var puntos = 0
+    var digitos = 0
+
+    si (t[0] == "+" o t[0] == "-") {
+        si (longitud(t) == 1) {
+            regresa falso
+        }
+        i = 1
+    }
+
+    mientras (i < longitud(t)) {
+        var c = t[i]
+        si (c == ".") {
+            puntos = puntos + 1
+            si (puntos > 1) {
+                regresa falso
+            }
+        } sino {
+            si (c >= "0" y c <= "9") {
+                digitos = digitos + 1
+            } sino {
+                regresa falso
+            }
+        }
+        i = i + 1
+    }
+
+    regresa digitos > 0
+}
+
+funcion pedir_numero(prompt, valor_defecto) {
+    mientras (verdadero) {
+        var txt = pedir_texto(prompt, valor_defecto)
+        si (txt == nulo) {
+            regresa nulo
+        }
+        si (_es_numero_texto(txt)) {
+            regresa aFlotante(txt)
+        }
+        alerta("Entrada invalida. Escribe un numero (ej: 12, -3.5, 0.25)")
+    }
+}
+
+funcion _resumen_resultado(nombre, resultado) {
+    alerta("Operacion: " + nombre + "\nResultado: " + aTexto(resultado))
+    regresa resultado
+}
+
+# ----- Navegador de operaciones Math -----
+
+funcion _menu_math() {
+    var m = crear_menu("Math Explorer", "Explora operaciones del modulo math desde una GUI de dialogos.")
+
+    menu_agregar(m, accion("1", "abs(x)", "Valor absoluto"))
+    menu_agregar(m, accion("2", "piso(x)", "Parte entera inferior"))
+    menu_agregar(m, accion("3", "techo(x)", "Parte entera superior"))
+    menu_agregar(m, accion("4", "redondear(x)", "Redondeo clasico"))
+    menu_agregar(m, accion("5", "raiz(x)", "Raiz cuadrada"))
+    menu_agregar(m, accion("6", "exp(x)", "Exponencial e^x"))
+    menu_agregar(m, accion("7", "log(x)", "Logaritmo natural"))
+    menu_agregar(m, accion("8", "log10(x)", "Logaritmo base 10"))
+    menu_agregar(m, accion("9", "seno(x)", "Seno en radianes"))
+    menu_agregar(m, accion("10", "coseno(x)", "Coseno en radianes"))
+    menu_agregar(m, accion("11", "tangente(x)", "Tangente en radianes"))
+    menu_agregar(m, accion("12", "arcoseno(x)", "Inversa de seno"))
+    menu_agregar(m, accion("13", "arcocoseno(x)", "Inversa de coseno"))
+    menu_agregar(m, accion("14", "arcotangente(x)", "Inversa de tangente"))
+    menu_agregar(m, accion("15", "potencia(x, y)", "x elevado a y"))
+    menu_agregar(m, accion("16", "Constantes", "Muestra PI y E"))
+
+    regresa m
+}
+
+funcion _math_ejecutar_unaria(math_mod, op, nombre) {
+    var x = pedir_numero("Ingresa valor para x", "0")
+    si (x == nulo) {
+        regresa nulo
+    }
+
+    var r = nulo
+    si (op == "1") { r = math_mod.abs(x) }
+    si (op == "2") { r = math_mod.piso(x) }
+    si (op == "3") { r = math_mod.techo(x) }
+    si (op == "4") { r = math_mod.redondear(x) }
+    si (op == "5") { r = math_mod.raiz(x) }
+    si (op == "6") { r = math_mod.exp(x) }
+    si (op == "7") { r = math_mod.log(x) }
+    si (op == "8") { r = math_mod.log10(x) }
+    si (op == "9") { r = math_mod.seno(x) }
+    si (op == "10") { r = math_mod.coseno(x) }
+    si (op == "11") { r = math_mod.tangente(x) }
+    si (op == "12") { r = math_mod.arcoseno(x) }
+    si (op == "13") { r = math_mod.arcocoseno(x) }
+    si (op == "14") { r = math_mod.arcotangente(x) }
+
+    regresa _resumen_resultado(nombre + "(" + aTexto(x) + ")", r)
+}
+
+funcion _math_ejecutar_potencia(math_mod) {
+    var x = pedir_numero("Base x", "2")
+    si (x == nulo) {
+        regresa nulo
+    }
+    var exponente = pedir_numero("Exponente y", "3")
+    si (exponente == nulo) {
+        regresa nulo
+    }
+
+    var r = math_mod.potencia(x, exponente)
+    regresa _resumen_resultado("potencia(" + aTexto(x) + ", " + aTexto(exponente) + ")", r)
+}
+
+funcion _math_mostrar_constantes(math_mod) {
+    var msg = "Constantes disponibles:\n"
+    msg = msg + "PI = " + aTexto(math_mod.PI) + "\n"
+    msg = msg + "E  = " + aTexto(math_mod.E)
+    alerta(msg)
+    regresa [math_mod.PI, math_mod.E]
+}
+
+funcion math(math_mod) {
+    var menu = _menu_math()
+
+    mientras (verdadero) {
+        var op = menu_seleccionar(menu, "1")
+
+        si (op == "q" o op == "Q" o op == "salir" o op == "Salir") {
+            regresa nulo
+        }
+
+        si (op == "16") {
+            _math_mostrar_constantes(math_mod)
+        } sino {
+            si (op == "15") {
+                _math_ejecutar_potencia(math_mod)
+            } sino {
+                si (op == "1" o op == "2" o op == "3" o op == "4" o op == "5" o op == "6" o op == "7" o op == "8" o op == "9" o op == "10" o op == "11" o op == "12" o op == "13" o op == "14") {
+            var nombre = "op"
+            si (op == "1") { nombre = "abs" }
+            si (op == "2") { nombre = "piso" }
+            si (op == "3") { nombre = "techo" }
+            si (op == "4") { nombre = "redondear" }
+            si (op == "5") { nombre = "raiz" }
+            si (op == "6") { nombre = "exp" }
+            si (op == "7") { nombre = "log" }
+            si (op == "8") { nombre = "log10" }
+            si (op == "9") { nombre = "seno" }
+            si (op == "10") { nombre = "coseno" }
+            si (op == "11") { nombre = "tangente" }
+            si (op == "12") { nombre = "arcoseno" }
+            si (op == "13") { nombre = "arcocoseno" }
+            si (op == "14") { nombre = "arcotangente" }
+
+            _math_ejecutar_unaria(math_mod, op, nombre)
+                } sino {
+                    alerta("Opcion no valida: " + aTexto(op))
+                }
+            }
+        }
+    }
+}
+
+# Alias mas explicito para estilo API
+funcion explorar_math(math_mod) {
+    regresa math(math_mod)
+}
+
+# Compatibilidad nativa con modulo grafico
+funcion mostrar_grafico(plot_mod) {
+    regresa plot_mod.mostrar()
+}
+
+funcion guardar_grafico_como(plot_mod, nombre_sugerido) {
+    var sugerida = nombre_sugerido
+    si (sugerida == nulo) {
+        sugerida = "grafico.ppm"
+    }
+
+    var origen = plot_mod.guardar(sugerida)
+    var destino = __gui_save_file("Guardar grafico", sugerida)
+    si (destino == nulo) {
+        regresa nulo
+    }
+
+    si (__gui_file_copy(origen, destino)) {
+        regresa destino
+    }
+
+    regresa nulo
+}
+
+funcion mostrar_y_guardar(plot_mod, nombre_sugerido) {
+    var ruta_preview = plot_mod.mostrar()
+    si (ruta_preview == nulo) {
+        regresa nulo
+    }
+
+    var destino = __gui_save_file("Guardar grafico", nombre_sugerido)
+    si (destino == nulo) {
+        regresa ruta_preview
+    }
+
+    si (__gui_file_copy(ruta_preview, destino)) {
+        regresa destino
+    }
+
+    regresa ruta_preview
+}

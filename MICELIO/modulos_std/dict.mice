@@ -1,0 +1,13 @@
+# Placeholder del modulo Dict
+
+funcion _pendiente(nombre) {
+    imp "[dict] Funcion no implementada: " + nombre
+    regresa nulo
+}
+
+funcion claves(d) { regresa _pendiente("claves") }
+funcion valores(d) { regresa _pendiente("valores") }
+funcion items(d) { regresa _pendiente("items") }
+funcion merge(d1, d2) { regresa _pendiente("merge") }
+funcion obtener(d, clave, valor_defecto) { regresa _pendiente("obtener") }
+funcion map_valores(d, fn) { regresa _pendiente("map_valores") }

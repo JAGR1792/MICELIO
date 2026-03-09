@@ -1,0 +1,22 @@
+# Placeholder del modulo Matriz
+
+funcion _pendiente(nombre) {
+    imp "[matriz] Funcion no implementada: " + nombre
+    regresa nulo
+}
+
+funcion ceros(filas, columnas) { regresa _pendiente("ceros") }
+funcion unos(filas, columnas) { regresa _pendiente("unos") }
+funcion identidad(n) { regresa _pendiente("identidad") }
+funcion aleatoria(filas, columnas) { regresa _pendiente("aleatoria") }
+funcion transpuesta(m) { regresa _pendiente("transpuesta") }
+funcion inversa(m) { regresa _pendiente("inversa") }
+funcion determinante(m) { regresa _pendiente("determinante") }
+funcion redimensionar(m, filas, columnas) { regresa _pendiente("redimensionar") }
+funcion aplicar(m, fn) { regresa _pendiente("aplicar") }
+funcion map(fn, m) { regresa _pendiente("map") }
+funcion multiplicar(a, b) { regresa _pendiente("multiplicar") }
+funcion suma(a, b) { regresa _pendiente("suma") }
+funcion resta(a, b) { regresa _pendiente("resta") }
+funcion producto_elemento(a, b) { regresa _pendiente("producto_elemento") }
+funcion potencia_matriz(m, n) { regresa _pendiente("potencia_matriz") }

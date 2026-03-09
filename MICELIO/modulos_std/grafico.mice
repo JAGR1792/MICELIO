@@ -1,0 +1,565 @@
+const _ANCHO = 800
+const _ALTO = 500
+const _MARGEN = 48
+
+var _titulo = "Grafico Micelio"
+var _xlabel = "x"
+var _ylabel = "y"
+
+var _line_r = 36
+var _line_g = 88
+var _line_b = 216
+
+var _point_r = 220
+var _point_g = 40
+var _point_b = 40
+
+var _bar_r = 58
+var _bar_g = 145
+var _bar_b = 81
+
+var _grid_r = 230
+var _grid_g = 230
+var _grid_b = 230
+
+var _axis_r = 80
+var _axis_g = 80
+var _axis_b = 80
+
+var _text_r = 50
+var _text_g = 50
+var _text_b = 50
+
+var _usar_marcadores = verdadero
+var _tam_marcador = 2
+
+funcion _abs(v) {
+    si (v < 0) {
+        regresa -v
+    }
+    regresa v
+}
+
+funcion _min_lista(xs) {
+    var m = xs[0]
+    var i = 1
+    mientras (i < longitud(xs)) {
+        si (xs[i] < m) {
+            m = xs[i]
+        }
+        i = i + 1
+    }
+    regresa m
+}
+
+funcion _max_lista(xs) {
+    var m = xs[0]
+    var i = 1
+    mientras (i < longitud(xs)) {
+        si (xs[i] > m) {
+            m = xs[i]
+        }
+        i = i + 1
+    }
+    regresa m
+}
+
+funcion _fila_glifo(ch, row) {
+    si (ch == "0") {
+        si (row == 0) { regresa "###" }
+        si (row == 1) { regresa "# #" }
+        si (row == 2) { regresa "# #" }
+        si (row == 3) { regresa "# #" }
+        regresa "###"
+    }
+    si (ch == "1") {
+        si (row == 0) { regresa " ##" }
+        si (row == 1) { regresa "  #" }
+        si (row == 2) { regresa "  #" }
+        si (row == 3) { regresa "  #" }
+        regresa " ###"
+    }
+    si (ch == "2") {
+        si (row == 0) { regresa "###" }
+        si (row == 1) { regresa "  #" }
+        si (row == 2) { regresa "###" }
+        si (row == 3) { regresa "#  " }
+        regresa "###"
+    }
+    si (ch == "3") {
+        si (row == 0) { regresa "###" }
+        si (row == 1) { regresa "  #" }
+        si (row == 2) { regresa " ##" }
+        si (row == 3) { regresa "  #" }
+        regresa "###"
+    }
+    si (ch == "4") {
+        si (row == 0) { regresa "# #" }
+        si (row == 1) { regresa "# #" }
+        si (row == 2) { regresa "###" }
+        si (row == 3) { regresa "  #" }
+        regresa "  #"
+    }
+    si (ch == "5") {
+        si (row == 0) { regresa "###" }
+        si (row == 1) { regresa "#  " }
+        si (row == 2) { regresa "###" }
+        si (row == 3) { regresa "  #" }
+        regresa "###"
+    }
+    si (ch == "6") {
+        si (row == 0) { regresa "###" }
+        si (row == 1) { regresa "#  " }
+        si (row == 2) { regresa "###" }
+        si (row == 3) { regresa "# #" }
+        regresa "###"
+    }
+    si (ch == "7") {
+        si (row == 0) { regresa "###" }
+        si (row == 1) { regresa "  #" }
+        si (row == 2) { regresa "  #" }
+        si (row == 3) { regresa "  #" }
+        regresa "  #"
+    }
+    si (ch == "8") {
+        si (row == 0) { regresa "###" }
+        si (row == 1) { regresa "# #" }
+        si (row == 2) { regresa "###" }
+        si (row == 3) { regresa "# #" }
+        regresa "###"
+    }
+    si (ch == "9") {
+        si (row == 0) { regresa "###" }
+        si (row == 1) { regresa "# #" }
+        si (row == 2) { regresa "###" }
+        si (row == 3) { regresa "  #" }
+        regresa "###"
+    }
+    si (ch == "-") {
+        si (row == 2) { regresa "###" }
+        regresa "   "
+    }
+    regresa "   "
+}
+
+funcion _dibujar_texto(x, y0, texto, r, g, b) {
+    var t = aTexto(texto)
+    var i = 0
+    mientras (i < longitud(t)) {
+        var ch = t[i]
+        var row = 0
+        mientras (row < 5) {
+            var patron = _fila_glifo(ch, row)
+            var col = 0
+            mientras (col < 3) {
+                si (patron[col] == "#") {
+                    __grafico_set_pixel(x + (i * 4) + col, y0 + row, r, g, b)
+                }
+                col = col + 1
+            }
+            row = row + 1
+        }
+        i = i + 1
+    }
+}
+
+funcion _dibujar_linea(x0, y0, x1, y1, r, g, b) {
+    var dx = _abs(x1 - x0)
+    var sx = -1
+    si (x0 < x1) {
+        sx = 1
+    }
+
+    var dy = -_abs(y1 - y0)
+    var sy = -1
+    si (y0 < y1) {
+        sy = 1
+    }
+
+    var err = dx + dy
+
+    mientras (verdadero) {
+        __grafico_set_pixel(x0, y0, r, g, b)
+
+        si (x0 == x1 y y0 == y1) {
+            romper
+        }
+
+        var e2 = 2 * err
+        si (e2 >= dy) {
+            err = err + dy
+            x0 = x0 + sx
+        }
+        si (e2 <= dx) {
+            err = err + dx
+            y0 = y0 + sy
+        }
+    }
+}
+
+funcion _dibujar_marcador(px, py) {
+    var dx = -_tam_marcador
+    mientras (dx <= _tam_marcador) {
+        var dy = -_tam_marcador
+        mientras (dy <= _tam_marcador) {
+            __grafico_set_pixel(px + dx, py + dy, _point_r, _point_g, _point_b)
+            dy = dy + 1
+        }
+        dx = dx + 1
+    }
+}
+
+funcion _dibujar_rejilla() {
+    var left = _MARGEN
+    var right = _ANCHO - _MARGEN
+    var top = _MARGEN
+    var bottom = _ALTO - _MARGEN
+
+    var pasos = 8
+
+    var i = 1
+    mientras (i < pasos) {
+        var xv = left + aEntero((i * (right - left)) / pasos)
+        var yv = top + aEntero((i * (bottom - top)) / pasos)
+
+        var ypix = top
+        mientras (ypix <= bottom) {
+            __grafico_set_pixel(xv, ypix, _grid_r, _grid_g, _grid_b)
+            ypix = ypix + 1
+        }
+
+        var xpix = left
+        mientras (xpix <= right) {
+            __grafico_set_pixel(xpix, yv, _grid_r, _grid_g, _grid_b)
+            xpix = xpix + 1
+        }
+
+        i = i + 1
+    }
+}
+
+funcion _dibujar_ejes() {
+    var left = _MARGEN
+    var right = _ANCHO - _MARGEN
+    var top = _MARGEN
+    var bottom = _ALTO - _MARGEN
+
+    var x = left
+    mientras (x <= right) {
+        __grafico_set_pixel(x, bottom, _axis_r, _axis_g, _axis_b)
+        x = x + 1
+    }
+
+    var ypix = top
+    mientras (ypix <= bottom) {
+        __grafico_set_pixel(left, ypix, _axis_r, _axis_g, _axis_b)
+        ypix = ypix + 1
+    }
+}
+
+funcion _dibujar_ticks(xmin, xmax, ymin, ymax) {
+    var left = _MARGEN
+    var right = _ANCHO - _MARGEN
+    var top = _MARGEN
+    var bottom = _ALTO - _MARGEN
+    var pasos = 8
+
+    var i = 0
+    mientras (i <= pasos) {
+        var tx = left + aEntero((i * (right - left)) / pasos)
+        var ty = bottom
+        _dibujar_linea(tx, ty, tx, ty + 5, _axis_r, _axis_g, _axis_b)
+
+        var vx = xmin + ((i * (xmax - xmin)) / pasos)
+        _dibujar_texto(tx - 8, ty + 8, aTexto(aEntero(vx)), _text_r, _text_g, _text_b)
+
+        var ly = bottom - aEntero((i * (bottom - top)) / pasos)
+        _dibujar_linea(left - 5, ly, left, ly, _axis_r, _axis_g, _axis_b)
+
+        var vy = ymin + ((i * (ymax - ymin)) / pasos)
+        _dibujar_texto(3, ly - 2, aTexto(aEntero(vy)), _text_r, _text_g, _text_b)
+
+        i = i + 1
+    }
+}
+
+funcion estilo(nombre) {
+    var n = aTexto(nombre)
+
+    si (n == "claro") {
+        _line_r = 36; _line_g = 88; _line_b = 216
+        _point_r = 220; _point_g = 40; _point_b = 40
+        _bar_r = 58; _bar_g = 145; _bar_b = 81
+        _grid_r = 230; _grid_g = 230; _grid_b = 230
+        _axis_r = 80; _axis_g = 80; _axis_b = 80
+        _text_r = 50; _text_g = 50; _text_b = 50
+        regresa "claro"
+    }
+
+    si (n == "oscuro") {
+        _line_r = 124; _line_g = 189; _line_b = 255
+        _point_r = 255; _point_g = 135; _point_b = 135
+        _bar_r = 102; _bar_g = 214; _bar_b = 132
+        _grid_r = 120; _grid_g = 120; _grid_b = 120
+        _axis_r = 200; _axis_g = 200; _axis_b = 200
+        _text_r = 210; _text_g = 210; _text_b = 210
+        regresa "oscuro"
+    }
+
+    si (n == "ocean") {
+        _line_r = 16; _line_g = 108; _line_b = 176
+        _point_r = 0; _point_g = 151; _point_b = 167
+        _bar_r = 32; _bar_g = 178; _bar_b = 170
+        _grid_r = 215; _grid_g = 235; _grid_b = 240
+        _axis_r = 64; _axis_g = 96; _axis_b = 112
+        _text_r = 32; _text_g = 64; _text_b = 80
+        regresa "ocean"
+    }
+
+    si (n == "retro") {
+        _line_r = 140; _line_g = 80; _line_b = 32
+        _point_r = 200; _point_g = 120; _point_b = 48
+        _bar_r = 130; _bar_g = 110; _bar_b = 60
+        _grid_r = 235; _grid_g = 228; _grid_b = 210
+        _axis_r = 100; _axis_g = 84; _axis_b = 55
+        _text_r = 90; _text_g = 70; _text_b = 40
+        regresa "retro"
+    }
+
+    regresa "desconocido"
+}
+
+funcion marcadores(activo, tamano) {
+    _usar_marcadores = activo
+    var t = aEntero(tamano)
+    si (t < 1) {
+        t = 1
+    }
+    si (t > 5) {
+        t = 5
+    }
+    _tam_marcador = t
+    regresa [_usar_marcadores, _tam_marcador]
+}
+
+funcion color_linea(r, g, b) {
+    _line_r = aEntero(r)
+    _line_g = aEntero(g)
+    _line_b = aEntero(b)
+    regresa [_line_r, _line_g, _line_b]
+}
+
+funcion titulo(texto) {
+    _titulo = aTexto(texto)
+    regresa _titulo
+}
+
+funcion etiquetas(xtext, ytext) {
+    _xlabel = aTexto(xtext)
+    _ylabel = aTexto(ytext)
+    regresa [_xlabel, _ylabel]
+}
+
+funcion lineas(x, ys) {
+    si (longitud(x) != longitud(ys)) {
+        imp "Error: lineas(x,y) requiere listas del mismo tamano"
+        regresa nulo
+    }
+    si (longitud(x) == 0) {
+        imp "Error: lineas(x,y) requiere al menos un punto"
+        regresa nulo
+    }
+
+    __grafico_reset(_ANCHO, _ALTO, _MARGEN)
+    _dibujar_rejilla()
+    _dibujar_ejes()
+
+    var xmin = _min_lista(x)
+    var xmax = _max_lista(x)
+    var ymin = _min_lista(ys)
+    var ymax = _max_lista(ys)
+
+    si (xmin == xmax) { xmin = xmin - 1; xmax = xmax + 1 }
+    si (ymin == ymax) { ymin = ymin - 1; ymax = ymax + 1 }
+
+    _dibujar_ticks(xmin, xmax, ymin, ymax)
+
+    var left = _MARGEN
+    var right = _ANCHO - _MARGEN
+    var top = _MARGEN
+    var bottom = _ALTO - _MARGEN
+    var spanx = xmax - xmin
+    var spany = ymax - ymin
+
+    var puntos = []
+    var i = 0
+    mientras (i < longitud(x)) {
+        var px = left + aEntero(((x[i] - xmin) * (right - left)) / spanx)
+        var py = bottom - aEntero(((ys[i] - ymin) * (bottom - top)) / spany)
+        puntos.agregar([px, py])
+        i = i + 1
+    }
+
+    i = 0
+    mientras ((i + 1) < longitud(puntos)) {
+        var p0 = puntos[i]
+        var p1 = puntos[i + 1]
+        _dibujar_linea(aEntero(p0[0]), aEntero(p0[1]), aEntero(p1[0]), aEntero(p1[1]), _line_r, _line_g, _line_b)
+        i = i + 1
+    }
+
+    si (_usar_marcadores) {
+        i = 0
+        mientras (i < longitud(puntos)) {
+            var p = puntos[i]
+            _dibujar_marcador(aEntero(p[0]), aEntero(p[1]))
+            i = i + 1
+        }
+    }
+
+    regresa longitud(puntos)
+}
+
+funcion dispersion(x, ys) {
+    si (longitud(x) != longitud(ys)) {
+        imp "Error: dispersion(x,y) requiere listas del mismo tamano"
+        regresa nulo
+    }
+    si (longitud(x) == 0) {
+        imp "Error: dispersion(x,y) requiere al menos un punto"
+        regresa nulo
+    }
+
+    __grafico_reset(_ANCHO, _ALTO, _MARGEN)
+    _dibujar_rejilla()
+    _dibujar_ejes()
+
+    var xmin = _min_lista(x)
+    var xmax = _max_lista(x)
+    var ymin = _min_lista(ys)
+    var ymax = _max_lista(ys)
+
+    si (xmin == xmax) { xmin = xmin - 1; xmax = xmax + 1 }
+    si (ymin == ymax) { ymin = ymin - 1; ymax = ymax + 1 }
+
+    _dibujar_ticks(xmin, xmax, ymin, ymax)
+
+    var left = _MARGEN
+    var right = _ANCHO - _MARGEN
+    var top = _MARGEN
+    var bottom = _ALTO - _MARGEN
+    var spanx = xmax - xmin
+    var spany = ymax - ymin
+
+    var i = 0
+    mientras (i < longitud(x)) {
+        var px = left + aEntero(((x[i] - xmin) * (right - left)) / spanx)
+        var py = bottom - aEntero(((ys[i] - ymin) * (bottom - top)) / spany)
+        _dibujar_marcador(px, py)
+        i = i + 1
+    }
+
+    regresa longitud(x)
+}
+
+funcion histograma(datos, bins) {
+    si (longitud(datos) == 0) {
+        imp "Error: histograma(datos,bins) requiere datos"
+        regresa nulo
+    }
+
+    var b = aEntero(bins)
+    si (b <= 0) {
+        imp "Error: bins debe ser mayor que 0"
+        regresa nulo
+    }
+
+    __grafico_reset(_ANCHO, _ALTO, _MARGEN)
+    _dibujar_rejilla()
+    _dibujar_ejes()
+
+    var vmin = _min_lista(datos)
+    var vmax = _max_lista(datos)
+    si (vmin == vmax) {
+        vmax = vmin + 1
+    }
+
+    var left = _MARGEN
+    var right = _ANCHO - _MARGEN
+    var top = _MARGEN
+    var bottom = _ALTO - _MARGEN
+    var plot_w = right - left
+    var bin_w = aEntero(plot_w / b)
+    si (bin_w < 1) {
+        bin_w = 1
+    }
+
+    var ancho_bin = (vmax - vmin) / b
+    var counts = []
+    var max_count = 0
+
+    var j = 0
+    mientras (j < b) {
+        var low = vmin + (j * ancho_bin)
+        var high = low + ancho_bin
+        si (j == (b - 1)) {
+            high = vmax + 0.000001
+        }
+
+        var c = 0
+        var i = 0
+        mientras (i < longitud(datos)) {
+            var v = datos[i]
+            si (v >= low y v < high) {
+                c = c + 1
+            }
+            i = i + 1
+        }
+
+        counts.agregar(c)
+        si (c > max_count) {
+            max_count = c
+        }
+        j = j + 1
+    }
+
+    si (max_count <= 0) {
+        max_count = 1
+    }
+
+    _dibujar_ticks(vmin, vmax, 0, max_count)
+
+    j = 0
+    mientras (j < longitud(counts)) {
+        var count = counts[j]
+        var bar_h = aEntero((count * (bottom - top)) / max_count)
+        var x0 = left + (j * bin_w)
+        var x1 = x0 + bin_w - 1
+        si (x1 > right) {
+            x1 = right
+        }
+        var y0 = bottom - bar_h
+
+        var xpix = x0
+        mientras (xpix <= x1) {
+            var ypix = y0
+            mientras (ypix <= bottom) {
+                __grafico_set_pixel(xpix, ypix, _bar_r, _bar_g, _bar_b)
+                ypix = ypix + 1
+            }
+            xpix = xpix + 1
+        }
+
+        j = j + 1
+    }
+
+    regresa counts
+}
+
+funcion guardar(path) {
+    regresa __grafico_guardar(path, _titulo, _xlabel, _ylabel)
+}
+
+funcion mostrar() {
+    regresa __grafico_mostrar("grafico.ppm", _titulo, _xlabel, _ylabel)
+}

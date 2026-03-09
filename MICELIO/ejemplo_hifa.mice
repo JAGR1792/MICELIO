@@ -1,0 +1,10 @@
+importar "hifa.mice" como hifa
+
+var app = hifa.crear("demo_hifa")
+hifa.plantillas(app, "hifa_templates")
+hifa.estaticos(app, "hifa_static")
+
+hifa.get_template(app, "/", "index.html", {"title": "Hifa", "message": "Framework web rapido para Micelio"})
+hifa.get_json(app, "/api/ping", {"ok": verdadero, "framework": "hifa", "lang": "micelio"})
+
+hifa.iniciar(app, "127.0.0.1", 8090)
