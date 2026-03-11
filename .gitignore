@@ -3,3 +3,9 @@
 **/__pycache__/
 *.pyc
 MICELIO.zip
+
+# Entorno virtual Python
+venv/
+env/
+ENV/
+.venv

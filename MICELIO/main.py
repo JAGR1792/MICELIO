@@ -231,6 +231,8 @@ def execute(code: str, visitor: EvalVisitor):
 
 def repl() -> None:
     visitor = EvalVisitor(base_dir=os.getcwd())
+    # _ siempre existe en global env para pipe-continuation lines
+    visitor.global_env.values["_"] = None
     print("Micelio REPL (exit para salir)")
     while True:
         try:
@@ -246,9 +248,14 @@ def repl() -> None:
         if not line.strip():
             continue
 
+        # Una linea comenzando con |> continua el resultado anterior via _
+        if line.lstrip().startswith("|>"):
+            line = "_ " + line.lstrip()
+
         try:
             result = execute(line + "\n", visitor)
             if result is not None:
+                visitor.global_env.values["_"] = result
                 print(micelio_repr(result))
         except PedagogicalSyntaxError as exc:
             print(format_pedagogical_syntax_error(exc))

@@ -46,6 +46,119 @@ La referencia tecnica completa esta en `docs/`:
 - `docs/vscode-extension.md`
 - `docs/release.md`
 
+## Quickstart (multiplataforma)
+
+### Requisitos previos
+
+- **Python 3.9+** (descargable desde [python.org](https://www.python.org))
+- **Git** (para clonar el repo)
+- **Visual Studio Code** (recomendado) — descargable desde [code.visualstudio.com](https://code.visualstudio.com)
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/JAGR1792/MICELIO.git
+cd MICELIO
+```
+
+### 2. Ejecutar setup automatizado
+
+Esto instala dependencias, crea el entorno virtual y configura la extensión VS Code.
+
+**Linux / Mac:**
+
+```bash
+bash setup.sh
+source venv/bin/activate
+```
+
+**Windows:**
+
+```cmd
+setup.bat
+REM ya se activa automáticamente
+```
+
+### 3. Trabajar con Micelio
+
+#### Opción A: VS Code (recomendado)
+
+La extensión Micelio se instala automáticamente durante setup. Ofrece:
+
+- Resaltado de sintaxis
+- Snippets de código
+- Autocompletado
+- Integración con terminal
+
+1. Abre VS Code
+2. Abre la carpeta `MICELIO` como workspace
+3. Crea archivos `.mice` o usa el terminal integrado
+
+**Terminal integrado (en VS Code):**
+
+```bash
+# Activar venv si aún no está activo
+source venv/bin/activate  # Linux/Mac
+# o
+venv\Scripts\activate.bat  # Windows
+
+# Abrir REPL
+python main.py
+
+# O ejecutar archivo
+python main.py tu_programa.mice
+```
+
+#### Opción B: Línea de comandos
+
+```bash
+cd MICELIO
+python main.py                  # Abre REPL
+python main.py tu_programa.mice # Ejecuta archivo
+```
+
+### Desactivar entorno virtual
+
+Cuando termines de trabajar:
+
+```bash
+deactivate  # Linux/Mac o Windows
+```
+
+---
+
+## Portabilidad multiplataforma
+
+**¿Por qué estos scripts?**
+
+- ✅ **Aislamiento**: El `venv` local no contamina el Python del sistema.
+- ✅ **Reproducibilidad**: Cualquiera que clone el repo obtiene exactamente las mismas versiones (`requirements.txt`).
+- ✅ **Multiplataforma**: Scripts separados para Linux/Mac (`.sh`) y Windows (`.bat`) detectan la plataforma automáticamente.
+- ✅ **Sin instalaciones extras**: Solo requiere Python 3.9+ (nada más).
+
+**Para colaboradores:**
+
+Si colaborás en el proyecto:
+
+1. Clona el repo
+2. Ejecuta `bash setup.sh` (Linux/Mac) o `setup.bat` (Windows)
+3. Comienza a desarrollar
+4. El `venv/` se ignora en Git (ver `.gitignore`)
+
+### Instalación manual de extensión VS Code
+
+Si `setup.sh`/`setup.bat` tiene problemas instalando la extensión:
+
+```bash
+code --install-extension micelio-vscode/extension_unpacked/
+```
+
+O abre VS Code y ve a:
+
+1. **Extensions** (Ctrl+Shift+X o Cmd+Shift+X)
+2. **Install from VSIX...**
+3. Busca `micelio-vscode/extension_unpacked/`
+
 ## Como esta hecho Micelio (arquitectura pedagogica)
 
 Micelio esta construido como un interprete clasico por etapas. Esta separacion no es solo tecnica: esta pensada para aprender compiladores e interpretes de forma didactica.

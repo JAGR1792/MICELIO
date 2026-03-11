@@ -67,6 +67,47 @@ Archivo de referencia del modulo estandar:
 
 - `MICELIO/modulos_std/grafico.mice`
 
+## REPL interactivo
+
+Arranca sin argumentos:
+
+```
+python main.py
+# o
+./micelio
+```
+
+### Variable `_`
+
+El REPL guarda automaticamente el ultimo resultado en la variable `_`.
+
+```
+micelio> var a = [2, 21, 32, 2]
+[2, 21, 32, 2]
+micelio> _
+[2, 21, 32, 2]
+```
+
+### Continuacion con `|>`
+
+Una linea que empiece con `|>` se encadena automaticamente al resultado anterior (`_`):
+
+```
+micelio> var a = [0, 2, 1, 3]
+[0, 2, 1, 3]
+micelio> a = a
+[0, 2, 1, 3]
+micelio> |> map(funcion(x) { regresa x + 1 })
+[1, 3, 2, 4]
+micelio> |> filter(funcion(x) { regresa x > 2 })
+[3, 4]
+```
+
+Internamente, `|> expr` se expande a `_ |> expr` antes de parsear.
+
+> **Nota:** `_` se actualiza solo cuando la expresion devuelve un valor no nulo.
+> Las sentencias (`var`, `imp`, etc.) no actualizan `_`.
+
 ## Azucar sintactico soportado
 
 Desde `main.py` se preprocesan patrones antes de parsear:
