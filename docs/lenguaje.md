@@ -86,9 +86,9 @@ No uses como identificadores: `si`, `sino`, `y`, `o`, `no`, `funcion`, `var`, `c
 
 La referencia de vision amplia esta en `main.tex`. El comportamiento real se define por:
 
-- `MICELIO/grammar/Micelio.g4`
-- `MICELIO/core/eval_visitor.py`
-- `MICELIO/core/runtime.py`
+- `MICELIO/gramatica/Micelio.g4`
+- `MICELIO/nucleo/eval_visitor.py`
+- `MICELIO/nucleo/runtime.py`
 
 ## Proxima ampliacion sugerida
 

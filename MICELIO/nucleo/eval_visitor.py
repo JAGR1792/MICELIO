@@ -6,10 +6,10 @@ import os
 from antlr4 import CommonTokenStream, InputStream
 from antlr4 import ParserRuleContext
 
-from generated.MicelioLexer import MicelioLexer
-from generated.MicelioParser import MicelioParser
-from generated.MicelioVisitor import MicelioVisitor
-from core.runtime import (
+from generado.MicelioLexer import MicelioLexer
+from generado.MicelioParser import MicelioParser
+from generado.MicelioVisitor import MicelioVisitor
+from nucleo.runtime import (
     BoundMethod,
     BreakFlow,
     ContinueFlow,
@@ -23,7 +23,7 @@ from core.runtime import (
     micelio_repr,
     module_table,
 )
-from errors.pedagogicos import pipeline_assignment_warning
+from errores.pedagogicos import pipeline_assignment_warning
 
 
 class EvalVisitor(MicelioVisitor):

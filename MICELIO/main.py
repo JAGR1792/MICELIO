@@ -6,11 +6,11 @@ import sys
 
 from antlr4 import CommonTokenStream, InputStream
 
-from generated.MicelioLexer import MicelioLexer
-from generated.MicelioParser import MicelioParser
-from core.eval_visitor import EvalVisitor
-from core.runtime import MicelioRuntimeError, micelio_repr
-from errors.pedagogicos import (
+from generado.MicelioLexer import MicelioLexer
+from generado.MicelioParser import MicelioParser
+from nucleo.eval_visitor import EvalVisitor
+from nucleo.runtime import MicelioRuntimeError, micelio_repr
+from errores.pedagogicos import (
     PedagogicalErrorListener,
     PedagogicalSyntaxError,
     format_pedagogical_runtime_error,

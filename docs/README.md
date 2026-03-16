@@ -5,6 +5,7 @@ Este directorio contiene la documentacion completa y tecnica del proyecto.
 ## Indice
 
 - `docs/lenguaje.md`: sintaxis, semantica y ejemplos del lenguaje.
+- `docs/estructura-proyecto.md`: mapa de carpetas y responsabilidades.
 - `docs/runtime.md`: arquitectura de ejecucion, entorno y builtins.
 - `docs/gtk-gui-readme.md`: backend GTK embebido, integracion GUI y fallbacks.
 - `docs/errores-pedagogicos.md`: formato de errores y catalogo de casos.
@@ -14,11 +15,12 @@ Este directorio contiene la documentacion completa y tecnica del proyecto.
 ## Recomendacion de lectura
 
 1. `docs/lenguaje.md`
-2. `docs/runtime.md`
-3. `docs/gtk-gui-readme.md`
-4. `docs/errores-pedagogicos.md`
-5. `docs/vscode-extension.md`
-6. `docs/release.md`
+2. `docs/estructura-proyecto.md`
+3. `docs/runtime.md`
+4. `docs/gtk-gui-readme.md`
+5. `docs/errores-pedagogicos.md`
+6. `docs/vscode-extension.md`
+7. `docs/release.md`
 
 ## Relacion con README raiz
 

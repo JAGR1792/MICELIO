@@ -15,17 +15,17 @@ Micelio busca ser un lenguaje en español que no sea solo "Python traducido", si
 
 Hoy el proyecto incluye:
 
-- Gramatica ANTLR en `MICELIO/grammar/Micelio.g4`.
-- Lexer/Parser/Visitor generados en `MICELIO/generated/`.
-- Interprete por Visitor en `MICELIO/core/eval_visitor.py`.
-- Runtime en `MICELIO/core/runtime.py`.
+- Gramatica ANTLR en `MICELIO/gramatica/Micelio.g4`.
+- Lexer/Parser/Visitor generados en `MICELIO/generado/`.
+- Interprete por Visitor en `MICELIO/nucleo/eval_visitor.py`.
+- Runtime en `MICELIO/nucleo/runtime.py`.
 - Entrada/salida, funciones, control de flujo y modulos.
 - Modulo estandar inicial: `MICELIO/modulos_std/math.mice`.
 - Soporte de desempaquetado:
 	- `var a, b = expr`
 	- `a, b = expr`
 	- `leer a, b` (entrada multiple en una linea)
-- Errores pedagogicos centralizados en `MICELIO/errors/pedagogicos.py`.
+- Errores pedagogicos centralizados en `MICELIO/errores/pedagogicos.py`.
 
 ## Estructura del repo
 
@@ -40,6 +40,7 @@ Hoy el proyecto incluye:
 La referencia tecnica completa esta en `docs/`:
 
 - `docs/README.md`
+- `docs/estructura-proyecto.md`
 - `docs/lenguaje.md`
 - `docs/runtime.md`
 - `docs/errores-pedagogicos.md`
@@ -170,11 +171,11 @@ Micelio esta construido como un interprete clasico por etapas. Esta separacion n
 
 Archivos clave:
 
-- `MICELIO/grammar/Micelio.g4`: define la sintaxis del lenguaje.
-- `MICELIO/generated/MicelioLexer.py` y `MICELIO/generated/MicelioParser.py`: generados por ANTLR.
-- `MICELIO/core/eval_visitor.py`: interpreta nodos del arbol.
-- `MICELIO/core/runtime.py`: entorno de ejecucion, builtins y representacion de valores.
-- `MICELIO/errors/pedagogicos.py`: formateo y ayudas de errores pedagogicos.
+- `MICELIO/gramatica/Micelio.g4`: define la sintaxis del lenguaje.
+- `MICELIO/generado/MicelioLexer.py` y `MICELIO/generado/MicelioParser.py`: generados por ANTLR.
+- `MICELIO/nucleo/eval_visitor.py`: interpreta nodos del arbol.
+- `MICELIO/nucleo/runtime.py`: entorno de ejecucion, builtins y representacion de valores.
+- `MICELIO/errores/pedagogicos.py`: formateo y ayudas de errores pedagogicos.
 - `MICELIO/main.py`: entrada CLI/REPL y preprocesado de azucar sintactico.
 
 ## Flujo de ejecucion (de archivo `.mice` a resultado)
