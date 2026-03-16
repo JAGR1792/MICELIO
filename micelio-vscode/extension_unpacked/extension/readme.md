@@ -46,6 +46,7 @@ Option A (recommended, portable `.vsix`):
 cd micelio-vscode
 ./build-vsix.sh
 code --install-extension micelio-syntax-0.0.7.vsix
+code --install-extension micelio-syntax-0.0.8.vsix
 ```
 
 Option B (quick local install from folder):
