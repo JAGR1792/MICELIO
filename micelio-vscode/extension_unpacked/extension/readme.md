@@ -45,7 +45,7 @@ Option A (recommended, portable `.vsix`):
 ```bash
 cd micelio-vscode
 ./build-vsix.sh
-code --install-extension micelio-syntax-0.0.6.vsix
+code --install-extension micelio-syntax-0.0.7.vsix
 ```
 
 Option B (quick local install from folder):
@@ -63,13 +63,13 @@ Input:
 
 ```mice
 datos
-  |> map(funcion (x) { regresa x * 2 })
+  |> map(funcion (x) { x * 2 })
 ```
 
 Cursor at end of second line + `Enter` produces:
 
 ```mice
 datos
-  |> map(funcion (x) { regresa x * 2 })
+  |> map(funcion (x) { x * 2 })
   |> 
 ```

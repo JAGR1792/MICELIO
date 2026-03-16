@@ -1,3 +1,15 @@
-para i = 0 hasta 10 {
-    imp i
-}
+var a = [[1,2], [3,4]]
+var b = [[5,6], [7,8]]
+
+imp a*b
+
+var datos = [1, 2, 3, 4, 5]
+var total = datos
+	|> map(funcion (x) { x })
+	|> filter(funcion (x) { verdadero })
+	|> ordenar()
+	|> reduce(funcion (acc, x) { acc + x }, 0)
+
+imp total
+
+

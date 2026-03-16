@@ -15,17 +15,17 @@ Micelio busca ser un lenguaje en español que no sea solo "Python traducido", si
 
 Hoy el proyecto incluye:
 
-- Gramatica ANTLR en `MICELIO/Micelio.g4`.
-- Lexer/Parser/Visitor generados en `MICELIO/`.
-- Interprete por Visitor en `MICELIO/eval_visitor.py`.
-- Runtime en `MICELIO/runtime.py`.
+- Gramatica ANTLR en `MICELIO/grammar/Micelio.g4`.
+- Lexer/Parser/Visitor generados en `MICELIO/generated/`.
+- Interprete por Visitor en `MICELIO/core/eval_visitor.py`.
+- Runtime en `MICELIO/core/runtime.py`.
 - Entrada/salida, funciones, control de flujo y modulos.
 - Modulo estandar inicial: `MICELIO/modulos_std/math.mice`.
 - Soporte de desempaquetado:
 	- `var a, b = expr`
 	- `a, b = expr`
 	- `leer a, b` (entrada multiple en una linea)
-- Errores pedagogicos en CLI/archivo (`MICELIO/main.py`).
+- Errores pedagogicos centralizados en `MICELIO/errors/pedagogicos.py`.
 
 ## Estructura del repo
 
@@ -170,11 +170,12 @@ Micelio esta construido como un interprete clasico por etapas. Esta separacion n
 
 Archivos clave:
 
-- `MICELIO/Micelio.g4`: define la sintaxis del lenguaje.
-- `MICELIO/MicelioLexer.py` y `MICELIO/MicelioParser.py`: generados por ANTLR.
-- `MICELIO/eval_visitor.py`: interpreta nodos del arbol.
-- `MICELIO/runtime.py`: entorno de ejecucion, builtins y representacion de valores.
-- `MICELIO/main.py`: entrada CLI/REPL, manejo de errores y preprocesado de azucar sintactico.
+- `MICELIO/grammar/Micelio.g4`: define la sintaxis del lenguaje.
+- `MICELIO/generated/MicelioLexer.py` y `MICELIO/generated/MicelioParser.py`: generados por ANTLR.
+- `MICELIO/core/eval_visitor.py`: interpreta nodos del arbol.
+- `MICELIO/core/runtime.py`: entorno de ejecucion, builtins y representacion de valores.
+- `MICELIO/errors/pedagogicos.py`: formateo y ayudas de errores pedagogicos.
+- `MICELIO/main.py`: entrada CLI/REPL y preprocesado de azucar sintactico.
 
 ## Flujo de ejecucion (de archivo `.mice` a resultado)
 
@@ -245,9 +246,9 @@ python3 main.py A.mice
 var datos = [1, 2, 3, 4, 5]
 
 var total = datos
-	|> map(funcion (x) { regresa x * 2 })
-	|> filter(funcion (x) { regresa x > 5 })
-	|> reduce(funcion (acc, x) { regresa acc + x }, 0)
+	|> map(funcion (x) { x * 2 })
+	|> filter(funcion (x) { x > 5 })
+	|> reduce(funcion (acc, x) { acc + x }, 0)
 
 imp total
 ```
@@ -328,7 +329,7 @@ Opcion recomendada (`.vsix`):
 ```bash
 cd micelio-vscode
 ./build-vsix.sh
-code --install-extension micelio-syntax-0.0.4.vsix
+code --install-extension micelio-syntax-0.0.7.vsix
 ```
 
 Opcion local rapida:

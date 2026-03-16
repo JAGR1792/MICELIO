@@ -85,10 +85,9 @@ class FunctionValue:
         for p, v in zip(self.params, args):
             local_env.define(p, v)
         try:
-            call_eval(self.body_ctx, local_env)
+            return call_eval(self.body_ctx, local_env)
         except ReturnFlow as ret:
             return ret.value
-        return None
 
 
 class BoundMethod:

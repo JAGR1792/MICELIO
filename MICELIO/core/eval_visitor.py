@@ -6,10 +6,10 @@ import os
 from antlr4 import CommonTokenStream, InputStream
 from antlr4 import ParserRuleContext
 
-from MicelioLexer import MicelioLexer
-from MicelioParser import MicelioParser
-from MicelioVisitor import MicelioVisitor
-from runtime import (
+from generated.MicelioLexer import MicelioLexer
+from generated.MicelioParser import MicelioParser
+from generated.MicelioVisitor import MicelioVisitor
+from core.runtime import (
     BoundMethod,
     BreakFlow,
     ContinueFlow,
@@ -23,6 +23,7 @@ from runtime import (
     micelio_repr,
     module_table,
 )
+from errors.pedagogicos import pipeline_assignment_warning
 
 
 class EvalVisitor(MicelioVisitor):
@@ -261,13 +262,7 @@ class EvalVisitor(MicelioVisitor):
             value = self.visit(expr_ctx)
             if isinstance(expr_ctx, MicelioParser.PipeExprContext):
                 line = expr_ctx.start.line if getattr(expr_ctx, "start", None) else "?"
-                print(
-                    f"[WARNING pedagogico] linea {line}: "
-                    "la tuberia `|>` no modifica la variable original por si sola. "
-                    "Haz asignacion explicita, por ejemplo: " "\n"
-                    "`datos = datos" "\n" "   |> map(funcion (x) { regresa x * 2 })`."
-                    "\n""\n"
-                )
+                print(pipeline_assignment_warning(line))
             return value
         if simple is not None:
             return self.visit(simple)
