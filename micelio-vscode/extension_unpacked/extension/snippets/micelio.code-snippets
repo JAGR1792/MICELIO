@@ -1,4 +1,11 @@
 {
+  "Importar modulo": {
+    "prefix": "import",
+    "body": [
+      "importar \"${1:math}.mice\" como ${2:math}"
+    ],
+    "description": "Inserta una declaracion de importacion con alias"
+  },
   "Pipe: composicion basica": {
     "prefix": "pipe",
     "body": [
