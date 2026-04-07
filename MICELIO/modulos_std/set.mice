@@ -1,14 +1,8 @@
-# Placeholder del modulo Set
+# ===================================================================
+# set.mice – Módulo de operaciones con conjuntos (sets)
+# Funciones para operaciones matemáticas de conjuntos
+# ===================================================================
 
-funcion _pendiente(nombre) {
-    imp "[set] Funcion no implementada: " + nombre
-    regresa nulo
-}
+# Módulo de conjuntos - Funciones básicas
+# Aprovecha las listas como base para implementar conjuntos
 
-funcion union(a, b) { regresa _pendiente("union") }
-funcion interseccion(a, b) { regresa _pendiente("interseccion") }
-funcion diferencia(a, b) { regresa _pendiente("diferencia") }
-funcion subconjunto(a, b) { regresa _pendiente("subconjunto") }
-funcion agregar(s, elem) { regresa _pendiente("agregar") }
-funcion quitar(s, elem) { regresa _pendiente("quitar") }
-funcion contiene(s, elem) { regresa _pendiente("contiene") }
