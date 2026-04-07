@@ -70,20 +70,60 @@ class Environment:
 
 @dataclass
 class FunctionValue:
+    """
+    Representa una función definida en Micelio.
+    Soporta parámetros normales, *args (variádicos) y **kwargs (nombrados).
+    """
     name: str | None
-    params: list[str]
-    body_ctx: Any
-    closure: Environment
+    params: list[str]              # Parámetros normales
+    args_param: str | None         # Nombre del parámetro *args (None si no existe)
+    kwargs_param: str | None       # Nombre del parámetro **kwargs (None si no existe)
+    body_ctx: Any                  # Contexto ANTLR del cuerpo
+    closure: Environment           # Entorno de cierre
 
-    def call(self, args: list[Any], call_eval: Callable[[Any, Environment], Any]) -> Any:
-        if len(args) != len(self.params):
-            fname = self.name or "funcion anonima"
-            raise MicelioRuntimeError(
-                f"{fname} esperaba {len(self.params)} argumento(s), recibio {len(args)}"
-            )
+    def call(self, args: list[Any], kwargs: dict[str, Any], 
+             call_eval: Callable[[Any, Environment], Any]) -> Any:
+        """
+        Ejecuta la función con los argumentos dados.
+        
+        - args: argumentos posicionales
+        - kwargs: argumentos nombrados (diccionario)
+        - call_eval: función para evaluar el cuerpo en un entorno
+        """
+        # Crear entorno local
         local_env = Environment(self.closure)
-        for p, v in zip(self.params, args):
-            local_env.define(p, v)
+        
+        # Asignar parámetros normales
+        for i, param in enumerate(self.params):
+            if i < len(args):
+                local_env.define(param, args[i])
+            else:
+                fname = self.name or "función anónima"
+                raise MicelioRuntimeError(
+                    f"{fname} esperaba {len(self.params)} argumento(s), recibió {len(args)}"
+                )
+        
+        # Empaquetar argumentos extras en *args
+        if self.args_param:
+            extra_args = args[len(self.params):]
+            local_env.define(self.args_param, extra_args)
+        elif len(args) > len(self.params):
+            fname = self.name or "función anónima"
+            raise MicelioRuntimeError(
+                f"{fname} no acepta más de {len(self.params)} argumento(s)"
+            )
+        
+        # Empaquetar argumentos nombrados en **kwargs
+        if self.kwargs_param:
+            local_env.define(self.kwargs_param, kwargs)
+        elif kwargs:
+            fname = self.name or "función anónima"
+            kwargs_str = ", ".join(kwargs.keys())
+            raise MicelioRuntimeError(
+                f"{fname} no acepta argumentos nombrados: {kwargs_str}"
+            )
+        
+        # Ejecutar el cuerpo en el entorno local
         try:
             return call_eval(self.body_ctx, local_env)
         except ReturnFlow as ret:
@@ -1616,6 +1656,137 @@ def _hifa_generar_demo(path: Any = "hifa_demo") -> bool:
         f.write(app_mice)
 
     return True
+
+
+def make_primitives() -> dict[str, Any]:
+    """
+    Crea el conjunto mínimo de primitivas de sistema que requieren Python.
+    Estas son funciones especiales (prefijadas con __) que no pueden expresarse
+    fácilmente en Micelio porque requieren acceso directo al OS o librerías Python.
+    
+    El resto de funciones globales (map, filter, tipo, longitud, etc.)
+    se definen en modulos_std/builtins.mice y se cargan al iniciar el intérprete.
+    """
+    import math as _pymath
+    import random as _pyrandom
+    
+    def _a_numero(valor: Any) -> float:
+        """Convierte un valor a número. Se llama desde builtins.mice."""
+        return to_number(valor)
+    
+    def _a_texto(valor: Any) -> str:
+        """Convierte un valor a texto. Se llama desde builtins.mice."""
+        return to_text(valor)
+    
+    def _tipo_nativo(x: Any) -> str:
+        """Obtiene el tipo nativo Python de un valor."""
+        tipo_map = {
+            bool: "booleano",
+            int: "numero",
+            float: "numero",
+            str: "texto",
+            list: "lista",
+            dict: "diccionario",
+            set: "conjunto",
+            type(None): "nulo",
+        }
+        return tipo_map.get(type(x), type(x).__name__)
+    
+    def _ordenar_nativo(lst: Any) -> list[Any]:
+        """Ordena una lista usando el algoritmo nativo de Python (Timsort)."""
+        if isinstance(lst, list):
+            try:
+                return sorted(lst)
+            except TypeError:
+                raise MicelioRuntimeError("No se pueden comparar los elementos de la lista")
+        return list(sorted(lst))
+    
+    def _aleatorio() -> float:
+        """Genera un número aleatorio entre 0 y 1."""
+        return _pyrandom.random()
+    
+    def _exp_nativo(x: Any) -> float:
+        """Calcula e^x (exponencial). Usado por módulo ML."""
+        return _pymath.exp(float(to_number(x)))
+    
+    def _error(mensaje: Any) -> None:
+        """Lanza una excepción con el mensaje dado."""
+        raise MicelioRuntimeError(str(mensaje))
+    
+    # Funciones de archivos
+    def _archivo_leer(ruta: Any) -> str:
+        """Lee el contenido completo de un archivo de texto."""
+        try:
+            with open(str(ruta), 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            raise MicelioRuntimeError(f"Archivo no encontrado: {ruta}")
+        except Exception as e:
+            raise MicelioRuntimeError(f"Error leyendo archivo: {e}")
+    
+    def _archivo_escribir(ruta: Any, contenido: Any) -> None:
+        """Escribe contenido en un archivo (sobrescribe si existe)."""
+        try:
+            with open(str(ruta), 'w', encoding='utf-8') as f:
+                f.write(str(contenido))
+        except Exception as e:
+            raise MicelioRuntimeError(f"Error escribiendo archivo: {e}")
+    
+    def _archivo_anexar(ruta: Any, contenido: Any) -> None:
+        """Añade contenido al final de un archivo."""
+        try:
+            with open(str(ruta), 'a', encoding='utf-8') as f:
+                f.write(str(contenido))
+        except Exception as e:
+            raise MicelioRuntimeError(f"Error anexando archivo: {e}")
+    
+    def _archivo_existe(ruta: Any) -> bool:
+        """Verifica si un archivo existe."""
+        return os.path.isfile(str(ruta))
+    
+    def _archivo_eliminar(ruta: Any) -> None:
+        """Elimina un archivo."""
+        try:
+            os.remove(str(ruta))
+        except Exception as e:
+            raise MicelioRuntimeError(f"Error eliminando archivo: {e}")
+    
+    def _directorio_existe(ruta: Any) -> bool:
+        """Verifica si un directorio existe."""
+        return os.path.isdir(str(ruta))
+    
+    def _directorio_crear(ruta: Any) -> None:
+        """Crea un directorio."""
+        try:
+            os.makedirs(str(ruta), exist_ok=True)
+        except Exception as e:
+            raise MicelioRuntimeError(f"Error creando directorio: {e}")
+    
+    return {
+        # Conversiones base (requieren lógica Python compleja)
+        '__a_numero': _a_numero,
+        '__a_texto': _a_texto,
+        '__tipo_nativo': _tipo_nativo,
+        '__ordenar_nativo': _ordenar_nativo,
+        
+        # Números aleatorios
+        '__aleatorio': _aleatorio,
+        
+        # Funciones matemáticas
+        '__exp_nativo': _exp_nativo,
+        
+        # Manejo de errores
+        '__error': _error,
+        
+        # Operaciones de archivos
+        '__archivo_leer': _archivo_leer,
+        '__archivo_escribir': _archivo_escribir,
+        '__archivo_anexar': _archivo_anexar,
+        '__archivo_existe': _archivo_existe,
+        '__archivo_eliminar': _archivo_eliminar,
+        '__directorio_existe': _directorio_existe,
+        '__directorio_crear': _directorio_crear,
+    }
 
 
 def make_builtins() -> dict[str, Any]:
