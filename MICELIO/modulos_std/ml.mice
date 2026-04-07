@@ -1,15 +1,7 @@
-# Placeholder del modulo ML
+# ===================================================================
+# ml.mice – Módulo de aprendizaje automático (machine learning)
+# Algoritmos básicos de machine learning desde cero
+# ===================================================================
 
-funcion _pendiente(nombre) {
-    imp "[ml] Funcion no implementada: " + nombre
-    regresa nulo
-}
+# Módulo de ML - Funciones básicas
 
-funcion regresion_lineal(xs, ys) { regresa _pendiente("regresion_lineal") }
-funcion regresion_logistica(xs, ys) { regresa _pendiente("regresion_logistica") }
-funcion perceptron_multicapa(capas, activacion) { regresa _pendiente("perceptron_multicapa") }
-funcion entrenar(modelo, xs, ys, epocas, tasa) { regresa _pendiente("entrenar") }
-funcion predecir(modelo, xs) { regresa _pendiente("predecir") }
-funcion predecir_proba(modelo, xs) { regresa _pendiente("predecir_proba") }
-funcion kmeans(datos, k) { regresa _pendiente("kmeans") }
-funcion historial_perdida(modelo) { regresa _pendiente("historial_perdida") }
