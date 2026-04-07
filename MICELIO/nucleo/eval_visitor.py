@@ -19,6 +19,7 @@ from nucleo.runtime import (
     ReturnFlow,
     elementwise_mul,
     make_builtins,
+    make_primitives,
     matrix_mul,
     micelio_repr,
     module_table,
@@ -36,9 +37,17 @@ class EvalVisitor(MicelioVisitor):
         self.modules = module_table()
         self.current_dir = os.path.abspath(base_dir or os.getcwd())
         self.loaded_modules: dict[str, dict[str, object]] = {}
-        builtins = make_builtins()
 
+        # ─── 1. Inyectar primitivas Python (funciones __*)
+        # Estas son las operaciones de bajo nivel que requieren Python
+        primitives = make_primitives()
+        for name, fn in primitives.items():
+            self.global_env.define(name, fn)
+        
+        # ─── 2. Definir funciones especiales que requieren acceso a self
+        
         def _parse_input_atom(raw: str):
+            """Convierte string de entrada a número o booleano si aplica"""
             value = raw
             try:
                 value = float(raw) if "." in raw else int(raw)
@@ -53,6 +62,7 @@ class EvalVisitor(MicelioVisitor):
             return value
 
         def _ensure_unpack_values(values, count: int):
+            """Verifica que el desempaquetado tenga la cantidad correcta"""
             if not isinstance(values, (list, tuple)):
                 raise MicelioRuntimeError(
                     "Desempaquetado requiere lista o tupla"
@@ -63,19 +73,8 @@ class EvalVisitor(MicelioVisitor):
                 )
             return values
 
-        def _map(fn, iterable):
-            return [self._call_callable(fn, [x]) for x in iterable]
-
-        def _filter(fn, iterable):
-            return [x for x in iterable if self._call_callable(fn, [x])]
-
-        def _reduce(fn, iterable, initial):
-            acc = initial
-            for x in iterable:
-                acc = self._call_callable(fn, [acc, x])
-            return acc
-
         def _asignar_multi(names_csv, values):
+            """Asigna múltiples variables a la vez (para a, b = ...)"""
             names = [n.strip() for n in str(names_csv).split(",") if n.strip()]
             unpacked = _ensure_unpack_values(values, len(names))
             for name, item in zip(names, unpacked):
@@ -83,32 +82,73 @@ class EvalVisitor(MicelioVisitor):
             return unpacked
 
         def _leer_multi(names_csv):
+            """Lee múltiples valores de entrada (para leer a, b)"""
             names = [n.strip() for n in str(names_csv).split(",") if n.strip()]
             raw = input()
             parts = raw.split()
             if len(parts) != len(names):
                 raise MicelioRuntimeError(
-                    "Cantidad de entradas no coincide con variables en leer multiple"
+                    "Cantidad de entradas no coincide con variables en leer múltiple"
                 )
             parsed = [_parse_input_atom(p) for p in parts]
             for name, item in zip(names, parsed):
                 self._assign_or_define(name, item)
             return parsed
-
-        builtins["map"] = _map
-        builtins["filter"] = _filter
-        builtins["reduce"] = _reduce
-        builtins["__asignar_multi"] = _asignar_multi
-        builtins["__leer_multi"] = _leer_multi
-        builtins["__script_dir"] = lambda: self.current_dir
-
-        if "lista" in self.modules:
-            self.modules["lista"]["map"] = _map
-            self.modules["lista"]["filter"] = _filter
-            self.modules["lista"]["reduce"] = _reduce
-
-        for name, fn in builtins.items():
-            self.global_env.define(name, fn)
+        
+        # Registrar las funciones especiales
+        self.global_env.define("__asignar_multi", _asignar_multi)
+        self.global_env.define("__leer_multi", _leer_multi)
+        self.global_env.define("__script_dir", lambda: self.current_dir)
+        
+        # ─── 3. Cargar el archivo builtins.mice que define las funciones globales
+        self._cargar_builtins_micelio()
+    
+    def _cargar_builtins_micelio(self):
+        """
+        Carga automáticamente el archivo modulos_std/builtins.mice
+        que contiene la definición de todas las funciones globales
+        (map, filter, reduce, tipo, longitud, etc.) en Micelio puro.
+        """
+        # Resolver ruta al archivo builtins.mice
+        ruta_base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        ruta = os.path.normpath(os.path.join(ruta_base, 'modulos_std', 'builtins.mice'))
+        
+        if not os.path.isfile(ruta):
+            # No es crítico si no existe, pero advertir
+            import warnings
+            warnings.warn(f'modulos_std/builtins.mice no encontrado en {ruta}')
+            return
+        
+        # Leer el código del archivo
+        try:
+            with open(ruta, 'r', encoding='utf-8') as f:
+                codigo = f.read()
+        except Exception as e:
+            raise MicelioRuntimeError(f'Error leyendo builtins.mice: {e}') from e
+        
+        # Guardar directorio actual y cambiarlo para imports relativos
+        saved_dir = self.current_dir
+        self.current_dir = os.path.dirname(ruta)
+        
+        try:
+            # Ejecutar el código en el entorno global
+            self._ejecutar_codigo_fuente(codigo)
+        except Exception as e:
+            raise MicelioRuntimeError(f'Error cargando builtins.mice: {e}') from e
+        finally:
+            # Restaurar directorio
+            self.current_dir = saved_dir
+    
+    def _ejecutar_codigo_fuente(self, codigo: str):
+        """
+        Ejecuta código fuente Micelio en el entorno actual.
+        Se usa internamente para cargar builtins.mice.
+        """
+        lexer = MicelioLexer(InputStream(codigo))
+        tokens = CommonTokenStream(lexer)
+        parser = MicelioParser(tokens)
+        tree = parser.program()
+        self.visit(tree)
 
     def _execute_source(self, code: str):
         lexer = MicelioLexer(InputStream(code))
@@ -214,7 +254,8 @@ class EvalVisitor(MicelioVisitor):
     def _call_callable(self, callee, args):
         fn = self._resolve_callable(callee)
         if isinstance(fn, FunctionValue):
-            return fn.call(args, self._eval_in_env)
+            # Pasar args, kwargs vacío, y la función para evaluar
+            return fn.call(args, {}, self._eval_in_env)
         return fn(*args)
 
     def _decode_string_literal(self, raw: str) -> str:
@@ -598,9 +639,60 @@ class EvalVisitor(MicelioVisitor):
         return result
 
     def visitFunc_def(self, ctx: MicelioParser.Func_defContext):
+        """
+        Procesa la definición de una función.
+        Soporta parámetros normales, *args (variádicos) y **kwargs (nombrados).
+        
+        Ejemplo: funcion foo(a, b, *args, **kwargs) { ... }
+        """
         name = ctx.ID().getText()
-        params = [p.getText() for p in (ctx.param_list().ID() if ctx.param_list() else [])]
-        fn = FunctionValue(name=name, params=params, body_ctx=ctx.block(), closure=self.env)
+        params = []
+        args_param = None
+        kwargs_param = None
+        
+        # Extraer parámetros de la lista
+        if ctx.param_list():
+            # Con la nueva gramática, param_list tiene param_item(s)
+            try:
+                param_items = ctx.param_list().param_item()
+                if param_items is not None:
+                    # Si es una única región, param_item() devuelve un solo elemento
+                    if not isinstance(param_items, list):
+                        param_items = [param_items]
+                    
+                    for item in param_items:
+                        # Verificar qué tipo de parámetro es
+                        if item.getChildCount() == 1:
+                            # Parámetro normal: solo ID
+                            params.append(item.ID().getText())
+                        elif item.getChildCount() == 2:
+                            # *args o **kwargs: operador + ID
+                            op_token = item.getChild(0).getSymbol()
+                            id_text = item.ID().getText()
+                            
+                            if op_token.text == '*':
+                                args_param = id_text
+                            elif op_token.text == '**':
+                                kwargs_param = id_text
+            except Exception:
+                # Fallback para compatibilidad con versión anterior
+                # Si param_list solo tiene IDs (sin el nuevo formato)
+                old_ids = ctx.param_list().ID()
+                if old_ids:
+                    if isinstance(old_ids, list):
+                        params = [p.getText() for p in old_ids]
+                    else:
+                        params = [old_ids.getText()]
+        
+        # Crear el objeto FunctionValue con los parámetros procesados
+        fn = FunctionValue(
+            name=name,
+            params=params,
+            args_param=args_param,
+            kwargs_param=kwargs_param,
+            body_ctx=ctx.block(),
+            closure=self.env
+        )
         self.env.define(name, fn)
         return fn
 
