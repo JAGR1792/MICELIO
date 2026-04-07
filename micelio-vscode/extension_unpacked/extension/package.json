@@ -2,12 +2,11 @@
   "name": "micelio-syntax",
   "displayName": "Micelio Syntax",
   "description": "Syntax highlighting and language configuration for Micelio (.mice)",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "publisher": "micelio-local",
   "main": "./extension.js",
   "activationEvents": [
-    "onLanguage:micelio",
-    "onCommand:micelio.enterPipe"
+    
   ],
   "engines": {
     "vscode": "^1.85.0"
