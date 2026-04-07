@@ -1,0 +1,284 @@
+# ===================================================================
+# builtins.mice – Núcleo de la biblioteca estándar de Micelio
+# Se carga automáticamente al inicio del intérprete
+# Traslada la mayoría de funciones globales de Python a Micelio puro
+# ===================================================================
+
+# ─── Inspección de tipos ────────────────────────────────────────────
+
+# Obtiene el tipo de un valor
+funcion tipo(valor) {
+    regresa __tipo_nativo(valor)
+}
+
+# ─── Longitud universal ─────────────────────────────────────────────
+
+# Obtiene la longitud de cualquier colección (lista, texto, dict, etc.)
+funcion longitud(coleccion) {
+    regresa coleccion.longitud()
+}
+
+# ─── Funcionales de orden superior ──────────────────────────────────
+
+# Aplica una función a cada elemento de una lista
+funcion map(funcion_f, lista) {
+    var resultado = []
+    para elemento en lista {
+        resultado.agregar(funcion_f(elemento))
+    }
+    regresa resultado
+}
+
+# Filtra elementos de una lista según un predicado
+funcion filter(predicado, lista) {
+    var resultado = []
+    para elemento en lista {
+        si (predicado(elemento)) {
+            resultado.agregar(elemento)
+        }
+    }
+    regresa resultado
+}
+
+# Reduce una lista a un único valor aplicando una función binaria
+funcion reduce(funcion_f, lista, inicio) {
+    var acumulador = inicio
+    para elemento en lista {
+        acumulador = funcion_f(acumulador, elemento)
+    }
+    regresa acumulador
+}
+
+# Verifica si todos los elementos cumplen el predicado
+funcion todos(predicado, lista) {
+    para elemento en lista {
+        si (no predicado(elemento)) {
+            regresa falso
+        }
+    }
+    regresa verdadero
+}
+
+# Verifica si al menos un elemento cumple el predicado
+funcion alguno(predicado, lista) {
+    para elemento en lista {
+        si (predicado(elemento)) {
+            regresa verdadero
+        }
+    }
+    regresa falso
+}
+
+# ─── Ordenamiento ────────────────────────────────────────────────────
+
+# Ordena una lista usando el algoritmo nativo (Timsort)
+funcion ordenar(lista) {
+    regresa __ordenar_nativo(lista)
+}
+
+# ─── Conversiones de tipos ──────────────────────────────────────────
+
+# Convierte texto a número. Soporta binario (0b), octal (0o), hexadecimal (0x)
+funcion aNumero(valor) {
+    si (tipo(valor) == "texto") {
+        regresa __a_numero(valor)
+    } sino {
+        regresa valor
+    }
+}
+
+# Convierte cualquier valor a texto
+funcion aTexto(valor) {
+    regresa __a_texto(valor)
+}
+
+# ─── Manejo de errores ──────────────────────────────────────────────
+
+# Lanza un error con el mensaje dado
+funcion error(mensaje) {
+    __error(mensaje)
+}
+
+# ─── Generación de rangos ──────────────────────────────────────────
+
+# Genera una lista de números en un rango [inicio, fin)
+funcion rango(inicio, fin) {
+    var lista = []
+    var i = inicio
+    mientras (i < fin) {
+        lista.agregar(i)
+        i = i + 1
+    }
+    regresa lista
+}
+
+# ─── Operaciones de listas ─────────────────────────────────────────
+
+# Obtiene el primer elemento de una lista
+funcion primero(lista) {
+    si (lista.longitud() == 0) {
+        __error("No se puede obtener primero() de lista vacía")
+    }
+    regresa lista[0]
+}
+
+# Obtiene el último elemento de una lista
+funcion ultimo(lista) {
+    var n = lista.longitud()
+    si (n == 0) {
+        __error("No se puede obtener ultimo() de lista vacía")
+    }
+    regresa lista[n - 1]
+}
+
+# Invierte una lista
+funcion invertir(lista) {
+    var resultado = []
+    var i = lista.longitud() - 1
+    mientras (i >= 0) {
+        resultado.agregar(lista[i])
+        i = i - 1
+    }
+    regresa resultado
+}
+
+# Concatena dos listas
+funcion concatenar(lista1, lista2) {
+    var resultado = []
+    para elemento en lista1 {
+        resultado.agregar(elemento)
+    }
+    para elemento en lista2 {
+        resultado.agregar(elemento)
+    }
+    regresa resultado
+}
+
+# ─── Números aleatorios ────────────────────────────────────────────
+
+# Genera un número aleatorio entre 0 y 1
+funcion aleatorio() {
+    regresa __aleatorio()
+}
+
+# ─── Funciones matemáticas ────────────────────────────────────────
+
+# Valor absoluto
+funcion abs(x) {
+    si (x < 0) {
+        regresa -x
+    } sino {
+        regresa x
+    }
+}
+
+# Máximo de dos números
+funcion maximo(a, b) {
+    si (a > b) {
+        regresa a
+    } sino {
+        regresa b
+    }
+}
+
+# Mínimo de dos números
+funcion minimo(a, b) {
+    si (a < b) {
+        regresa a
+    } sino {
+        regresa b
+    }
+}
+
+# Exponencial (e^x)
+funcion exp(x) {
+    regresa __exp_nativo(x)
+}
+
+# ─── Máximo y mínimo de una colección ──────────────────────────────
+
+# Máximo valor en una lista
+funcion max_lista(lista) {
+    si (lista.longitud() == 0) {
+        __error("max_lista() requiere una lista no vacía")
+    }
+    var max_val = lista[0]
+    para elemento en lista {
+        si (elemento > max_val) {
+            max_val = elemento
+        }
+    }
+    regresa max_val
+}
+
+# Mínimo valor en una lista
+funcion min_lista(lista) {
+    si (lista.longitud() == 0) {
+        __error("min_lista() requiere una lista no vacía")
+    }
+    var min_val = lista[0]
+    para elemento en lista {
+        si (elemento < min_val) {
+            min_val = elemento
+        }
+    }
+    regresa min_val
+}
+
+# Suma de todos los elementos
+funcion suma(lista) {
+    var total = 0
+    para elemento en lista {
+        total = total + elemento
+    }
+    regresa total
+}
+
+# Producto de todos los elementos
+funcion producto(lista) {
+    var total = 1
+    para elemento en lista {
+        total = total * elemento
+    }
+    regresa total
+}
+
+# Promedio de la lista
+funcion promedio(lista) {
+    si (lista.longitud() == 0) {
+        __error("promedio() requiere una lista no vacía")
+    }
+    var total = suma(lista)
+    var cantidad = lista.longitud()
+    regresa total / cantidad
+}
+
+# ─── Búsqueda en listas ────────────────────────────────────────────
+
+# Cuenta cuántos elementos cumplen el predicado
+funcion contar(predicado, lista) {
+    var cuenta = 0
+    para elemento en lista {
+        si (predicado(elemento)) {
+            cuenta = cuenta + 1
+        }
+    }
+    regresa cuenta
+}
+
+# ─── Diccionarios ──────────────────────────────────────────────────
+
+# Obtiene las claves de un diccionario
+funcion claves(diccionario) {
+    regresa diccionario.claves()
+}
+
+# Obtiene los valores de un diccionario
+funcion valores(diccionario) {
+    regresa diccionario.valores()
+}
+
+# Obtiene los pares (clave, valor) de un diccionario
+funcion items(diccionario) {
+    regresa diccionario.items()
+}
