@@ -1,0 +1,70 @@
+
+# Prueba del sistema de built-ins migrado a Micelio
+
+# Probar función tipo
+var tipo_numero = tipo(42)
+imp tipo_numero
+
+# Probar función longitud
+var longitud_lista = longitud([1, 2, 3])
+imp longitud_lista
+
+# Probar función rango
+var r = rango(1, 5)
+imp r
+
+# Probar map con función definida
+funcion doble(x) {
+    regresa x * 2
+}
+
+var resultado_map = map(doble, [1, 2, 3])
+imp resultado_map
+
+# Probar filter
+funcion es_par(x) {
+    regresa x % 2 == 0
+}
+
+var pares = filter(es_par, [1, 2, 3, 4, 5])
+imp pares
+
+# Probar función aNumero
+var txt = "42"
+var num = aNumero(txt)
+imp num
+
+# Probar función aTexto
+var num2 = 123
+var txt2 = aTexto(num2)
+imp txt2
+
+# Probar función reduce
+funcion suma_dos(acum, x) {
+    regresa acum + x
+}
+
+var suma_total = reduce(suma_dos, [1, 2, 3, 4], 0)
+imp suma_total
+
+# Probar función abs
+var val_abs = abs(-42)
+imp val_abs
+
+# Probar función max_lista
+var maximo = max_lista([3, 1, 4, 1, 5, 9])
+imp maximo
+
+# Probar función min_lista
+var minimo = min_lista([3, 1, 4, 1, 5, 9])
+imp minimo
+
+# Probar función suma
+var total = suma([1, 2, 3, 4, 5])
+imp total
+
+# Probar función promedio
+var prom = promedio([2, 4, 6, 8])
+imp prom
+
+imp "Todas las pruebas completadas"
