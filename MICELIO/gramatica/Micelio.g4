@@ -52,7 +52,12 @@ for_stmt
     ;
 
 func_def : FUNCION ID '(' param_list? ')' sep* block ;
-param_list : ID (',' ID)* ;
+param_list : param_item (',' param_item)* ;
+param_item
+    : ID                    # paramNormal
+    | MUL ID                # paramArgs
+    | POW ID                # paramKwargs
+    ;
 
 block : '{' sep* (statement sep*)* '}' ;
 
@@ -65,6 +70,7 @@ expr
     | DICT '(' (keyValue (',' keyValue)*)? ')'                        #dictExpr
     | '{' (keyValue (',' keyValue)*)? '}'                             #mapLiteral
     | FUNCION '(' param_list? ')' block                               #anonFuncExpr
+    | MATRIZ '(' expr ')'                                             #matrizExpr
     | expr '[' expr ']'                                               #indexExpr
     | expr '(' exprList? ')'                                          #callExpr
     | op=(INC_OP | DEC_OP) expr                                       #preIncDec
@@ -92,6 +98,7 @@ sep : ';' | NEWLINE+ ;
 VAR : 'var' ;
 CONST : 'const' ;
 FUNCION : 'funcion' ;
+MATRIZ : 'matriz' ;
 REGRESA : 'regresa' ;
 SI : 'si' ;
 SINO : 'sino' ;
