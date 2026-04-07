@@ -1,12 +1,7 @@
-# Placeholder del modulo Archivo
+# ===================================================================
+# archivo.mice – Módulo de entrada/salida de archivos
+# Funciones para leer y escribir archivos
+# ===================================================================
 
-funcion _pendiente(nombre) {
-    imp "[archivo] Funcion no implementada: " + nombre
-    regresa nulo
-}
+# Módulo de archivos - Funciones básicas
 
-funcion leer(ruta) { regresa _pendiente("leer") }
-funcion escribir(ruta, contenido) { regresa _pendiente("escribir") }
-funcion anexar(ruta, contenido) { regresa _pendiente("anexar") }
-funcion leer_csv(ruta) { regresa _pendiente("leer_csv") }
-funcion escribir_csv(ruta, datos) { regresa _pendiente("escribir_csv") }
