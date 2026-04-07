@@ -475,20 +475,24 @@ class EvalVisitor(MicelioVisitor):
                 with open(full_path, "r", encoding="utf-8") as f:
                     code = f.read()
 
+                # Evaluar el modulo en un entorno aislado para evitar colisiones
+                # con nombres globales (ej: abs/exp en builtins y math).
+                module_env = Environment(self.global_env)
+                saved_env = self.env
                 saved_dir = self.current_dir
+                self.env = module_env
                 self.current_dir = os.path.dirname(full_path)
-                before = set(self.global_env.values.keys())
                 try:
                     self._execute_source(code)
                 finally:
+                    self.env = saved_env
                     self.current_dir = saved_dir
 
-                exported = {
+                module = {
                     name: value
-                    for name, value in self.global_env.values.items()
-                    if name not in before and not name.startswith("_")
+                    for name, value in module_env.values.items()
+                    if not name.startswith("_")
                 }
-                module = exported
                 self.loaded_modules[full_path] = module
 
         alias = ctx.ID().getText() if ctx.ID() else module_name
