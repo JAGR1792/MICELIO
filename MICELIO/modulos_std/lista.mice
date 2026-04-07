@@ -1,0 +1,8 @@
+# ===================================================================
+# lista.mice – Módulo de utilidades para operaciones con listas
+# Proporciona funciones especializadas para trabajar con listas
+# ===================================================================
+
+# Mismo contenido que builtins para compatibilidad
+# (Se pueden importar funciones desde aquí)
+
