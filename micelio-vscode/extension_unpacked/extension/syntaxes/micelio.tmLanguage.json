@@ -61,7 +61,7 @@
         },
         {
           "name": "support.function.builtin.micelio",
-          "match": "\\b(imp|leer|map|filter|reduce|longitud|aNumero|aEntero|aFlotante|aTexto|aBooleano|aCaracter|aCodigo|aBinario|aOctal|aHexadecimal|aBase|aBaseComplemento|aBasecomplemento|aBaseFraccion|aBasefraccion|aBaseConDigitos|aBaseCondigitos|desdeBinario|desdeOctal|desdeHexadecimal|desdeBase|ordenar)\\b"
+          "match": "\\b(imp|leer|map|filter|reduce|longitud|aNumero|aEntero|aFlotante|aTexto|aBooleano|aCaracter|aCodigo|aBinario|aOctal|aHexadecimal|aBase|aBaseComplemento|aBasecomplemento|aBaseFraccion|aBasefraccion|aBaseConDigitos|aBaseCondigitos|desdeBinario|desdeOctal|desdeHexadecimal|desdeBase|ordenar|tipo|rango|primero|ultimo|invertir|concatenar|aleatorio|abs|maximo|minimo|exp|max_lista|min_lista|suma|producto|promedio|contar|claves|valores|items|todos|alguno|error)\\b"
         }
       ]
     },
