@@ -1,0 +1,49 @@
+importar "Matriz" desde "matriz.mice"
+# Prueba final del sistema de built-ins migrado a Micelio
+
+# Función de prueba
+funcion duplicar(x) {
+    regresa x + x
+}
+
+# Test de funciones core
+imp "=== PRUEBA DE FUNCIONES BUILT-IN ==="
+var a =  tipo(42)
+imp "Tipo:"
+imp a
+imp tipo(Matriz([[1, 2], [3, 4]]))
+
+imp "Longitud:"
+imp longitud([1, 2, 3])
+
+imp "Rango:"
+imp rango(1, 4)
+
+imp "Map:"
+var resultado_map = map(duplicar, [1, 2, 3])
+imp resultado_map
+
+imp "Filter (números pares):"
+funcion es_par(x) {
+    regresa x % 2 == 0
+}
+imp filter(es_par, [1, 2, 3, 4, 5])
+
+imp "Conversiones:"
+imp aNumero("99")
+imp aTexto(456)
+
+imp "Reduce (suma):"
+funcion suma_fn(a, b) {
+    regresa a + b
+}
+imp reduce(suma_fn, [1, 2, 3, 4], 0)
+
+imp "Operaciones matemáticas:"
+imp abs(-15)
+imp max_lista([3, 1, 4, 1, 5, 9, 2, 6])
+imp min_lista([3, 1, 4, 1, 5, 9, 2, 6])
+imp suma([10, 20, 30])
+imp promedio([10, 20, 30, 40])
+
+imp "=== TODAS LAS PRUEBAS PASARON ==="
