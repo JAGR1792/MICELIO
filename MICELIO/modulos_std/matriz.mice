@@ -3,5 +3,259 @@
 # Operaciones sobre matrices y álgebra lineal
 # ===================================================================
 
-# Módulo de matrices - Funciones básicas
+# Crea una matriz de ceros
+funcion ceros(filas, columnas) {
+    var matriz = []
+    var i = 0
+    mientras (i < filas) {
+        var fila = []
+        var j = 0
+        mientras (j < columnas) {
+            fila.agregar(0)
+            j = j + 1
+        }
+        matriz.agregar(fila)
+        i = i + 1
+    }
+    regresa matriz
+}
+
+# Crea una matriz de unos
+funcion unos(filas, columnas) {
+    var matriz = []
+    var i = 0
+    mientras (i < filas) {
+        var fila = []
+        var j = 0
+        mientras (j < columnas) {
+            fila.agregar(1)
+            j = j + 1
+        }
+        matriz.agregar(fila)
+        i = i + 1
+    }
+    regresa matriz
+}
+
+# Crea una matriz identidad (diagonal de 1s)
+funcion identidad(n) {
+    var matriz = ceros(n, n)
+    var i = 0
+    mientras (i < n) {
+        matriz[i][i] = 1
+        i = i + 1
+    }
+    regresa matriz
+}
+
+# Obtiene el número de filas
+funcion filas(matriz) {
+    regresa matriz.longitud()
+}
+
+# Obtiene el número de columnas
+funcion columnas(matriz) {
+    si (matriz.longitud() == 0) {
+        regresa 0
+    }
+    regresa matriz[0].longitud()
+}
+
+# Obtiene las dimensiones (filas, columnas)
+funcion dimensiones(matriz) {
+    regresa [filas(matriz), columnas(matriz)]
+}
+
+# Transpone una matriz (intercambia filas por columnas)
+funcion transpuesta(matriz) {
+    si (matriz.longitud() == 0) {
+        regresa []
+    }
+    var f = filas(matriz)
+    var c = columnas(matriz)
+    var result = []
+    var j = 0
+    mientras (j < c) {
+        var fila = []
+        var i = 0
+        mientras (i < f) {
+            fila.agregar(matriz[i][j])
+            i = i + 1
+        }
+        result.agregar(fila)
+        j = j + 1
+    }
+    regresa result
+}
+
+# Suma dos matrices
+funcion suma_matrices(a, b) {
+    si (filas(a) != filas(b) o columnas(a) != columnas(b)) {
+        __error("Las matrices deben tener las mismas dimensiones para sumar")
+    }
+    var f = filas(a)
+    var c = columnas(a)
+    var result = []
+    var i = 0
+    mientras (i < f) {
+        var fila = []
+        var j = 0
+        mientras (j < c) {
+            fila.agregar(a[i][j] + b[i][j])
+            j = j + 1
+        }
+        result.agregar(fila)
+        i = i + 1
+    }
+    regresa result
+}
+
+# Resta dos matrices
+funcion resta_matrices(a, b) {
+    si (filas(a) != filas(b) o columnas(a) != columnas(b)) {
+        __error("Las matrices deben tener las mismas dimensiones para restar")
+    }
+    var f = filas(a)
+    var c = columnas(a)
+    var result = []
+    var i = 0
+    mientras (i < f) {
+        var fila = []
+        var j = 0
+        mientras (j < c) {
+            fila.agregar(a[i][j] - b[i][j])
+            j = j + 1
+        }
+        result.agregar(fila)
+        i = i + 1
+    }
+    regresa result
+}
+
+# Multiplica una matriz por un escalar
+funcion escalar(matriz, valor) {
+    var f = filas(matriz)
+    var c = columnas(matriz)
+    var result = []
+    var i = 0
+    mientras (i < f) {
+        var fila = []
+        var j = 0
+        mientras (j < c) {
+            fila.agregar(matriz[i][j] * valor)
+            j = j + 1
+        }
+        result.agregar(fila)
+        i = i + 1
+    }
+    regresa result
+}
+
+# Multiplica dos matrices (producto punto)
+funcion multiplicar(a, b) {
+    si (columnas(a) != filas(b)) {
+        __error("Dimensiones incompatibles para multiplicación de matrices")
+    }
+    var f_a = filas(a)
+    var c_a = columnas(a)
+    var c_b = columnas(b)
+    var result = ceros(f_a, c_b)
+    var i = 0
+    mientras (i < f_a) {
+        var j = 0
+        mientras (j < c_b) {
+            var suma = 0
+            var k = 0
+            mientras (k < c_a) {
+                suma = suma + (a[i][k] * b[k][j])
+                k = k + 1
+            }
+            result[i][j] = suma
+            j = j + 1
+        }
+        i = i + 1
+    }
+    regresa result
+}
+
+# Obtiene una fila específica
+funcion fila(matriz, indice) {
+    regresa matriz[indice]
+}
+
+# Obtiene una columna específica
+funcion columna(matriz, indice) {
+    var f = filas(matriz)
+    var col = []
+    var i = 0
+    mientras (i < f) {
+        col.agregar(matriz[i][indice])
+        i = i + 1
+    }
+    regresa col
+}
+
+# Aplana una matriz a un vector (lista)
+funcion aplanar(matriz) {
+    var result = []
+    para fila en matriz {
+        para elemento en fila {
+            result.agregar(elemento)
+        }
+    }
+    regresa result
+}
+
+# Calcula la traza (suma de diagonal principal)
+funcion traza(matriz) {
+    var suma = 0
+    var n = minimo(filas(matriz), columnas(matriz))
+    var i = 0
+    mientras (i < n) {
+        suma = suma + matriz[i][i]
+        i = i + 1
+    }
+    regresa suma
+}
+
+# Verifica si es matriz válida
+funcion es_matriz_valida(m) {
+    si (tipo(m) != "lista") {
+        regresa falso
+    }
+    si (m.longitud() == 0) {
+        regresa verdadero
+    }
+    var col_esperadas = m[0].longitud()
+    para fila en m {
+        si (tipo(fila) != "lista" o fila.longitud() != col_esperadas) {
+            regresa falso
+        }
+    }
+    regresa verdadero
+}
+
+# Norma de Frobenius
+funcion norma_frobenius(matriz) {
+    var suma = 0
+    para fila en matriz {
+        para elemento en fila {
+            suma = suma + (elemento * elemento)
+        }
+    }
+    regresa __exp_nativo(suma / 2)
+}
+
+# Copia profunda de una matriz
+funcion copia(matriz) {
+    var result = []
+    para fila en matriz {
+        var nueva_fila = []
+        para elemento en fila {
+            nueva_fila.agregar(elemento)
+        }
+        result.agregar(nueva_fila)
+    }
+    regresa result
+}
 
