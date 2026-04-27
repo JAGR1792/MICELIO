@@ -1,7 +1,149 @@
 # ===================================================================
-# dict.mice – Módulo de diccionarios y mapas
-# Utilidades para trabajar con estructuras clave-valor
+# dict.mice – Módulo de utilidades para diccionarios
+# Operaciones sobre diccionarios
 # ===================================================================
 
-# Módulo de diccionarios - Funciones básicas
+# Verifica si una clave existe
+funcion tiene_clave(diccionario, clave) {
+    var claves_lista = claves(diccionario)
+    para k en claves_lista {
+        si (k == clave) {
+            regresa verdadero
+        }
+    }
+    regresa falso
+}
+
+# Verifica si un valor existe
+funcion tiene_valor(diccionario, valor) {
+    var valores_lista = valores(diccionario)
+    para v en valores_lista {
+        si (v == valor) {
+            regresa verdadero
+        }
+    }
+    regresa falso
+}
+
+# Obtiene un valor con clave por defecto si no existe
+funcion obtener(diccionario, clave, por_defecto) {
+    si (tiene_clave(diccionario, clave)) {
+        regresa diccionario[clave]
+    }
+    regresa por_defecto
+}
+
+# Combina dos diccionarios
+funcion combinar(dict1, dict2) {
+    var result = {}
+    para k en claves(dict1) {
+        result[k] = dict1[k]
+    }
+    para k en claves(dict2) {
+        result[k] = dict2[k]
+    }
+    regresa result
+}
+
+# Invierte claves y valores
+funcion invertir(diccionario) {
+    var result = {}
+    para item en items(diccionario) {
+        var k = item[0]
+        var v = item[1]
+        result[v] = k
+    }
+    regresa result
+}
+
+# Filtra diccionario por claves
+funcion filtrar_claves(diccionario, clave_test) {
+    var result = {}
+    para k en claves(diccionario) {
+        si (clave_test(k)) {
+            result[k] = diccionario[k]
+        }
+    }
+    regresa result
+}
+
+# Filtra diccionario por valores
+funcion filtrar_valores(diccionario, valor_test) {
+    var result = {}
+    para k en claves(diccionario) {
+        si (valor_test(diccionario[k])) {
+            result[k] = diccionario[k]
+        }
+    }
+    regresa result
+}
+
+# Mapea valores del diccionario
+funcion mapear_valores(diccionario, fn) {
+    var result = {}
+    para k en claves(diccionario) {
+        result[k] = fn(diccionario[k])
+    }
+    regresa result
+}
+
+# Crea diccionario a partir de listas de claves y valores
+funcion de_listas(claves_lista, valores_lista) {
+    var result = {}
+    var i = 0
+    mientras (i < claves_lista.longitud() y i < valores_lista.longitud()) {
+        result[claves_lista[i]] = valores_lista[i]
+        i = i + 1
+    }
+    regresa result
+}
+
+# Cuenta entradas en el diccionario
+funcion tamaño(diccionario) {
+    regresa claves(diccionario).longitud()
+}
+
+# Verifica si diccionario está vacío
+funcion esta_vacio(diccionario) {
+    regresa tamaño(diccionario) == 0
+}
+
+# Obtiene subcadena de diccionario
+funcion subcadena(diccionario, inicio, fin) {
+    var claves_lista = claves(diccionario)
+    var porcion_claves = porcion(claves_lista, inicio, fin)
+    var result = {}
+    para k en porcion_claves {
+        result[k] = diccionario[k]
+    }
+    regresa result
+}
+
+funcion porcion(lista, inicio, fin) {
+    var result = []
+    var i = inicio
+    mientras (i < fin y i < lista.longitud()) {
+        result.agregar(lista[i])
+        i = i + 1
+    }
+    regresa result
+}
+
+# Copia profunda de diccionario
+funcion copia_profunda(diccionario) {
+    var result = {}
+    para k en claves(diccionario) {
+        var v = diccionario[k]
+        si (tipo(v) == "lista") {
+            var nueva_lista = []
+            para item en v {
+                nueva_lista.agregar(item)
+            }
+            result[k] = nueva_lista
+        } sino {
+            result[k] = v
+        }
+    }
+    regresa result
+}
 
