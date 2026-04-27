@@ -1,7 +1,119 @@
 # ===================================================================
 # archivo.mice – Módulo de entrada/salida de archivos
-# Funciones para leer y escribir archivos
+# Lectura y escritura de archivos
 # ===================================================================
 
-# Módulo de archivos - Funciones básicas
+# Lee contenido completo de un archivo
+funcion leer(ruta) {
+    regresa __leer_archivo(ruta)
+}
+
+# Escribe contenido a un archivo
+funcion escribir(ruta, contenido) {
+    __escribir_archivo(ruta, contenido)
+}
+
+# Lee líneas de un archivo
+funcion leer_lineas(ruta) {
+    var contenido = leer(ruta)
+    var lineas = []
+    var linea_actual = ""
+    var i = 0
+    mientras (i < contenido.longitud()) {
+        var car = contenido[i]
+        si (car == "\\n") {
+            lineas.agregar(linea_actual)
+            linea_actual = ""
+        } sino {
+            linea_actual = linea_actual + car
+        }
+        i = i + 1
+    }
+    si (linea_actual.longitud() > 0) {
+        lineas.agregar(linea_actual)
+    }
+    regresa lineas
+}
+
+# Escribe líneas a un archivo
+funcion escribir_lineas(ruta, lineas) {
+    var contenido = ""
+    var primera = verdadero
+    para linea en lineas {
+        si (!primera) {
+            contenido = contenido + "\\n"
+        }
+        contenido = contenido + linea
+        primera = falso
+    }
+    escribir(ruta, contenido)
+}
+
+# Añade contenido a un archivo
+funcion anexar(ruta, contenido) {
+    var contenido_actual = leer(ruta)
+    escribir(ruta, contenido_actual + contenido)
+}
+
+# Verifica si un archivo existe
+funcion existe(ruta) {
+    regresa __archivo_existe(ruta)
+}
+
+# Elimina un archivo
+funcion eliminar(ruta) {
+    __eliminar_archivo(ruta)
+}
+
+# Obtiene tamaño de archivo en bytes
+funcion tamaño(ruta) {
+    regresa __tamaño_archivo(ruta)
+}
+
+# Lee un archivo CSV
+funcion leer_csv(ruta, delimitador) {
+    var lineas = leer_lineas(ruta)
+    var resultado = []
+    para linea en lineas {
+        var partes = dividir_por(linea, delimitador)
+        resultado.agregar(partes)
+    }
+    regresa resultado
+}
+
+# Divide cadena por delimitador
+funcion dividir_por(cadena, delim) {
+    var partes = []
+    var parte = ""
+    var i = 0
+    mientras (i < cadena.longitud()) {
+        si (cadena[i] == delim) {
+            partes.agregar(parte)
+            parte = ""
+        } sino {
+            parte = parte + cadena[i]
+        }
+        i = i + 1
+    }
+    partes.agregar(parte)
+    regresa partes
+}
+
+# Escribe datos CSV
+funcion escribir_csv(ruta, datos, delimitador) {
+    var lineas = []
+    para fila en datos {
+        var linea = ""
+        var primera = verdadero
+        para valor en fila {
+            si (!primera) {
+                linea = linea + delimitador
+            }
+            linea = linea + aTexto(valor)
+            primera = falso
+        }
+        lineas.agregar(linea)
+    }
+    escribir_lineas(ruta, lineas)
+}
 
