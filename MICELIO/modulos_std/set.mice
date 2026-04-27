@@ -1,8 +1,146 @@
 # ===================================================================
-# set.mice – Módulo de operaciones con conjuntos (sets)
-# Funciones para operaciones matemáticas de conjuntos
+# set.mice – Módulo de operaciones de conjuntos
+# Operaciones de teoría de conjuntos
 # ===================================================================
 
-# Módulo de conjuntos - Funciones básicas
-# Aprovecha las listas como base para implementar conjuntos
+# Crea un conjunto (sin duplicados)
+funcion crear_conjunto(lista) {
+    var result = []
+    para item en lista {
+        var encontrado = falso
+        para elem en result {
+            si (elem == item) {
+                encontrado = verdadero
+            }
+        }
+        si (!encontrado) {
+            result.agregar(item)
+        }
+    }
+    regresa result
+}
+
+# Unión de dos conjuntos
+funcion union(conjunto1, conjunto2) {
+    var result = []
+    para item en conjunto1 {
+        result.agregar(item)
+    }
+    para item en conjunto2 {
+        var encontrado = falso
+        para elem en result {
+            si (elem == item) {
+                encontrado = verdadero
+            }
+        }
+        si (!encontrado) {
+            result.agregar(item)
+        }
+    }
+    regresa result
+}
+
+# Intersección de dos conjuntos
+funcion interseccion(conjunto1, conjunto2) {
+    var result = []
+    para item en conjunto1 {
+        para elem en conjunto2 {
+            si (item == elem) {
+                var encontrado = falso
+                para r en result {
+                    si (r == item) {
+                        encontrado = verdadero
+                    }
+                }
+                si (!encontrado) {
+                    result.agregar(item)
+                }
+            }
+        }
+    }
+    regresa result
+}
+
+# Diferencia: elementos en A pero no en B
+funcion diferencia(conjunto_a, conjunto_b) {
+    var result = []
+    para item en conjunto_a {
+        var encontrado = falso
+        para elem en conjunto_b {
+            si (elem == item) {
+                encontrado = verdadero
+            }
+        }
+        si (!encontrado) {
+            result.agregar(item)
+        }
+    }
+    regresa result
+}
+
+# Diferencia simétrica: elementos en A o B pero no en ambos
+funcion diferencia_simetrica(conjunto_a, conjunto_b) {
+    var diff_ab = diferencia(conjunto_a, conjunto_b)
+    var diff_ba = diferencia(conjunto_b, conjunto_a)
+    regresa union(diff_ab, diff_ba)
+}
+
+# Verifica si es subconjunto
+funcion es_subconjunto(conjunto_a, conjunto_b) {
+    para item en conjunto_a {
+        var encontrado = falso
+        para elem en conjunto_b {
+            si (elem == item) {
+                encontrado = verdadero
+            }
+        }
+        si (!encontrado) {
+            regresa falso
+        }
+    }
+    regresa verdadero
+}
+
+# Verifica si es superconjunto
+funcion es_superconjunto(conjunto_a, conjunto_b) {
+    regresa es_subconjunto(conjunto_b, conjunto_a)
+}
+
+# Verifica si dos conjuntos son iguales
+funcion son_iguales(conjunto_a, conjunto_b) {
+    regresa es_subconjunto(conjunto_a, conjunto_b) y es_subconjunto(conjunto_b, conjunto_a)
+}
+
+# Obtiene el complemento
+funcion complemento(conjunto, universo) {
+    var result = []
+    para item en universo {
+        var encontrado = falso
+        para elem en conjunto {
+            si (elem == item) {
+                encontrado = verdadero
+            }
+        }
+        si (!encontrado) {
+            result.agregar(item)
+        }
+    }
+    regresa result
+}
+
+# Cardinalidad (tamaño del conjunto)
+funcion cardinalidad(conjunto) {
+    regresa conjunto.longitud()
+}
+
+# Producto cartesiano
+funcion producto_cartesiano(conjunto_a, conjunto_b) {
+    var result = []
+    para item_a en conjunto_a {
+        para item_b en conjunto_b {
+            result.agregar([item_a, item_b])
+        }
+    }
+    regresa result
+}
 
