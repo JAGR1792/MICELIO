@@ -1,7 +1,197 @@
 # ===================================================================
-# ml.mice – Módulo de aprendizaje automático (machine learning)
-# Algoritmos básicos de machine learning desde cero
+# ml.mice – Módulo de algoritmos de aprendizaje automático
+# Implementación de modelos simples desde cero
 # ===================================================================
 
-# Módulo de ML - Funciones básicas
+# Divide datos en entrenamiento y prueba
+funcion dividir_datos(X, Y, proporcion_train) {
+    var n = X.longitud()
+    var indice_split = n * proporcion_train
+    var X_train = []
+    var X_test = []
+    var Y_train = []
+    var Y_test = []
+    var i = 0
+    mientras (i < n) {
+        si (i < indice_split) {
+            X_train.agregar(X[i])
+            Y_train.agregar(Y[i])
+        } sino {
+            X_test.agregar(X[i])
+            Y_test.agregar(Y[i])
+        }
+        i = i + 1
+    }
+    regresa {"X_train": X_train, "X_test": X_test, "Y_train": Y_train, "Y_test": Y_test}
+}
+
+# Calcula media
+funcion media(valores) {
+    regresa suma(valores) / valores.longitud()
+}
+
+# Calcula varianza
+funcion varianza(valores) {
+    var m = media(valores)
+    var suma_desv = 0
+    para v en valores {
+        suma_desv = suma_desv + ((v - m) * (v - m))
+    }
+    regresa suma_desv / valores.longitud()
+}
+
+# Calcula desviación estándar
+funcion desviacion_estandar(valores) {
+    regresa __exp_nativo(varianza(valores) / 2)
+}
+
+# Normaliza valores (z-score)
+funcion normalizar(valores) {
+    var m = media(valores)
+    var de = desviacion_estandar(valores)
+    var result = []
+    para v en valores {
+        si (de == 0) {
+            result.agregar(0)
+        } sino {
+            result.agregar((v - m) / de)
+        }
+    }
+    regresa result
+}
+
+# Regresión lineal: calcula pendiente e intercepción
+funcion regresion_lineal(X, Y) {
+    var n = X.longitud()
+    var suma_xy = 0
+    var suma_x2 = 0
+    var suma_x = 0
+    var suma_y = 0
+    var i = 0
+    mientras (i < n) {
+        suma_xy = suma_xy + (X[i] * Y[i])
+        suma_x2 = suma_x2 + (X[i] * X[i])
+        suma_x = suma_x + X[i]
+        suma_y = suma_y + Y[i]
+        i = i + 1
+    }
+    var m = (n * suma_xy - suma_x * suma_y) / (n * suma_x2 - suma_x * suma_x)
+    var b = (suma_y - m * suma_x) / n
+    regresa {"pendiente": m, "intercepcion": b}
+}
+
+# Predice valores con regresión lineal
+funcion predecir_lineal(x, modelo) {
+    regresa modelo["pendiente"] * x + modelo["intercepcion"]
+}
+
+# K-Means: agrupa datos en k clusters
+funcion k_means(X, k, iteraciones) {
+    var n = X.longitud()
+    var centroides = []
+    var i = 0
+    mientras (i < k) {
+        centroides.agregar(X[i])
+        i = i + 1
+    }
+    var iter = 0
+    mientras (iter < iteraciones) {
+        var asignaciones = []
+        para punto en X {
+            var dist_min = 999999
+            var indice_cercano = 0
+            var j = 0
+            mientras (j < k) {
+                var dist = distancia_euclidiana(punto, centroides[j])
+                si (dist < dist_min) {
+                    dist_min = dist
+                    indice_cercano = j
+                }
+                j = j + 1
+            }
+            asignaciones.agregar(indice_cercano)
+        }
+        iter = iter + 1
+    }
+    regresa {"centroides": centroides, "asignaciones": asignaciones}
+}
+
+# Calcula distancia euclidiana
+funcion distancia_euclidiana(p1, p2) {
+    si (tipo(p1) == "numero" y tipo(p2) == "numero") {
+        var d = p1 - p2
+        regresa __exp_nativo((d * d) / 2)
+    }
+    var suma = 0
+    var i = 0
+    mientras (i < p1.longitud()) {
+        var diff = p1[i] - p2[i]
+        suma = suma + (diff * diff)
+        i = i + 1
+    }
+    regresa __exp_nativo(suma / 2)
+}
+
+# Calcula matriz de confusión
+funcion matriz_confusion(predichos, reales) {
+    var tp = 0
+    var tn = 0
+    var fp = 0
+    var fn = 0
+    var i = 0
+    mientras (i < predichos.longitud()) {
+        si (predichos[i] == 1 y reales[i] == 1) {
+            tp = tp + 1
+        } sino_si (predichos[i] == 0 y reales[i] == 0) {
+            tn = tn + 1
+        } sino_si (predichos[i] == 1 y reales[i] == 0) {
+            fp = fp + 1
+        } sino {
+            fn = fn + 1
+        }
+        i = i + 1
+    }
+    regresa {"tp": tp, "tn": tn, "fp": fp, "fn": fn}
+}
+
+# Calcula exactitud
+funcion exactitud(predichos, reales) {
+    var correctos = 0
+    var i = 0
+    mientras (i < predichos.longitud()) {
+        si (predichos[i] == reales[i]) {
+            correctos = correctos + 1
+        }
+        i = i + 1
+    }
+    regresa correctos / predichos.longitud()
+}
+
+# Calcula precisión
+funcion precision(predichos, reales) {
+    var conf = matriz_confusion(predichos, reales)
+    si (conf["tp"] + conf["fp"] == 0) {
+        regresa 0
+    }
+    regresa conf["tp"] / (conf["tp"] + conf["fp"])
+}
+
+# Calcula recall
+funcion recall(predichos, reales) {
+    var conf = matriz_confusion(predichos, reales)
+    si (conf["tp"] + conf["fn"] == 0) {
+        regresa 0
+    }
+    regresa conf["tp"] / (conf["tp"] + conf["fn"])
+}
+
+# Calcula F1-score
+funcion f1_score(predichos, reales) {
+    var p = precision(predichos, reales)
+    var r = recall(predichos, reales)
+    si (p + r == 0) {
+        regresa 0
+    }
+    regresa 2 * (p * r) / (p + r)
+}
 
