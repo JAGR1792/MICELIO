@@ -1,4 +1,4 @@
-grammar Micelio;
+grammar Micelio; 
 
 program : sep* (statement sep*)* EOF ;
 
