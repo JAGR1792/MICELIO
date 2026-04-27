@@ -1,5 +1,0 @@
-:root{--bg:#0f172a;--card:#111827;--ink:#e5e7eb;--accent:#22d3ee;}
-body{margin:0;font-family:ui-sans-serif,system-ui;background:radial-gradient(circle at top,#1f2937,#0f172a);color:var(--ink);}
-.card{max-width:680px;margin:8vh auto;padding:24px;border:1px solid #334155;border-radius:14px;background:rgba(17,24,39,.86);}
-button{padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:#06202a;font-weight:700;cursor:pointer;}
-pre{margin-top:14px;background:#020617;padding:10px;border-radius:8px;overflow:auto;}

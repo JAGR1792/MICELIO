@@ -4,6 +4,9 @@ REM Micelio Setup para Windows
 echo === Micelio Setup (Windows) ===
 echo.
 
+REM Obtener directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 REM Crear venv
 if not exist venv (
     echo 1. Creando entorno virtual...
@@ -22,7 +25,7 @@ echo OK: Dependencias instaladas
 
 echo.
 echo 3. Verificando instalacion...
-python -c "import antlr4; print(f'OK: antlr4 version: {antlr4.__version__}')"
+python -c "import antlr4; import importlib.metadata; v = importlib.metadata.version('antlr4-python3-runtime'); print(f'OK: antlr4 version: {v}')"
 cd MICELIO && python eval_visitor.py && cd ..
 echo OK: Micelio setup completado
 
@@ -49,10 +52,10 @@ echo OK: Setup completado!
 echo =========================================
 echo.
 echo Para usar Micelio:
-echo   1. Abre VS Code (recomendado)
-echo   2. venv\Scripts\activate.bat  REM activar venv
-echo   3. cd MICELIO && python main.py  REM correr REPL
-echo   4. cd MICELIO && python main.py archivo.mice  REM ejecutar archivo
+echo   1. venv\Scripts\activate.bat  REM activar venv
+echo   2. micelio archivo.mice       REM ejecutar archivo
+echo   3. micelio                    REM abrir REPL
+echo   4. Abre VS Code (recomendado)
 echo.
 echo Documentacion: docs\README.md
 pause

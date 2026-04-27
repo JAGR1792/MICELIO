@@ -6,7 +6,8 @@ set -euo pipefail
 # - /usr/local/bin (si se pasa --system, requiere sudo)
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-MAIN_PY="$SCRIPT_DIR/main.py"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+MAIN_PY="$PROJECT_ROOT/MICELIO/main.py"
 
 if [[ ! -f "$MAIN_PY" ]]; then
   echo "No se encontro main.py en: $MAIN_PY" >&2
@@ -27,8 +28,16 @@ WRAPPER_PATH="$TARGET_DIR/micelio"
 WRAPPER_CONTENT=$(cat <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-PYTHON_BIN="\${PYTHON_BIN:-python3}"
+PROJECT_ROOT="$PROJECT_ROOT"
 MAIN_PY="$MAIN_PY"
+VENV_PYTHON="\$PROJECT_ROOT/venv/bin/python"
+
+# Usar el Python del venv si existe, sino usar python3 del sistema
+if [[ -f "\$VENV_PYTHON" ]]; then
+  PYTHON_BIN="\$VENV_PYTHON"
+else
+  PYTHON_BIN="\${PYTHON_BIN:-python3}"
+fi
 
 if [[ "\${1:-}" == "--help" || "\${1:-}" == "-h" ]]; then
   echo "Uso: micelio <archivo.mice>"

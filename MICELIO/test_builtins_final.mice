@@ -1,4 +1,4 @@
-importar "Matriz" desde "matriz.mice"
+importar "math.mice" como math
 # Prueba final del sistema de built-ins migrado a Micelio
 
 # Función de prueba
@@ -8,10 +8,10 @@ funcion duplicar(x) {
 
 # Test de funciones core
 imp "=== PRUEBA DE FUNCIONES BUILT-IN ==="
-var a =  tipo(42)
+var a =  tipo(math.PI)
 imp "Tipo:"
 imp a
-imp tipo(Matriz([[1, 2], [3, 4]]))
+imp tipo([[1, 2], [3, 4]])
 
 imp "Longitud:"
 imp longitud([1, 2, 3])
@@ -40,7 +40,7 @@ funcion suma_fn(a, b) {
 imp reduce(suma_fn, [1, 2, 3, 4], 0)
 
 imp "Operaciones matemáticas:"
-imp abs(-15)
+
 imp max_lista([3, 1, 4, 1, 5, 9, 2, 6])
 imp min_lista([3, 1, 4, 1, 5, 9, 2, 6])
 imp suma([10, 20, 30])

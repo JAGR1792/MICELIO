@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+# Obtener directorio raíz del proyecto
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT"
+
 echo "=== Micelio Setup (Linux/Mac) ==="
 echo
 
@@ -22,7 +27,7 @@ echo "✓ Dependencias instaladas"
 
 echo
 echo "3. Verificando instalacion..."
-python -c "import antlr4; print(f'✓ antlr4 version: {antlr4.__version__}')"
+python -c "import antlr4; import importlib.metadata; v = importlib.metadata.version('antlr4-python3-runtime'); print(f'✓ antlr4 version: {v}')"
 cd MICELIO && python eval_visitor.py && cd ..
 echo "✓ Micelio setup completado"
 
@@ -40,14 +45,18 @@ else
 fi
 
 echo
+echo "5. Instalando comando 'micelio'..."
+bash "$SCRIPT_DIR/install-micelio.sh"
+echo
+
 echo "========================================="
 echo "✓ Setup completado!"
 echo "========================================="
 echo
 echo "Para usar Micelio:"
-echo "  1. Abre VS Code (recomendado)"
-echo "  2. source venv/bin/activate  # activar venv"
-echo "  3. cd MICELIO && python main.py  # correr REPL"
-echo "  4. cd MICELIO && python main.py archivo.mice  # ejecutar archivo"
+echo "  1. source venv/bin/activate  # activar venv"
+echo "  2. micelio archivo.mice      # ejecutar archivo"
+echo "  3. micelio                   # abrir REPL"
+echo "  4. Abre VS Code (recomendado)"
 echo
 echo "Documentación: docs/README.md"

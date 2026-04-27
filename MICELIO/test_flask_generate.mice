@@ -1,4 +1,0 @@
-importar "flask.mice" como web
-
-var ok = web.generar_demo("tmp_flask_demo", "app")
-imp "Generado: " + aTexto(ok)

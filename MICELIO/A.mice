@@ -1,22 +1,16 @@
-var a = [[1,2], [3,4]]
-var b = [[5,6], [7,8]]
+funcion factorial(n){
+    si (n == 0) {
+     regresa 1;
+    } sino {
+        regresa n * factorial(n - 1);
+    }
+}
 
-imp a*b
 
-var datos = [1, 2, 3, 4, 5]
-var total = datos
-	|> map(funcion (x) { x })
-	|> filter(funcion (x) { verdadero })
-	|> ordenar()
-	|> reduce(funcion (acc, x) { acc + x }, 0)
 
-imp total
+imp factorial(5) # Debería imprimir 120
 
-a= [1,2,3,4]
-a=datos 
-|> map(funcion (x) { x+1})
-|> map(funcion (x) { x+1})
-|> map(funcion (x) { x+1})
-  
 
-imp a
+
+
+

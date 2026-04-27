@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+import argparse
 
 from antlr4 import CommonTokenStream, InputStream
 
@@ -76,6 +77,11 @@ def preprocess_source(code: str) -> str:
 
 
 def execute(code: str, visitor: EvalVisitor):
+    tree, _, _ = parse_source(code)
+    return visitor.visit(tree)
+
+
+def parse_source(code: str):
     preprocessed = preprocess_source(code)
     lexer = MicelioLexer(InputStream(preprocessed))
     source_lines = preprocessed.splitlines()
@@ -92,7 +98,7 @@ def execute(code: str, visitor: EvalVisitor):
     tree = parser.program()
     if syntax_listener.issues:
         raise PedagogicalSyntaxError(syntax_listener.issues, source_lines)
-    return visitor.visit(tree)
+    return tree, parser, source_lines
 
 
 def repl() -> None:
@@ -145,7 +151,31 @@ def run_file(path: str) -> int:
         return 1
 
 
+def print_tree(path: str) -> int:
+    abs_path = os.path.abspath(path)
+    with open(abs_path, "r", encoding="utf-8") as f:
+        code = f.read()
+
+    try:
+        tree, parser, _ = parse_source(code)
+        print(tree.toStringTree(recog=parser))
+        return 0
+    except PedagogicalSyntaxError as exc:
+        print(format_pedagogical_syntax_error(exc))
+        return 1
+    except (MicelioRuntimeError, Exception) as exc:
+        print(format_pedagogical_runtime_error(exc))
+        return 1
+
+
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        raise SystemExit(run_file(sys.argv[1]))
+    cli = argparse.ArgumentParser(prog="micelio")
+    cli.add_argument("path", nargs="?", help="Archivo .mice a ejecutar")
+    cli.add_argument("--tree", action="store_true", help="Muestra el arbol de parseo")
+    args = cli.parse_args()
+
+    if args.path:
+        if args.tree:
+            raise SystemExit(print_tree(args.path))
+        raise SystemExit(run_file(args.path))
     repl()

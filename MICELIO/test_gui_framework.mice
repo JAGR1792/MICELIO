@@ -1,9 +1,0 @@
-importar "gui.mice" como gui
-importar "math.mice" como mth
-
-var m = gui.crear_menu("Demo", "Menu de prueba")
-gui.menu_agregar(m, gui.accion("1", "Operacion", "descripcion"))
-
-imp "Menu OK: " + aTexto(longitud(m[2]))
-imp "API publicar ok"
-imp "PI: " + aTexto(mth.PI)
