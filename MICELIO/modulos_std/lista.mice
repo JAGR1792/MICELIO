@@ -1,8 +1,200 @@
 # ===================================================================
-# lista.mice – Módulo de utilidades para operaciones con listas
-# Proporciona funciones especializadas para trabajar con listas
+# lista.mice – Módulo de utilidades para listas
+# Operaciones y transformaciones sobre listas
 # ===================================================================
 
-# Mismo contenido que builtins para compatibilidad
-# (Se pueden importar funciones desde aquí)
+# Verifica si un elemento está en una lista
+funcion contiene(lista, elemento) {
+    para item en lista {
+        si (item == elemento) {
+            regresa verdadero
+        }
+    }
+    regresa falso
+}
+
+# Cuenta ocurrencias de un elemento
+funcion contar_ocurrencias(lista, elemento) {
+    var contador = 0
+    para item en lista {
+        si (item == elemento) {
+            contador = contador + 1
+        }
+    }
+    regresa contador
+}
+
+# Encuentra el índice de un elemento
+funcion indice_de(lista, elemento) {
+    var i = 0
+    para item en lista {
+        si (item == elemento) {
+            regresa i
+        }
+        i = i + 1
+    }
+    regresa -1
+}
+
+# Elimina duplicados preservando orden
+funcion sin_duplicados(lista) {
+    var result = []
+    para item en lista {
+        si (!contiene(result, item)) {
+            result.agregar(item)
+        }
+    }
+    regresa result
+}
+
+# Obtiene una sublista (slice)
+funcion porcion(lista, inicio, fin) {
+    var result = []
+    var i = inicio
+    mientras (i < fin y i < lista.longitud()) {
+        result.agregar(lista[i])
+        i = i + 1
+    }
+    regresa result
+}
+
+# Repite cada elemento n veces
+funcion repetir(lista, n) {
+    var result = []
+    para item en lista {
+        var i = 0
+        mientras (i < n) {
+            result.agregar(item)
+            i = i + 1
+        }
+    }
+    regresa result
+}
+
+# Intercala dos listas alternando elementos
+funcion intercalar(lista1, lista2) {
+    var result = []
+    var i = 0
+    var len1 = lista1.longitud()
+    var len2 = lista2.longitud()
+    mientras (i < len1 o i < len2) {
+        si (i < len1) {
+            result.agregar(lista1[i])
+        }
+        si (i < len2) {
+            result.agregar(lista2[i])
+        }
+        i = i + 1
+    }
+    regresa result
+}
+
+# Rellena una lista a cierta longitud
+funcion rellenar(lista, longitud, valor) {
+    var result = []
+    para item en lista {
+        result.agregar(item)
+    }
+    var i = result.longitud()
+    mientras (i < longitud) {
+        result.agregar(valor)
+        i = i + 1
+    }
+    regresa result
+}
+
+# Particiona una lista en grupos de tamaño n
+funcion agrupar(lista, tamaño) {
+    var result = []
+    var grupo = []
+    para item en lista {
+        grupo.agregar(item)
+        si (grupo.longitud() == tamaño) {
+            result.agregar(grupo)
+            grupo = []
+        }
+    }
+    si (grupo.longitud() > 0) {
+        result.agregar(grupo)
+    }
+    regresa result
+}
+
+# Ordena una lista en orden ascendente
+funcion ordenar_asc(lista) {
+    var result = []
+    para item en lista {
+        result.agregar(item)
+    }
+    var n = result.longitud()
+    var i = 0
+    mientras (i < n) {
+        var j = i + 1
+        mientras (j < n) {
+            si (result[j] < result[i]) {
+                var temp = result[i]
+                result[i] = result[j]
+                result[j] = temp
+            }
+            j = j + 1
+        }
+        i = i + 1
+    }
+    regresa result
+}
+
+# Ordena una lista en orden descendente
+funcion ordenar_desc(lista) {
+    var result = []
+    para item en lista {
+        result.agregar(item)
+    }
+    var n = result.longitud()
+    var i = 0
+    mientras (i < n) {
+        var j = i + 1
+        mientras (j < n) {
+            si (result[j] > result[i]) {
+                var temp = result[i]
+                result[i] = result[j]
+                result[j] = temp
+            }
+            j = j + 1
+        }
+        i = i + 1
+    }
+    regresa result
+}
+
+# Comprueba si está ordenada ascendentemente
+funcion es_ordenada(lista) {
+    para i en rango(lista.longitud() - 1) {
+        si (lista[i] > lista[i + 1]) {
+            regresa falso
+        }
+    }
+    regresa verdadero
+}
+
+# Obtiene elementos en posiciones pares
+funcion pares(lista) {
+    var result = []
+    var i = 0
+    mientras (i < lista.longitud()) {
+        result.agregar(lista[i])
+        i = i + 2
+    }
+    regresa result
+}
+
+# Obtiene elementos en posiciones impares
+funcion impares(lista) {
+    var result = []
+    var i = 1
+    mientras (i < lista.longitud()) {
+        result.agregar(lista[i])
+        i = i + 2
+    }
+    regresa result
+}
 
