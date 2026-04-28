@@ -6,8 +6,8 @@ import os
 from antlr4 import CommonTokenStream, InputStream
 from antlr4 import ParserRuleContext
 
-from generado.MicelioLexer import MicelioLexer
-from generado.MicelioParser import MicelioParser
+from generado.gramatica.MicelioLexer import MicelioLexer
+from generado.gramatica.MicelioParser import MicelioParser
 from generado.MicelioVisitor import MicelioVisitor
 from nucleo.runtime import (
     BoundMethod,
@@ -764,20 +764,62 @@ class EvalVisitor(MicelioVisitor):
         return out
 
     def visitAnonFuncExpr(self, ctx: MicelioParser.AnonFuncExprContext):
-        params = [p.getText() for p in (ctx.param_list().ID() if ctx.param_list() else [])]
-        return FunctionValue(name=None, params=params, body_ctx=ctx.block(), closure=self.env)
+        params: list[str] = []
+        args_param = None
+        kwargs_param = None
 
-    def visitIndexExpr(self, ctx: MicelioParser.IndexExprContext):
-        container = self.visit(ctx.expr(0))
-        index = self.visit(ctx.expr(1))
-        return container[index]
+        if ctx.param_list() is not None:
+            for param_item in ctx.param_list().param_item():
+                if isinstance(param_item, MicelioParser.ParamNormalContext):
+                    params.append(param_item.ID().getText())
+                elif isinstance(param_item, MicelioParser.ParamArgsContext):
+                    args_param = param_item.ID().getText()
+                elif isinstance(param_item, MicelioParser.ParamKwargsContext):
+                    kwargs_param = param_item.ID().getText()
 
-    def visitCallExpr(self, ctx: MicelioParser.CallExprContext):
-        callee = self.visit(ctx.expr())
-        args = []
-        if ctx.exprList() is not None:
-            args = [self.visit(e) for e in ctx.exprList().expr()]
-        return self._call_callable(callee, args)
+        return FunctionValue(
+            name=None,
+            params=params,
+            args_param=args_param,
+            kwargs_param=kwargs_param,
+            body_ctx=ctx.block(),
+            closure=self.env,
+        )
+
+    def _apply_postfix_suffix(self, value, suffix_ctx):
+        if isinstance(suffix_ctx, MicelioParser.IndexSuffixContext):
+            index = self.visit(suffix_ctx.expr())
+            return value[index]
+
+        if isinstance(suffix_ctx, MicelioParser.CallSuffixContext):
+            args = []
+            if suffix_ctx.exprList() is not None:
+                args = [self.visit(e) for e in suffix_ctx.exprList().expr()]
+            return self._call_callable(value, args)
+
+        if isinstance(suffix_ctx, MicelioParser.MemberSuffixContext):
+            member = suffix_ctx.ID().getText()
+            if isinstance(value, dict) and member in value:
+                return value[member]
+            return BoundMethod(value, member)
+
+        return value
+
+    def _evaluate_postfix_expr(self, ctx: MicelioParser.PostfixExprNodeContext):
+        value = self.visit(ctx.primary())
+        suffixes = list(ctx.postfixSuffix())
+        if not suffixes:
+            return value
+
+        for suffix_ctx in suffixes:
+            value = self._apply_postfix_suffix(value, suffix_ctx)
+        return value
+
+    def visitPostfixRoot(self, ctx: MicelioParser.PostfixRootContext):
+        return self._evaluate_postfix_expr(ctx.postfixExpr())
+
+    def visitPostfixExprNode(self, ctx: MicelioParser.PostfixExprNodeContext):
+        return self._evaluate_postfix_expr(ctx)
 
     def _inc_dec(self, expr_ctx, delta: int, post: bool):
         if not isinstance(expr_ctx, MicelioParser.IdExprContext):
@@ -889,15 +931,24 @@ class EvalVisitor(MicelioVisitor):
         left_value = self.visit(ctx.expr(0))
         right_ctx = ctx.expr(1)
 
-        if isinstance(right_ctx, MicelioParser.CallExprContext):
-            callee = self.visit(right_ctx.expr())
-            args = []
-            if right_ctx.exprList() is not None:
-                args = [self.visit(e) for e in right_ctx.exprList().expr()]
-            if not args:
-                return self._call_callable(callee, [left_value])
-            pipe_args = [args[0], left_value] + args[1:]
-            return self._call_callable(callee, pipe_args)
+        postfix_root = right_ctx if isinstance(right_ctx, MicelioParser.PostfixRootContext) else None
+        postfix_expr = postfix_root.postfixExpr() if postfix_root is not None else None
+
+        if isinstance(postfix_expr, MicelioParser.PostfixExprNodeContext):
+            suffixes = list(postfix_expr.postfixSuffix())
+            if suffixes and isinstance(suffixes[-1], MicelioParser.CallSuffixContext):
+                callee = self.visit(postfix_expr.primary())
+                for suffix_ctx in suffixes[:-1]:
+                    callee = self._apply_postfix_suffix(callee, suffix_ctx)
+
+                call_suffix = suffixes[-1]
+                args = []
+                if call_suffix.exprList() is not None:
+                    args = [self.visit(e) for e in call_suffix.exprList().expr()]
+                if not args:
+                    return self._call_callable(callee, [left_value])
+                pipe_args = [args[0], left_value] + args[1:]
+                return self._call_callable(callee, pipe_args)
 
         callee = self.visit(right_ctx)
         return self._call_callable(callee, [left_value])

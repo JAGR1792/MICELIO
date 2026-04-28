@@ -1790,7 +1790,9 @@ def make_primitives() -> dict[str, Any]:
 
 
 def make_builtins() -> dict[str, Any]:
-    def _map(fn: Callable[..., Any], iterable: list[Any]) -> list[Any]:
+    def _map(fn: Callable[..., Any], iterable: Any) -> Any:
+        if not isinstance(iterable, list):
+            return fn(iterable)
         return [fn(x) for x in iterable]
 
     def _filter(fn: Callable[..., Any], iterable: list[Any]) -> list[Any]:

@@ -7,8 +7,8 @@ import argparse
 
 from antlr4 import CommonTokenStream, InputStream
 
-from generado.MicelioLexer import MicelioLexer
-from generado.MicelioParser import MicelioParser
+from generado.gramatica.MicelioLexer import MicelioLexer
+from generado.gramatica.MicelioParser import MicelioParser
 from nucleo.eval_visitor import EvalVisitor
 from nucleo.runtime import MicelioRuntimeError, micelio_repr
 from errores.pedagogicos import (

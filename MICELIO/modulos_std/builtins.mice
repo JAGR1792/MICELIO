@@ -20,8 +20,13 @@ funcion longitud(coleccion) {
 
 # ─── Funcionales de orden superior ──────────────────────────────────
 
-# Aplica una función a cada elemento de una lista
+# Aplica una función a cada elemento de una lista,
+# o al valor completo si ya no es una lista.
 funcion map(funcion_f, lista) {
+    si (tipo(lista) != "lista") {
+        regresa funcion_f(lista)
+    }
+
     var resultado = []
     para elemento en lista {
         resultado.agregar(funcion_f(elemento))

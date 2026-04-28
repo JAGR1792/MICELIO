@@ -1,16 +1,17 @@
-funcion factorial(n){
-    si (n == 0) {
-     regresa 1;
-    } sino {
-        regresa n * factorial(n - 1);
-    }
-}
+importar "math.mice" como math
+var datos = [3, 2, 1]
 
+datos = datos
+  |> map(funcion (x) { x+1 }) # 4,3,2
+  |> filter(funcion (x) { x % 2 == 0 }) # 4,2
+  |> ordenar() #2,4
+  |> reduce(funcion (acc, x) { acc + x }, 0)
+  |> map(funcion (x) { x + 19 }) # 25
+  |> map(math.raiz) # 5
+  |> map(math.entero)
+  
+  
+  
+  
 
-
-imp factorial(5) # Debería imprimir 120
-
-
-
-
-
+imp datos

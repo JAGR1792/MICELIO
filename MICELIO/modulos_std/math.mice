@@ -2,11 +2,29 @@
 const PI = 3.141592653589793
 const E = 2.718281828459045
 
+funcion entero(x) {
+    si (x >= 0) {
+        regresa piso(x)
+    }
+    regresa techo(x)
+}
+
+funcion flotante(x) {
+    regresa x/1.0
+}
 funcion abs(x) {
     si (x < 0) {
         regresa -x
     }
     regresa x
+}
+
+funcion factorial(n){
+    si (n == 0) {
+     regresa 1;
+    } sino {
+        regresa n * factorial(n - 1);
+    }
 }
 
 funcion piso(x) {

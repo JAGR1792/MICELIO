@@ -242,12 +242,12 @@ class MicelioListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MicelioParser#memberAccess.
-    def enterMemberAccess(self, ctx:MicelioParser.MemberAccessContext):
+    # Enter a parse tree produced by MicelioParser#postfixRoot.
+    def enterPostfixRoot(self, ctx:MicelioParser.PostfixRootContext):
         pass
 
-    # Exit a parse tree produced by MicelioParser#memberAccess.
-    def exitMemberAccess(self, ctx:MicelioParser.MemberAccessContext):
+    # Exit a parse tree produced by MicelioParser#postfixRoot.
+    def exitPostfixRoot(self, ctx:MicelioParser.PostfixRootContext):
         pass
 
 
@@ -296,33 +296,6 @@ class MicelioListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MicelioParser#anonFuncExpr.
-    def enterAnonFuncExpr(self, ctx:MicelioParser.AnonFuncExprContext):
-        pass
-
-    # Exit a parse tree produced by MicelioParser#anonFuncExpr.
-    def exitAnonFuncExpr(self, ctx:MicelioParser.AnonFuncExprContext):
-        pass
-
-
-    # Enter a parse tree produced by MicelioParser#parenExpr.
-    def enterParenExpr(self, ctx:MicelioParser.ParenExprContext):
-        pass
-
-    # Exit a parse tree produced by MicelioParser#parenExpr.
-    def exitParenExpr(self, ctx:MicelioParser.ParenExprContext):
-        pass
-
-
-    # Enter a parse tree produced by MicelioParser#indexExpr.
-    def enterIndexExpr(self, ctx:MicelioParser.IndexExprContext):
-        pass
-
-    # Exit a parse tree produced by MicelioParser#indexExpr.
-    def exitIndexExpr(self, ctx:MicelioParser.IndexExprContext):
-        pass
-
-
     # Enter a parse tree produced by MicelioParser#postIncDec.
     def enterPostIncDec(self, ctx:MicelioParser.PostIncDecContext):
         pass
@@ -341,39 +314,12 @@ class MicelioListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MicelioParser#literalExpr.
-    def enterLiteralExpr(self, ctx:MicelioParser.LiteralExprContext):
-        pass
-
-    # Exit a parse tree produced by MicelioParser#literalExpr.
-    def exitLiteralExpr(self, ctx:MicelioParser.LiteralExprContext):
-        pass
-
-
     # Enter a parse tree produced by MicelioParser#unaryMinus.
     def enterUnaryMinus(self, ctx:MicelioParser.UnaryMinusContext):
         pass
 
     # Exit a parse tree produced by MicelioParser#unaryMinus.
     def exitUnaryMinus(self, ctx:MicelioParser.UnaryMinusContext):
-        pass
-
-
-    # Enter a parse tree produced by MicelioParser#dictExpr.
-    def enterDictExpr(self, ctx:MicelioParser.DictExprContext):
-        pass
-
-    # Exit a parse tree produced by MicelioParser#dictExpr.
-    def exitDictExpr(self, ctx:MicelioParser.DictExprContext):
-        pass
-
-
-    # Enter a parse tree produced by MicelioParser#mapLiteral.
-    def enterMapLiteral(self, ctx:MicelioParser.MapLiteralContext):
-        pass
-
-    # Exit a parse tree produced by MicelioParser#mapLiteral.
-    def exitMapLiteral(self, ctx:MicelioParser.MapLiteralContext):
         pass
 
 
@@ -386,12 +332,57 @@ class MicelioListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MicelioParser#callExpr.
-    def enterCallExpr(self, ctx:MicelioParser.CallExprContext):
+    # Enter a parse tree produced by MicelioParser#preIncDec.
+    def enterPreIncDec(self, ctx:MicelioParser.PreIncDecContext):
         pass
 
-    # Exit a parse tree produced by MicelioParser#callExpr.
-    def exitCallExpr(self, ctx:MicelioParser.CallExprContext):
+    # Exit a parse tree produced by MicelioParser#preIncDec.
+    def exitPreIncDec(self, ctx:MicelioParser.PreIncDecContext):
+        pass
+
+
+    # Enter a parse tree produced by MicelioParser#andExpr.
+    def enterAndExpr(self, ctx:MicelioParser.AndExprContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#andExpr.
+    def exitAndExpr(self, ctx:MicelioParser.AndExprContext):
+        pass
+
+
+    # Enter a parse tree produced by MicelioParser#postfixExprNode.
+    def enterPostfixExprNode(self, ctx:MicelioParser.PostfixExprNodeContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#postfixExprNode.
+    def exitPostfixExprNode(self, ctx:MicelioParser.PostfixExprNodeContext):
+        pass
+
+
+    # Enter a parse tree produced by MicelioParser#literalExpr.
+    def enterLiteralExpr(self, ctx:MicelioParser.LiteralExprContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#literalExpr.
+    def exitLiteralExpr(self, ctx:MicelioParser.LiteralExprContext):
+        pass
+
+
+    # Enter a parse tree produced by MicelioParser#idExpr.
+    def enterIdExpr(self, ctx:MicelioParser.IdExprContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#idExpr.
+    def exitIdExpr(self, ctx:MicelioParser.IdExprContext):
+        pass
+
+
+    # Enter a parse tree produced by MicelioParser#parenExpr.
+    def enterParenExpr(self, ctx:MicelioParser.ParenExprContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#parenExpr.
+    def exitParenExpr(self, ctx:MicelioParser.ParenExprContext):
         pass
 
 
@@ -413,21 +404,30 @@ class MicelioListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MicelioParser#preIncDec.
-    def enterPreIncDec(self, ctx:MicelioParser.PreIncDecContext):
+    # Enter a parse tree produced by MicelioParser#dictExpr.
+    def enterDictExpr(self, ctx:MicelioParser.DictExprContext):
         pass
 
-    # Exit a parse tree produced by MicelioParser#preIncDec.
-    def exitPreIncDec(self, ctx:MicelioParser.PreIncDecContext):
+    # Exit a parse tree produced by MicelioParser#dictExpr.
+    def exitDictExpr(self, ctx:MicelioParser.DictExprContext):
         pass
 
 
-    # Enter a parse tree produced by MicelioParser#idExpr.
-    def enterIdExpr(self, ctx:MicelioParser.IdExprContext):
+    # Enter a parse tree produced by MicelioParser#mapLiteral.
+    def enterMapLiteral(self, ctx:MicelioParser.MapLiteralContext):
         pass
 
-    # Exit a parse tree produced by MicelioParser#idExpr.
-    def exitIdExpr(self, ctx:MicelioParser.IdExprContext):
+    # Exit a parse tree produced by MicelioParser#mapLiteral.
+    def exitMapLiteral(self, ctx:MicelioParser.MapLiteralContext):
+        pass
+
+
+    # Enter a parse tree produced by MicelioParser#anonFuncExpr.
+    def enterAnonFuncExpr(self, ctx:MicelioParser.AnonFuncExprContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#anonFuncExpr.
+    def exitAnonFuncExpr(self, ctx:MicelioParser.AnonFuncExprContext):
         pass
 
 
@@ -440,12 +440,30 @@ class MicelioListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MicelioParser#andExpr.
-    def enterAndExpr(self, ctx:MicelioParser.AndExprContext):
+    # Enter a parse tree produced by MicelioParser#indexSuffix.
+    def enterIndexSuffix(self, ctx:MicelioParser.IndexSuffixContext):
         pass
 
-    # Exit a parse tree produced by MicelioParser#andExpr.
-    def exitAndExpr(self, ctx:MicelioParser.AndExprContext):
+    # Exit a parse tree produced by MicelioParser#indexSuffix.
+    def exitIndexSuffix(self, ctx:MicelioParser.IndexSuffixContext):
+        pass
+
+
+    # Enter a parse tree produced by MicelioParser#callSuffix.
+    def enterCallSuffix(self, ctx:MicelioParser.CallSuffixContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#callSuffix.
+    def exitCallSuffix(self, ctx:MicelioParser.CallSuffixContext):
+        pass
+
+
+    # Enter a parse tree produced by MicelioParser#memberSuffix.
+    def enterMemberSuffix(self, ctx:MicelioParser.MemberSuffixContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#memberSuffix.
+    def exitMemberSuffix(self, ctx:MicelioParser.MemberSuffixContext):
         pass
 
 

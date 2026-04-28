@@ -62,17 +62,7 @@ param_item
 block : '{' sep* (statement sep*)* '}' ;
 
 expr
-    : literal                                                         #literalExpr
-    | ID                                                              #idExpr
-    | '(' expr ')'                                                    #parenExpr
-    | '[' (expr (',' expr)*)? ']'                                     #listExpr
-    | SET '(' (expr (',' expr)*)? ')'                                 #setExpr
-    | DICT '(' (keyValue (',' keyValue)*)? ')'                        #dictExpr
-    | '{' (keyValue (',' keyValue)*)? '}'                             #mapLiteral
-    | FUNCION '(' param_list? ')' block                               #anonFuncExpr
-    | MATRIZ '(' expr ')'                                             #matrizExpr
-    | expr '[' expr ']'                                               #indexExpr
-    | expr '(' exprList? ')'                                          #callExpr
+    : postfixExpr                                                     #postfixRoot
     | op=(INC_OP | DEC_OP) expr                                       #preIncDec
     | expr op=(INC_OP | DEC_OP)                                       #postIncDec
     | '-' expr                                                        #unaryMinus
@@ -85,7 +75,28 @@ expr
     | expr O expr                                                     #orExpr
     | expr IN expr                                                    #inExpr
     | expr NEWLINE* PIPE NEWLINE* expr                                #pipeExpr
-    | expr '.' ID                                                     #memberAccess
+    ;
+
+postfixExpr
+    : primary postfixSuffix*                                          #postfixExprNode
+    ;
+
+primary
+    : literal                                                         #literalExpr
+    | ID                                                              #idExpr
+    | '(' expr ')'                                                    #parenExpr
+    | '[' (expr (',' expr)*)? ']'                                     #listExpr
+    | SET '(' (expr (',' expr)*)? ')'                                 #setExpr
+    | DICT '(' (keyValue (',' keyValue)*)? ')'                        #dictExpr
+    | '{' (keyValue (',' keyValue)*)? '}'                             #mapLiteral
+    | FUNCION '(' param_list? ')' block                               #anonFuncExpr
+    | MATRIZ '(' expr ')'                                             #matrizExpr
+    ;
+
+postfixSuffix
+    : '[' expr ']'                                                    #indexSuffix
+    | '(' exprList? ')'                                               #callSuffix
+    | '.' ID                                                          #memberSuffix
     ;
 
 keyValue : expr ':' expr ;
