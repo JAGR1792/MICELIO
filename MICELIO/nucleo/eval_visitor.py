@@ -605,8 +605,8 @@ class EvalVisitor(MicelioVisitor):
 
         self._assign_or_define(var_name, start)
 
-        # Resolve once where the loop variable lives to avoid recursive assign lookup
-        # on every iteration in tight numeric loops.
+        # Resuelve una vez donde la variable del bucle vive para evitar asignaciones recursivas
+        # En cada iteracion de bucles finitos
         target_env = self.env
         while target_env is not None and var_name not in target_env.values:
             target_env = target_env.parent
@@ -660,7 +660,7 @@ class EvalVisitor(MicelioVisitor):
             try:
                 param_items = ctx.param_list().param_item()
                 if param_items is not None:
-                    # Si es una única región, param_item() devuelve un solo elemento
+                    # Si es una única región/elemento (referente a la memoria), param_item() devuelve un solo elemento
                     if not isinstance(param_items, list):
                         param_items = [param_items]
                     
