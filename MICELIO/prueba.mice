@@ -1,0 +1,131 @@
+importar "math.mice" como math
+
+# ==========================================================
+# Prueba matemática de Micelio
+# - operaciones entre matrices 2x2
+# - funciones recursivas
+# - bucles
+# - validación de funciones math
+# ==========================================================
+
+funcion suma_2x2(a, b) {
+    regresa [[a[0][0] + b[0][0], a[0][1] + b[0][1]], [a[1][0] + b[1][0], a[1][1] + b[1][1]]]
+}
+
+funcion producto_2x2(a, b) {
+    regresa [[(a[0][0] * b[0][0]) + (a[0][1] * b[1][0]), (a[0][0] * b[0][1]) + (a[0][1] * b[1][1])], [(a[1][0] * b[0][0]) + (a[1][1] * b[1][0]), (a[1][0] * b[0][1]) + (a[1][1] * b[1][1])]]
+}
+
+funcion transpuesta_2x2(m) {
+    regresa [[m[0][0], m[1][0]], [m[0][1], m[1][1]]]
+}
+
+funcion escalar_2x2(m, k) {
+    regresa [[m[0][0] * k, m[0][1] * k], [m[1][0] * k, m[1][1] * k]]
+}
+
+funcion traza_2x2(m) {
+    regresa m[0][0] + m[1][1]
+}
+
+funcion factorial_local(n) {
+    si (n <= 1) {
+        regresa 1
+    }
+    regresa n * factorial_local(n - 1)
+}
+
+funcion fibonacci(n) {
+    si (n <= 1) {
+        regresa n
+    }
+    regresa fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+imp "=== PRUEBA MATEMATICA MICELIO ==="
+
+imp ""
+imp "--- Matrices 2x2 ---"
+var a = [[1, 2], [3, 4]]
+var b = [[5, 6], [7, 8]]
+
+imp "A:"
+imp a
+imp "B:"
+imp b
+imp "A + B:"
+imp suma_2x2(a, b)
+imp "A * B:"
+imp producto_2x2(a, b)
+imp "Transpuesta de A:"
+imp transpuesta_2x2(a)
+imp "Escalar(A, 3):"
+imp escalar_2x2(a, 3)
+imp "Traza de A:"
+imp traza_2x2(a)
+
+imp ""
+imp "--- Recursion ---"
+imp "factorial_local(5):"
+imp factorial_local(5)
+imp "fibonacci(7):"
+imp fibonacci(7)
+imp "math.factorial(6):"
+imp math.factorial(6)
+
+imp ""
+imp "--- Bucles ---"
+var total_suma = 0
+var i = 1
+mientras (i <= 5) {
+    total_suma = total_suma + i
+    i = i + 1
+}
+imp "Suma del 1 al 5:"
+imp total_suma
+
+var cuadrados = []
+var j = 1
+mientras (j <= 5) {
+    cuadrados.agregar(j * j)
+    j = j + 1
+}
+imp "Cuadrados del 1 al 5:"
+imp cuadrados
+
+imp ""
+imp "--- Math ---"
+imp "PI:"
+imp math.PI
+imp "E:"
+imp math.E
+imp "raiz(81):"
+imp math.raiz(81)
+imp "entero(4.9):"
+imp math.entero(4.9)
+imp "flotante(7):"
+imp math.flotante(7)
+imp "abs(-12):"
+imp math.abs(-12)
+imp "seno(0):"
+imp math.seno(0)
+imp "coseno(0):"
+imp math.coseno(0)
+imp "potencia(2, 5):"
+imp math.potencia(2, 5)
+imp "redondear(3.6):"
+imp math.redondear(3.6)
+
+imp ""
+imp "--- Combinacion extra ---"
+var vector = [1, 2, 3, 4]
+var acumulado = 0
+var k = 0
+mientras (k < 4) {
+    acumulado = acumulado + vector[k]
+    k = k + 1
+}
+imp "Suma de vector [1,2,3,4]:"
+imp acumulado
+
+imp "=== FIN DE PRUEBA MATEMATICA ==="

@@ -12,6 +12,7 @@ funcion entero(x) {
 funcion flotante(x) {
     regresa x/1.0
 }
+
 funcion abs(x) {
     si (x < 0) {
         regresa -x

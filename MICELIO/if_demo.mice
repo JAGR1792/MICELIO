@@ -1,0 +1,7 @@
+# Demo minimal para grun -gui
+var n = 7
+si (n % 2 == 0) {
+  imp "n es par"
+} else {
+  imp "n es impar"
+}

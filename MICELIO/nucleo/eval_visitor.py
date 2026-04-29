@@ -822,9 +822,33 @@ class EvalVisitor(MicelioVisitor):
         return self._evaluate_postfix_expr(ctx)
 
     def _inc_dec(self, expr_ctx, delta: int, post: bool):
-        if not isinstance(expr_ctx, MicelioParser.IdExprContext):
+        # Unwrap the expression to find the ID
+        # expr_ctx could be a PostfixRootContext -> PostfixExprNodeContext -> primary (IdExprContext)
+        id_expr = None
+        
+        # If it's a PostfixRootContext, get the postfixExpr
+        if isinstance(expr_ctx, MicelioParser.PostfixRootContext):
+            postfix_expr = expr_ctx.postfixExpr()
+            if isinstance(postfix_expr, MicelioParser.PostfixExprNodeContext):
+                # Check if it has no suffixes
+                if postfix_expr.getChildCount() == 1:  # Only the primary
+                    primary = postfix_expr.primary()
+                    if isinstance(primary, MicelioParser.IdExprContext):
+                        id_expr = primary
+        # If it's already an IdExprContext
+        elif isinstance(expr_ctx, MicelioParser.IdExprContext):
+            id_expr = expr_ctx
+        # If it's a PostfixExprNodeContext with no suffixes
+        elif isinstance(expr_ctx, MicelioParser.PostfixExprNodeContext):
+            if expr_ctx.getChildCount() == 1:
+                primary = expr_ctx.primary()
+                if isinstance(primary, MicelioParser.IdExprContext):
+                    id_expr = primary
+        
+        if id_expr is None:
             raise MicelioRuntimeError("++/-- solo funciona con variables")
-        name = expr_ctx.ID().getText()
+        
+        name = id_expr.ID().getText()
         cur = self.env.get(name)
         self._ensure_number(cur, "++/--")
         new_val = cur + delta

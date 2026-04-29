@@ -1,17 +1,26 @@
 importar "math.mice" como math
-var datos = [3, 2, 1]
+funcion euclides(a, b) {
+    mientras (b != 0) {
+        var temp = b
+        b = a % b
+        a = temp
+    }
+    regresa a
+}
+imp "Máximo común divisor de 48 y 18:"
+imp euclides(48, 18)
 
-datos = datos
-  |> map(funcion (x) { x+1 }) # 4,3,2
-  |> filter(funcion (x) { x % 2 == 0 }) # 4,2
-  |> ordenar() #2,4
-  |> reduce(funcion (acc, x) { acc + x }, 0)
-  |> map(funcion (x) { x + 19 }) # 25
-  |> map(math.raiz) # 5
-  |> map(math.entero)
-  
-  
-  
-  
 
-imp datos
+funcion polinomtaylor(x, n) {
+    var resultado = 1
+    var termino = 1
+    para i en rango(1, n + 1) {
+        termino = termino * (x / i)
+        resultado = resultado + termino
+    }
+    regresa resultado
+}
+imp "Valor de e^x para x=1 usando polinomio de Taylor con n=10:"
+imp polinomtaylor(1, 10)
+
+
