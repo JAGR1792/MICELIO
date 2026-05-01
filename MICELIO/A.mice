@@ -1,7 +1,8 @@
 importar "math.mice" como math
 funcion euclides(a, b) {
+    var temp
     mientras (b != 0) {
-        var temp = b
+        temp = b
         b = a % b
         a = temp
     }
