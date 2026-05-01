@@ -8,7 +8,7 @@ from antlr4 import ParserRuleContext
 
 from generado.gramatica.MicelioLexer import MicelioLexer
 from generado.gramatica.MicelioParser import MicelioParser
-from generado.MicelioVisitor import MicelioVisitor
+from generado.gramatica.MicelioVisitor import MicelioVisitor
 from nucleo.runtime import (
     BoundMethod,
     BreakFlow,
@@ -432,8 +432,10 @@ class EvalVisitor(MicelioVisitor):
         return value
 
     def visitAssignment(self, ctx: MicelioParser.AssignmentContext):
-        name = ctx.ID().getText()
+        target = ctx.assign_target()
+        name = target.ID().getText()
         value = self.visit(ctx.expr())
+        indexes = [self.visit(expr_ctx) for expr_ctx in target.expr()]
         cache_key = id(ctx)
         target_env = self._assign_env_cache.get(cache_key)
         if (
@@ -445,6 +447,18 @@ class EvalVisitor(MicelioVisitor):
             if target_env is None:
                 raise MicelioRuntimeError(f"Variable '{name}' no definida")
             self._assign_env_cache[cache_key] = target_env
+
+        if indexes:
+            container = target_env.values[name]
+            try:
+                for index in indexes[:-1]:
+                    container = container[index]
+                container[indexes[-1]] = value
+            except Exception as exc:
+                raise MicelioRuntimeError(
+                    f"No se pudo asignar a '{name}' en el indice {indexes!r}: {exc}"
+                ) from exc
+            return value
 
         if name in target_env.constants:
             raise MicelioRuntimeError(f"No se puede reasignar la constante '{name}'")

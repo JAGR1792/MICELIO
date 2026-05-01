@@ -107,7 +107,18 @@ funcion error(mensaje) {
 # ─── Generación de rangos ──────────────────────────────────────────
 
 # Genera una lista de números en un rango [inicio, fin)
-funcion rango(inicio, fin) {
+# También acepta rango(fin) como abreviatura de rango(0, fin)
+funcion rango(*args) {
+    var inicio = 0
+    var fin = 0
+    si (args.longitud() == 1) {
+        inicio = 0
+        fin = args[0]
+    } sino {
+        inicio = args[0]
+        fin = args[1]
+    }
+
     var lista = []
     var i = inicio
     mientras (i < fin) {

@@ -24,3 +24,23 @@ imp "Valor de e^x para x=1 usando polinomio de Taylor con n=10:"
 imp polinomtaylor(1, 10)
 
 
+funcion bubblesort(arr) {
+    var n = longitud(arr)
+    para i en rango(n) {
+        para j en rango(0, n - i - 1) {
+            si (arr[j] > arr[j + 1]) {
+                var temp = arr[j]
+                arr[j] = arr[j + 1]
+                arr[j + 1] = temp
+            }
+        }
+    }
+    regresa arr
+}
+
+var lista = [64, 34, 25, 12, 22, 11, 90]
+imp "Lista original:"
+imp lista
+var lista_ordenada = bubblesort(lista)
+imp "Lista ordenada:"
+imp lista_ordenada

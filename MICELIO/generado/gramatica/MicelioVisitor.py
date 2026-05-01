@@ -44,6 +44,11 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MicelioParser#assign_target.
+    def visitAssign_target(self, ctx:MicelioParser.Assign_targetContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MicelioParser#return_stmt.
     def visitReturn_stmt(self, ctx:MicelioParser.Return_stmtContext):
         return self.visitChildren(ctx)

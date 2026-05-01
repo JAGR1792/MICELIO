@@ -31,7 +31,8 @@ compound_stmt
 
 var_decl : VAR ID (',' ID)* ('=' expr (',' expr)*)? ;
 const_decl : CONST ID '=' expr ;
-assignment : ID '=' expr ;
+assignment : assign_target '=' expr ;
+assign_target : ID ('[' expr ']')* ;
 return_stmt : REGRESA expr? ;
 break_stmt : ROMPER ;
 continue_stmt : CONTINUAR ;
