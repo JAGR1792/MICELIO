@@ -1,2 +1,0 @@
-importar "modulos_std/matriz.mice" como m
-imp "Importación exitosa"

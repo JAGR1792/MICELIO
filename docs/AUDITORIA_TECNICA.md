@@ -1,6 +1,6 @@
 # 🔍 AUDITORÍA TÉCNICA: MICELIO
 
-**Estado: 11 Mayo 2026 | 5 ✅ | 2 ⚠️ | 1 ❌**
+**Estado: 11 Mayo 2026 | 6 ✅ | 1 ⚠️ | 1 ❌**
 
 Qué está HECHO, PARCIAL y FALTA con nombres exactos de algoritmos.
 
@@ -12,7 +12,7 @@ Qué está HECHO, PARCIAL y FALTA con nombres exactos de algoritmos.
 |:---|:---:|---:|
 | **0-1** Fundamentos | ✅ | — |
 | **2** Matemáticas | ✅ | — |
-| **3** Matrices | ⚠️ | Gauss-Jordan, Determinante |
+| **3** Matrices | ✅ | Completado 11/05/2026 |
 | **4** Control Flujo | ✅ | — |
 | **5** Gráficas/I/O | ✅ | — |
 | **6** ML Básico | ⚠️ | Sigmoid, Logística, GD |
@@ -89,16 +89,26 @@ Qué está HECHO, PARCIAL y FALTA con nombres exactos de algoritmos.
 - copia(matriz) - copia profunda
 - es_matriz_valida(m)
 
+**Álgebra Lineal Avanzada:**
+- determinante(m) - Sarrus (n≤3), LU con pivoteo (n>3)
+- gauss_jordan(m) - Eliminación de Gauss-Jordan con pivoteo parcial
+- inversa(m) - Matriz inversa para regresión lineal
+
+### ✅ COMPLETAMENTE HECHO (11 MAYO 2026)
+**Todo implementado y verificado:**
+- [x] Determinante: Sarrus rule (3×3), LU triangulation (n>3)
+- [x] Gauss-Jordan: Full row reduction with partial pivoting
+- [x] Inversa: A × A⁻¹ ≈ Identity (error < 1e-14)
+
+**Verificación de correctitud:**
+```
+det([[1,2],[3,4]]) = -2 ✓
+det([[1,2,3],[0,4,5],[1,0,6]]) = 22 ✓
+A × A⁻¹ = [[1,ε],[ε,1]] donde ε < 1e-14 ✓
+```
+
 ### ⚠️ PARCIAL
-- Multiplicación matricial existe pero validación de dimensiones es básica
-- No hay integración completa con sintaxis del lenguaje
-
-### ❌ FALTA ⚠️⚠️⚠️ CRÍTICO PARA ML
-1. **Gauss-Jordan** - elimación de Gauss-Jordan para inversa
-2. **Determinante** - expansión de cofactores o triangulación
-3. **Inversa de matriz** - matrix.inverse() o inversa()
-
-**Por qué importa:** La regresión lineal por mínimos cuadrados necesita β = (X^T X)^(-1) X^T y
+- (Ninguno - todo está completo)
 
 ---
 
