@@ -1,0 +1,51 @@
+# Prueba completa de matrices: determinante, inversa, y operaciones
+importar "modulos_std/matriz.mice" como mat
+
+# === DETERMINANTES ===
+imp "=== DETERMINANTES ==="
+
+# Determinante 1x1
+var m1 = [[5]]
+imp "Determinante 1x1 [[5]]:"
+imp mat.determinante(m1)
+
+# Determinante 2x2
+var m2 = [[1, 2], [3, 4]]
+imp "Determinante 2x2 [[1,2],[3,4]]:"
+imp mat.determinante(m2)
+
+# Determinante 3x3 (Sarrus)
+var m3 = [[1, 2, 3], [0, 4, 5], [1, 0, 6]]
+imp "Determinante 3x3 (Sarrus rule):"
+imp mat.determinante(m3)
+
+# === INVERSA ===
+imp ""
+imp "=== INVERSA 2x2 ==="
+
+var inv2 = mat.inversa(m2)
+imp "Inversa de [[1,2],[3,4]]:"
+imp inv2
+
+# Verificar A * A^-1 = I
+imp ""
+imp "Verificación: A * A^-1 (debe ser ~identidad):"
+var verif = mat.multiplicar(m2, inv2)
+imp verif
+
+# === FUNCIONES BÁSICAS ===
+imp ""
+imp "=== FUNCIONES BÁSICAS ==="
+
+imp "Filas de m2:"
+imp mat.filas(m2)
+
+imp "Columnas de m2:"
+imp mat.columnas(m2)
+
+imp "Transpuesta de m2:"
+imp mat.transpuesta(m2)
+
+imp "Traza de identidad 3x3:"
+var id3 = mat.identidad(3)
+imp mat.traza(id3)

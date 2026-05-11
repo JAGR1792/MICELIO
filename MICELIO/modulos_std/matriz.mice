@@ -1,11 +1,11 @@
 # ===================================================================
-# matriz.mice – Módulo de álgebra lineal y matrices
+# matriz.mice – Módulo de álgebra lineal y matrices  
 # Operaciones sobre matrices y álgebra lineal
 # ===================================================================
 
 # Crea una matriz de ceros
 funcion ceros(filas, columnas) {
-    var matriz = []
+    var m = []
     var i = 0
     mientras (i < filas) {
         var fila = []
@@ -14,15 +14,15 @@ funcion ceros(filas, columnas) {
             fila.agregar(0)
             j = j + 1
         }
-        matriz.agregar(fila)
+        m.agregar(fila)
         i = i + 1
     }
-    regresa matriz
+    regresa m
 }
 
 # Crea una matriz de unos
 funcion unos(filas, columnas) {
-    var matriz = []
+    var m = []
     var i = 0
     mientras (i < filas) {
         var fila = []
@@ -31,77 +31,78 @@ funcion unos(filas, columnas) {
             fila.agregar(1)
             j = j + 1
         }
-        matriz.agregar(fila)
+        m.agregar(fila)
         i = i + 1
     }
-    regresa matriz
+    regresa m
 }
 
 # Crea una matriz identidad (diagonal de 1s)
 funcion identidad(n) {
-    var matriz = ceros(n, n)
+    var m = ceros(n, n)
     var i = 0
     mientras (i < n) {
-        matriz[i][i] = 1
+        m[i][i] = 1
         i = i + 1
     }
-    regresa matriz
+    regresa m
 }
 
 # Obtiene el número de filas
-funcion filas(matriz) {
-    regresa matriz.longitud()
+funcion filas(m) {
+    si (longitud(m) == 0) {
+        regresa 0
+    }
+    regresa longitud(m)
 }
 
 # Obtiene el número de columnas
-funcion columnas(matriz) {
-    si (matriz.longitud() == 0) {
+funcion columnas(m) {
+    si (longitud(m) == 0) {
         regresa 0
     }
-    regresa matriz[0].longitud()
+    regresa longitud(m[0])
 }
 
 # Obtiene las dimensiones (filas, columnas)
-funcion dimensiones(matriz) {
-    regresa [filas(matriz), columnas(matriz)]
+funcion dimensiones(m) {
+    regresa [filas(m), columnas(m)]
 }
 
 # Transpone una matriz (intercambia filas por columnas)
-funcion transpuesta(matriz) {
-    si (matriz.longitud() == 0) {
+funcion transpuesta(m) {
+    si (longitud(m) == 0) {
         regresa []
     }
-    var f = filas(matriz)
-    var c = columnas(matriz)
+    var f = filas(m)
+    var c = columnas(m)
     var result = []
-    var j = 0
-    mientras (j < c) {
+    var i = 0
+    mientras (i < c) {
         var fila = []
-        var i = 0
-        mientras (i < f) {
-            fila.agregar(matriz[i][j])
-            i = i + 1
+        var j = 0
+        mientras (j < f) {
+            fila.agregar(m[j][i])
+            j = j + 1
         }
         result.agregar(fila)
-        j = j + 1
+        i = i + 1
     }
     regresa result
 }
 
 # Suma dos matrices
-funcion suma_matrices(a, b) {
-    si (filas(a) != filas(b) o columnas(a) != columnas(b)) {
-        __error("Las matrices deben tener las mismas dimensiones para sumar")
+funcion suma_matrices(m1, m2) {
+    si (filas(m1) != filas(m2) o columnas(m1) != columnas(m2)) {
+        __error("Suma: matrices deben tener las mismas dimensiones")
     }
-    var f = filas(a)
-    var c = columnas(a)
     var result = []
     var i = 0
-    mientras (i < f) {
+    mientras (i < filas(m1)) {
         var fila = []
         var j = 0
-        mientras (j < c) {
-            fila.agregar(a[i][j] + b[i][j])
+        mientras (j < columnas(m1)) {
+            fila.agregar(m1[i][j] + m2[i][j])
             j = j + 1
         }
         result.agregar(fila)
@@ -111,19 +112,17 @@ funcion suma_matrices(a, b) {
 }
 
 # Resta dos matrices
-funcion resta_matrices(a, b) {
-    si (filas(a) != filas(b) o columnas(a) != columnas(b)) {
-        __error("Las matrices deben tener las mismas dimensiones para restar")
+funcion resta_matrices(m1, m2) {
+    si (filas(m1) != filas(m2) o columnas(m1) != columnas(m2)) {
+        __error("Resta: matrices deben tener las mismas dimensiones")
     }
-    var f = filas(a)
-    var c = columnas(a)
     var result = []
     var i = 0
-    mientras (i < f) {
+    mientras (i < filas(m1)) {
         var fila = []
         var j = 0
-        mientras (j < c) {
-            fila.agregar(a[i][j] - b[i][j])
+        mientras (j < columnas(m1)) {
+            fila.agregar(m1[i][j] - m2[i][j])
             j = j + 1
         }
         result.agregar(fila)
@@ -132,130 +131,346 @@ funcion resta_matrices(a, b) {
     regresa result
 }
 
-# Multiplica una matriz por un escalar
-funcion escalar(matriz, valor) {
-    var f = filas(matriz)
-    var c = columnas(matriz)
+# Multiplica dos matrices
+funcion multiplicar(m1, m2) {
+    si (columnas(m1) != filas(m2)) {
+        __error("Multiplicación: columnas de m1 deben igualar filas de m2")
+    }
     var result = []
     var i = 0
-    mientras (i < f) {
+    mientras (i < filas(m1)) {
         var fila = []
         var j = 0
-        mientras (j < c) {
-            fila.agregar(matriz[i][j] * valor)
-            j = j + 1
-        }
-        result.agregar(fila)
-        i = i + 1
-    }
-    regresa result
-}
-
-# Multiplica dos matrices (producto punto)
-funcion multiplicar(a, b) {
-    si (columnas(a) != filas(b)) {
-        __error("Dimensiones incompatibles para multiplicación de matrices")
-    }
-    var f_a = filas(a)
-    var c_a = columnas(a)
-    var c_b = columnas(b)
-    var result = ceros(f_a, c_b)
-    var i = 0
-    mientras (i < f_a) {
-        var j = 0
-        mientras (j < c_b) {
+        mientras (j < columnas(m2)) {
             var suma = 0
             var k = 0
-            mientras (k < c_a) {
-                suma = suma + (a[i][k] * b[k][j])
+            mientras (k < columnas(m1)) {
+                suma = suma + (m1[i][k] * m2[k][j])
                 k = k + 1
             }
-            result[i][j] = suma
+            fila.agregar(suma)
             j = j + 1
         }
+        result.agregar(fila)
+        i = i + 1
+    }
+    regresa result
+}
+
+# Multiplica matriz por escalar
+funcion escalar(m, valor) {
+    var result = []
+    var i = 0
+    mientras (i < filas(m)) {
+        var fila = []
+        var j = 0
+        mientras (j < columnas(m)) {
+            fila.agregar(m[i][j] * valor)
+            j = j + 1
+        }
+        result.agregar(fila)
         i = i + 1
     }
     regresa result
 }
 
 # Obtiene una fila específica
-funcion fila(matriz, indice) {
-    regresa matriz[indice]
+funcion fila(m, n) {
+    regresa m[n]
 }
 
 # Obtiene una columna específica
-funcion columna(matriz, indice) {
-    var f = filas(matriz)
+funcion columna(m, n) {
     var col = []
     var i = 0
-    mientras (i < f) {
-        col.agregar(matriz[i][indice])
+    mientras (i < filas(m)) {
+        col.agregar(m[i][n])
         i = i + 1
     }
     regresa col
 }
 
-# Aplana una matriz a un vector (lista)
-funcion aplanar(matriz) {
-    var result = []
-    para fila en matriz {
-        para elemento en fila {
-            result.agregar(elemento)
-        }
+# Calcula la traza (suma diagonal)
+funcion traza(m) {
+    si (filas(m) != columnas(m)) {
+        __error("Traza: matriz debe ser cuadrada")
     }
-    regresa result
-}
-
-# Calcula la traza (suma de diagonal principal)
-funcion traza(matriz) {
     var suma = 0
-    var n = minimo(filas(matriz), columnas(matriz))
     var i = 0
-    mientras (i < n) {
-        suma = suma + matriz[i][i]
+    mientras (i < filas(m)) {
+        suma = suma + m[i][i]
         i = i + 1
     }
     regresa suma
 }
 
-# Verifica si es matriz válida
-funcion es_matriz_valida(m) {
-    si (tipo(m) != "lista") {
-        regresa falso
+# Calcula la norma de Frobenius
+funcion norma_frobenius(m) {
+    var suma = 0
+    var i = 0
+    mientras (i < filas(m)) {
+        var j = 0
+        mientras (j < columnas(m)) {
+            suma = suma + (m[i][j] * m[i][j])
+            j = j + 1
+        }
+        i = i + 1
     }
-    si (m.longitud() == 0) {
+    regresa sqrt(suma)
+}
+
+# Aplana matriz a vector
+funcion aplanar(m) {
+    var vec = []
+    var i = 0
+    mientras (i < filas(m)) {
+        var j = 0
+        mientras (j < columnas(m)) {
+            vec.agregar(m[i][j])
+            j = j + 1
+        }
+        i = i + 1
+    }
+    regresa vec
+}
+
+# Valida si es una matriz válida (todas filas mismo largo)
+funcion es_matriz_valida(m) {
+    si (longitud(m) == 0) {
         regresa verdadero
     }
-    var col_esperadas = m[0].longitud()
-    para fila en m {
-        si (tipo(fila) != "lista" o fila.longitud() != col_esperadas) {
+    var largo_ref = longitud(m[0])
+    var i = 1
+    mientras (i < longitud(m)) {
+        si (longitud(m[i]) != largo_ref) {
             regresa falso
         }
+        i = i + 1
     }
     regresa verdadero
 }
 
-# Norma de Frobenius
-funcion norma_frobenius(matriz) {
-    var suma = 0
-    para fila en matriz {
-        para elemento en fila {
-            suma = suma + (elemento * elemento)
+# Copia una matriz
+funcion copia(m) {
+    var c = []
+    var i = 0
+    mientras (i < filas(m)) {
+        var fila_nueva = []
+        var j = 0
+        mientras (j < columnas(m)) {
+            fila_nueva.agregar(m[i][j])
+            j = j + 1
         }
+        c.agregar(fila_nueva)
+        i = i + 1
     }
-    regresa __exp_nativo(suma / 2)
+    regresa c
 }
 
-# Copia profunda de una matriz
-funcion copia(matriz) {
-    var result = []
-    para fila en matriz {
-        var nueva_fila = []
-        para elemento en fila {
-            nueva_fila.agregar(elemento)
-        }
-        result.agregar(nueva_fila)
+# ===================================================================
+# DETERMINANTE - Calcula el determinante usando Sarrus o LU
+# Usa regla de Sarrus para n<=3, triangulación LU para n>3
+# ===================================================================
+
+funcion determinante(m) {
+    var n = filas(m)
+    si (n != columnas(m)) {
+        __error("Determinante: matriz debe ser cuadrada")
     }
-    regresa result
+    
+    si (n == 1) {
+        regresa m[0][0]
+    }
+    
+    si (n == 2) {
+        regresa (m[0][0] * m[1][1]) - (m[0][1] * m[1][0])
+    }
+    
+    si (n == 3) {
+        # Regla de Sarrus para matriz 3x3
+        var a = m[0][0]
+        var b = m[0][1]
+        var c = m[0][2]
+        var d = m[1][0]
+        var e = m[1][1]
+        var f = m[1][2]
+        var g = m[2][0]
+        var h = m[2][1]
+        var i = m[2][2]
+        
+        var det = (a*e*i) + (b*f*g) + (c*d*h) - (c*e*g) - (b*d*i) - (a*f*h)
+        regresa det
+    }
+    
+    # Para n > 3: triangulación LU con pivoteo parcial
+    var mcopia = copia(m)
+    var det = 1
+    var intercambios = 0
+    
+    var k = 0
+    mientras (k < n) {
+        # Buscar pivote máximo
+        var pivot_row = k
+        var max_val = abs(mcopia[k][k])
+        var i = k + 1
+        mientras (i < n) {
+            var val = abs(mcopia[i][k])
+            si (val > max_val) {
+                max_val = val
+                pivot_row = i
+            }
+            i = i + 1
+        }
+        
+        # Intercambiar filas si es necesario
+        si (pivot_row != k) {
+            var temp = mcopia[k]
+            mcopia[k] = mcopia[pivot_row]
+            mcopia[pivot_row] = temp
+            intercambios = intercambios + 1
+        }
+        
+        # Verificar singularidad
+        si (abs(mcopia[k][k]) < 0.0000001) {
+            regresa 0
+        }
+        
+        # Acumular factor determinante
+        det = det * mcopia[k][k]
+        
+        # Eliminación hacia adelante
+        i = k + 1
+        mientras (i < n) {
+            var factor = mcopia[i][k] / mcopia[k][k]
+            var j = k
+            mientras (j < n) {
+                mcopia[i][j] = mcopia[i][j] - (factor * mcopia[k][j])
+                j = j + 1
+            }
+            i = i + 1
+        }
+        
+        k = k + 1
+    }
+    
+    # Ajustar signo por intercambios
+    si (intercambios % 2 == 1) {
+        det = det * (-1)
+    }
+    
+    regresa det
 }
 
+# ===================================================================
+# GAUSS-JORDAN - Eliminación de Gauss-Jordan con pivoteo
+# Calcula la inversa de una matriz usando A -> [A|I] -> [I|A^-1]
+# ===================================================================
+
+funcion gauss_jordan(m) {
+    var n = filas(m)
+    si (n != columnas(m)) {
+        __error("Gauss-Jordan: matriz debe ser cuadrada")
+    }
+    
+    # Verificar determinante
+    var det = determinante(m)
+    si (abs(det) < 0.0000001) {
+        __error("Gauss-Jordan: matriz singular (determinante = 0), no es invertible")
+    }
+    
+    # Crear matriz aumentada [A | I]
+    var aumentada = []
+    var i = 0
+    mientras (i < n) {
+        var fila_aug = []
+        var j = 0
+        mientras (j < n) {
+            fila_aug.agregar(m[i][j])
+            j = j + 1
+        }
+        # Agregar identidad en la derecha
+        j = 0
+        mientras (j < n) {
+            si (j == i) {
+                fila_aug.agregar(1)
+            } sino {
+                fila_aug.agregar(0)
+            }
+            j = j + 1
+        }
+        aumentada.agregar(fila_aug)
+        i = i + 1
+    }
+    
+    # Eliminación forward con pivoteo parcial
+    var k = 0
+    mientras (k < n) {
+        # Buscar pivote máximo
+        var pivot_row = k
+        var max_val = abs(aumentada[k][k])
+        var fila_actual = k + 1
+        mientras (fila_actual < n) {
+            var val = abs(aumentada[fila_actual][k])
+            si (val > max_val) {
+                max_val = val
+                pivot_row = fila_actual
+            }
+            fila_actual = fila_actual + 1
+        }
+        
+        # Intercambiar filas
+        si (pivot_row != k) {
+            var temp = aumentada[k]
+            aumentada[k] = aumentada[pivot_row]
+            aumentada[pivot_row] = temp
+        }
+        
+        # Dividir fila k por su pivote
+        var pivot = aumentada[k][k]
+        var col = 0
+        mientras (col < (2 * n)) {
+            aumentada[k][col] = aumentada[k][col] / pivot
+            col = col + 1
+        }
+        
+        # Eliminación en todas las filas
+        var fila_e = 0
+        mientras (fila_e < n) {
+            si (fila_e != k) {
+                var factor = aumentada[fila_e][k]
+                var col_e = 0
+                mientras (col_e < (2 * n)) {
+                    aumentada[fila_e][col_e] = aumentada[fila_e][col_e] - (factor * aumentada[k][col_e])
+                    col_e = col_e + 1
+                }
+            }
+            fila_e = fila_e + 1
+        }
+        
+        k = k + 1
+    }
+    
+    # Extraer la matriz inversa (lado derecho de la aumentada)
+    var inversa = []
+    var fila_inv = 0
+    mientras (fila_inv < n) {
+        var fila = []
+        var col_inv = 0
+        mientras (col_inv < n) {
+            fila.agregar(aumentada[fila_inv][n + col_inv])
+            col_inv = col_inv + 1
+        }
+        inversa.agregar(fila)
+        fila_inv = fila_inv + 1
+    }
+    
+    regresa inversa
+}
+
+# ===================================================================
+# INVERSA - Calcula la inversa de una matriz usando Gauss-Jordan
+# ===================================================================
+
+funcion inversa(m) {
+    regresa gauss_jordan(m)
+}

@@ -1,0 +1,6 @@
+# Prueba simple de matrices
+importar "modulos_std/matriz.mice" como mat
+
+# Probar determinante 2x2
+var m2 = [[1, 2], [3, 4]]
+imp mat.determinante(m2)
