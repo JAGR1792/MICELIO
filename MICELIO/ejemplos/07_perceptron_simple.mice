@@ -1,0 +1,40 @@
+# Ejemplo 07: Perceptrón Simple (Compuerta AND)
+# Implementación manual de una sola neurona artificial
+
+imp "--- Perceptrón para Compuerta AND ---"
+
+# Pesos (w1, w2) y Sesgo (b)
+# Para una compuerta AND, necesitamos pesos que sumen > umbral solo si ambos son 1
+var w1 = 0.6
+var w2 = 0.6
+var b = -1.0 # El sesgo actúa como el umbral negativo
+
+funcion neurona(x1, x2) {
+    # Suma ponderada: z = w1*x1 + w2*x2 + b
+    var z = (w1 * x1) + (w2 * x2) + b
+    
+    # Función de activación de Paso (Heaviside)
+    si (z >= 0) {
+        regresa 1
+    } sino {
+        regresa 0
+    }
+}
+
+# Tabla de verdad
+imp "AND(0, 0) = " + aTexto(neurona(0, 0))
+imp "AND(0, 1) = " + aTexto(neurona(0, 1))
+imp "AND(1, 0) = " + aTexto(neurona(1, 0))
+imp "AND(1, 1) = " + aTexto(neurona(1, 1))
+
+imp "---"
+
+# También podemos usar la función Sigmoide para una neurona probabilística
+funcion neurona_sigmoide(x1, x2) {
+    var z = (w1 * x1) + (w2 * x2) + b
+    # sigmoid(z) = 1 / (1 + e^-z)
+    regresa 1 / (1 + exp(-z))
+}
+
+imp "Probabilidad AND(1, 1): " + aTexto(neurona_sigmoide(1, 1))
+imp "Probabilidad AND(0, 1): " + aTexto(neurona_sigmoide(0, 1))

@@ -1,0 +1,24 @@
+# Ejemplo 01: Conceptos Básicos en Micelio
+
+imp "--- Bienvenido a Micelio ---"
+
+# Variables y Concatenación
+var nombre = "Usuario"
+imp "Hola, " + nombre + "!"
+
+# Entrada de datos
+imp "¿Como te sientes hoy? "
+# leer sentimiento # Descomentar para probar interactivo
+# imp "Me alegra que te sientas " + sentimiento
+
+# Aritmética básica
+var a = 10
+var b = 3
+imp "Suma: " + aTexto(a + b)
+imp "Potencia (10^3): " + aTexto(a ** b)
+
+# Listas
+var frutas = ["Micelio", "Hifa", "Espora"]
+imp "Lista de conceptos: " + aTexto(frutas)
+frutas.agregar("Seta")
+imp "Agregando uno: " + aTexto(frutas)

@@ -1,0 +1,49 @@
+# Ejemplo 05: El Poder de la Programación Funcional en Micelio
+importar "math.mice" como math
+
+imp "--- Paradigma Funcional en Micelio ---"
+
+# 1. Funciones como ciudadanos de primera clase
+var cuadrado = funcion(x) { regresa x * x }
+var cubo = funcion(x) { regresa x * x * x }
+
+funcion aplicar_operacion(f, valor) {
+    regresa f(valor)
+}
+
+imp "Cuadrado de 5: " + aTexto(aplicar_operacion(cuadrado, 5))
+imp "Cubo de 5: " + aTexto(aplicar_operacion(cubo, 5))
+
+# 2. Map, Filter y Reduce (Ya integrados en builtins)
+var numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+imp "Lista original: " + aTexto(numeros)
+
+# Map: Elevar todos al cuadrado
+var cuadrados = map(cuadrado, numeros)
+imp "Cuadrados: " + aTexto(cuadrados)
+
+# Filter: Solo pares
+var es_par = funcion(x) { regresa x % 2 == 0 }
+var pares = filter(es_par, numeros)
+imp "Pares: " + aTexto(pares)
+
+# Reduce: Suma total
+var sumar = funcion(a, b) { regresa a + b }
+var total = reduce(sumar, numeros, 0)
+imp "Suma total (reduce): " + aTexto(total)
+
+# 3. Composición de funciones usando Pipe |>
+# Micelio soporta el operador Pipe para encadenar transformaciones
+var resultado_pipe = numeros |> filter(es_par) |> map(cuadrado) |> reduce(sumar, 0)
+imp "Resultado de (pares -> cuadrados -> suma) usando Pipe: " + aTexto(resultado_pipe)
+
+# 4. Closures (Funciones que retornan funciones)
+funcion crear_multiplicador(n) {
+    regresa funcion(x) { regresa x * n }
+}
+
+var duplicar = crear_multiplicador(2)
+var triplicar = crear_multiplicador(3)
+
+imp "Duplicar 10: " + aTexto(duplicar(10))
+imp "Triplicar 10: " + aTexto(triplicar(10))

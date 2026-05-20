@@ -1,0 +1,38 @@
+# Ejemplo 08: Regresión Lineal y Logística
+importar "modulos_std/ml.mice" como ml
+
+imp "--- Regresión Lineal (Venta de Helados según Temperatura) ---"
+
+# Datos: [Temp] -> [Ventas]
+var X = [15, 20, 25, 30, 35]
+var Y = [100, 150, 200, 250, 300]
+
+# Entrenar modelo (Cálculo directo de Beta)
+var modelo_lin = ml.regresion_lineal(X, Y)
+
+imp "Pendiente calculada: " + aTexto(modelo_lin["pendiente"])
+imp "Intercepción: " + aTexto(modelo_lin["intercepcion"])
+
+# Predicción para 27 grados
+var pred = ml.predecir_lineal(27, modelo_lin)
+imp "Ventas estimadas para 27°C: " + aTexto(pred)
+
+imp "---"
+
+imp "--- Regresión Logística (Probabilidad de Aprobar según horas de estudio) ---"
+
+# Datos: [Horas] -> [0:Reprobado, 1:Aprobado]
+var X_log = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+var Y_log = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+
+# Entrenar modelo usando Descenso de Gradiente (implementado en ml.mice)
+imp "Entrenando clasificación..."
+var modelo_log = ml.regresion_logistica(X_log, Y_log, 0.1, 1000)
+
+# Predicción para 5.5 horas
+var aprob = ml.predecir_logistica(5.5, modelo_log)
+si (aprob == 1) {
+    imp "Estudiante con 5.5h: Aprobado"
+} sino {
+    imp "Estudiante con 5.5h: Reprobado"
+}

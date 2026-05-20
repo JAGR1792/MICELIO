@@ -1,0 +1,20 @@
+# Ejemplo 04: Manejo de Errores (Pedagogicos)
+
+imp "--- Pruebas de Errores en Micelio ---"
+
+funcion dividir(a, b) {
+    si (b == 0) {
+        error("¡No se puede dividir por cero en este micelio!")
+    }
+    regresa a / b
+}
+
+imp "Intento 1: 10 / 2"
+imp dividir(10, 2)
+
+# Descomentar la siguiente linea para ver un Error Pedagogico en accion:
+# imp dividir(5, 0)
+
+imp "Intento 2: Acceder a indice inexistente"
+var lista = [1, 2, 3]
+# imp lista[10] # Esto lanzara un error descriptivo

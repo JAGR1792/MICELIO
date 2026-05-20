@@ -195,3 +195,149 @@ funcion f1_score(predichos, reales) {
     regresa 2 * (p * r) / (p + r)
 }
 
+
+# ===================================================================
+# ACTIVACIONES Y PÉRDIDAS
+# ===================================================================
+
+# Función Sigmoide
+funcion sigmoid(z) {
+    # Usamos __exp_nativo directamente para evitar problemas de importación
+    regresa 1.0 / (1.0 + __exp_nativo(-z))
+}
+
+# Derivada de Sigmoide
+funcion sigmoid_derivada(z) {
+    var s = sigmoid(z)
+    regresa s * (1.0 - s)
+}
+
+# Error Matemático Básico para no depender de math.mice
+funcion __log_basico(x) {
+    # Aproximación o uso asumiendo logarítmo nativo si existe, 
+    # pero como necesitamos Log Loss, dependemos de math.mice (log)
+    regresa 0
+}
+
+# Error Cuadrático Medio (MSE)
+funcion mse(y_real, y_pred) {
+    var n = y_real.longitud()
+    var suma_error = 0
+    var i = 0
+    mientras (i < n) {
+        var diff = y_real[i] - y_pred[i]
+        suma_error = suma_error + (diff * diff)
+        i = i + 1
+    }
+    si (n == 0) { regresa 0 }
+    regresa suma_error / n
+}
+
+# ===================================================================
+# MODELOS AVANZADOS
+# ===================================================================
+
+# Regresión Logística (Descenso de Gradiente 1D)
+funcion regresion_logistica(X, Y, learning_rate, iteraciones) {
+    var n = X.longitud()
+    var m = 0.0 # pendiente
+    var b = 0.0 # intercepción
+    
+    var i = 0
+    mientras (i < iteraciones) {
+        var sum_m = 0.0
+        var sum_b = 0.0
+        
+        var j = 0
+        mientras (j < n) {
+            var z = m * X[j] + b
+            var p = sigmoid(z)
+            var err = p - Y[j]
+            
+            sum_m = sum_m + (err * X[j])
+            sum_b = sum_b + err
+            j = j + 1
+        }
+        
+        m = m - (learning_rate * sum_m / n)
+        b = b - (learning_rate * sum_b / n)
+        i = i + 1
+    }
+    
+    regresa {"pendiente": m, "intercepcion": b}
+}
+
+# Predicción Regresión Logística
+funcion predecir_logistica(x, modelo) {
+    var z = modelo["pendiente"] * x + modelo["intercepcion"]
+    si (sigmoid(z) >= 0.5) {
+        regresa 1
+    }
+    regresa 0
+}
+
+
+# R-cuadrado (Coeficiente de determinación)
+funcion r_cuadrado(y_real, y_pred) {
+    var n = y_real.longitud()
+    var media_y = media(y_real)
+    
+    var ss_tot = 0
+    var ss_res = 0
+    var i = 0
+    mientras (i < n) {
+        var diff_tot = y_real[i] - media_y
+        ss_tot = ss_tot + (diff_tot * diff_tot)
+        
+        var diff_res = y_real[i] - y_pred[i]
+        ss_res = ss_res + (diff_res * diff_res)
+        
+        i = i + 1
+    }
+    
+    si (ss_tot == 0) { regresa 1 }
+    regresa 1 - (ss_res / ss_tot)
+}
+
+# Regresión Lineal (Descenso de Gradiente 1D)
+funcion regresion_lineal_descenso(X, Y, learning_rate, iteraciones) {
+    var n = X.longitud()
+    var m = 0.0
+    var b = 0.0
+    
+    var i = 0
+    mientras (i < iteraciones) {
+        var sum_m = 0.0
+        var sum_b = 0.0
+        
+        var j = 0
+        mientras (j < n) {
+            var pred = m * X[j] + b
+            var err = pred - Y[j]
+            
+            sum_m = sum_m + (err * X[j])
+            sum_b = sum_b + err
+            j = j + 1
+        }
+        
+        m = m - (learning_rate * 2 * sum_m / n)
+        b = b - (learning_rate * 2 * sum_b / n)
+        i = i + 1
+    }
+    
+    regresa {"pendiente": m, "intercepcion": b}
+}
+
+
+# Regresión Lineal Matricial (Mínimos Cuadrados)
+# Requiere importar matriz.mice en tu programa principal
+# Ecuación: beta = (X^T * X)^-1 * X^T * Y
+funcion regresion_lineal_matricial(X, Y) {
+    var X_T = transpuesta(X)
+    var X_T_X = multiplicar(X_T, X)
+    var inv_X_T_X = inversa(X_T_X)
+    var X_T_Y = multiplicar(X_T, Y)
+    var beta = multiplicar(inv_X_T_X, X_T_Y)
+    regresa beta
+}
+

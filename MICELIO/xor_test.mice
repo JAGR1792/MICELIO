@@ -1,0 +1,15 @@
+importar "modulos_std/dl.mice" como dl
+
+var X = [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]
+
+var Y = [[1.0, 0.0], [0.0, 1.0], [0.0, 1.0], [1.0, 0.0]]
+
+var arq = [{"in": 2, "out": 4, "act": "relu"}, {"in": 4, "out": 2, "act": "softmax"}]
+
+var modelo = dl.perceptron_multicapa(arq)
+
+dl.entrenar_red(modelo, X, Y, 2000, 0.1)
+
+imp "Test predict:"
+var res = dl.forward(modelo, X)
+imp res["salida"]

@@ -117,47 +117,47 @@ Porque importa:
 
 Estos son los huecos que más frenan el proyecto si queremos que ML/DL tenga sentido técnico.
 
-1. **Matrix completa en Python puro**
+1. **Matrix completa en Python puro** ✅
     - Falta porque casi todo ML/DL depende de multiplicación, transpuesta e inversa.
     - Más tarde sirve para regresión lineal matricial, gradientes y backpropagation.
 
-2. **Gauss-Jordan para inversa**
+2. **Gauss-Jordan para inversa** ✅
     - Falta porque la regresión lineal por mínimos cuadrados la necesita.
     - Más tarde sirve para resolver sistemas lineales y verificar estabilidad numérica.
 
-3. **Determinante**
+3. **Determinante** ✅
     - Falta porque ayuda a validar invertibilidad y a entender el comportamiento de matrices cuadradas.
     - Más tarde sirve para filtros matemáticos y control de singularidad.
 
-4. **Normalización y train-test split**
+4. **Normalización y train-test split** ✅
     - Falta porque sin eso los modelos se entrenan y evalúan mal.
     - Más tarde sirve para comparar modelos de forma seria y reproducible.
 
-5. **Regresión lineal matricial**
+5. **Regresión lineal matricial** ✅
     - Falta porque es la primera puerta real al ML con álgebra lineal.
     - Más tarde sirve como base conceptual para descenso de gradiente y modelos más complejos.
 
-6. **Regresión logística binaria**
+6. **Regresión logística binaria** ✅
     - Falta porque introduce clasificación probabilística y función sigmoide.
     - Más tarde sirve para clasificar, medir accuracy y preparar softmax.
 
-7. **Funciones de activación y sus derivadas**
+7. **Funciones de activación y sus derivadas** ✅
     - Falta porque sin ellas no existe red neuronal entrenable.
     - Más tarde sirven para capas densas, clasificación y control de gradientes.
 
-8. **Backpropagation**
+8. **Backpropagation** ✅
     - Falta porque es el núcleo del aprendizaje en redes neuronales.
     - Más tarde sirve para MLP, autoencoders y cualquier red entrenable.
 
-9. **Softmax + one-hot + categorical cross-entropy**
+9. **Softmax + one-hot + categorical cross-entropy** ✅
     - Falta porque sin esto no hay clasificación multiclase seria.
     - Más tarde sirve para salida de redes de clasificación y evaluación multi-clase.
 
-10. **Inicialización de pesos**
+10. **Inicialización de pesos** ✅
     - Falta porque afecta estabilidad y velocidad de aprendizaje.
     - Más tarde sirve para evitar redes estancadas o gradientes pobres.
 
-11. **K-means**
+11. **K-means** ✅
     - Falta menos grave que lo anterior, pero es útil como primer clustering.
     - Más tarde sirve para agrupamiento y como comparación con autoencoders.
 
@@ -318,34 +318,34 @@ Esta fase no es solo "hacer matrices". Es cerrar el bloque matemático que más 
 
 ### Implementar Clase Matrix Desde Cero
 
-- [ ]  Crear clase `Matrix` en Python puro
-- [ ]  Constructor desde listas
-- [ ]  Acceso a elementos `matrix[i][j]`
-- [ ]  Métodos para obtener dimensiones
+- [x]  Crear clase `Matrix` en Python puro
+- [x]  Constructor desde listas
+- [x]  Acceso a elementos `matrix[i][j]`
+- [x]  Métodos para obtener dimensiones
 
 ### Sintaxis en el Lenguaje
 
-- [ ]  Decidir sintaxis: `A = [[1, 2], [3, 4]]`
-- [ ]  Agregar a la gramática
+- [x]  Decidir sintaxis: `A = [[1, 2], [3, 4]]`
+- [x]  Agregar a la gramática
 
 ### Operaciones Matriciales Desde Cero
 
-- [ ]  Suma (elemento por elemento)
-- [ ]  Resta (elemento por elemento)
-- [ ]  Multiplicación (algoritmo matricial)
-- [ ]  Transpuesta (intercambio filas/columnas)
-- [ ]  Inversa (Gauss-Jordan)
-- [ ]  Determinante (expansión de cofactores o eliminacion triangular)
-- [ ]  Validación de dimensiones y manejo de errores
+- [x]  Suma (elemento por elemento)
+- [x]  Resta (elemento por elemento)
+- [x]  Multiplicación (algoritmo matricial)
+- [x]  Transpuesta (intercambio filas/columnas)
+- [x]  Inversa (Gauss-Jordan)
+- [x]  Determinante (expansión de cofactores o eliminacion triangular)
+- [x]  Validación de dimensiones y manejo de errores
 
 ### Orden sugerido de implementación
 
-1. `Matrix` y validaciones.
-2. Suma, resta y transpuesta.
-3. Multiplicación matricial.
-4. Determinante.
-5. Inversa.
-6. Pruebas con ejemplos pequeños y verificables.
+1. [x] `Matrix` y validaciones.
+2. [x] Suma, resta y transpuesta.
+3. [x] Multiplicación matricial.
+4. [x] Determinante.
+5. [x] Inversa.
+6. [x] Pruebas con ejemplos pequeños y verificables.
 
 ### Por qué esta fase es clave
 
@@ -361,16 +361,16 @@ Esta fase no es solo "hacer matrices". Es cerrar el bloque matemático que más 
 
 ### Condicionales
 
-- [ ]  Definir sintaxis if/else
-- [ ]  Operadores de comparación: `>`, `<`, `>=`, `<=`, `==`, `!=`
-- [ ]  Operadores lógicos: `and`, `or`, `not`
-- [ ]  Implementar en Visitor
+- [x]  Definir sintaxis if/else
+- [x]  Operadores de comparación: `>`, `<`, `>=`, `<=`, `==`, `!=`
+- [x]  Operadores lógicos: `and`, `or`, `not`
+- [x]  Implementar en Visitor
 
 ### Ciclos
 
-- [ ]  Definir sintaxis `for`
-- [ ]  Definir sintaxis `while`
-- [ ]  Implementar en Visitor
+- [x]  Definir sintaxis `for`
+- [x]  Definir sintaxis `while`
+- [x]  Implementar en Visitor
 
 **Entregable:** Lenguaje con estructuras de control
 
@@ -387,18 +387,18 @@ Esta fase no es solo "hacer matrices". Es cerrar el bloque matemático que más 
 
 </aside>
 
-- [ ]  Decidir formato (SVG/HTML/ASCII)
-- [ ]  Implementar gráfica de línea: `plot(x, y)`
-- [ ]  Implementar dispersión: `scatter(x, y)`
-- [ ]  Implementar histograma: `histogram(datos)`
-- [ ]  Funciones: calcular escalas, normalizar, dibujar ejes
+- [x]  Decidir formato (SVG/HTML/ASCII/PPM) (Implementado en `grafico.mice`)
+- [x]  Implementar gráfica de línea: `plot(x, y)`
+- [x]  Implementar dispersión: `scatter(x, y)`
+- [x]  Implementar histograma: `histogram(datos)`
+- [x]  Funciones: calcular escalas, normalizar, dibujar ejes
 
 ### Archivos
 
-- [ ]  Sintaxis lectura: `datos = read_file("data.txt")`
-- [ ]  Sintaxis escritura: `write_file("output.txt", contenido)`
-- [ ]  Parseo de CSV/TXT
-- [ ]  Implementar en Visitor
+- [x]  Sintaxis lectura: `datos = read_file("data.txt")`
+- [x]  Sintaxis escritura: `write_file("output.txt", contenido)`
+- [x]  Parseo de CSV/TXT
+- [x]  Implementar en Visitor (Implementado en `archivo.mice`)
 
 **Entregable:** Visualización e I/O desde cero
 
@@ -408,36 +408,36 @@ Esta fase no es solo "hacer matrices". Es cerrar el bloque matemático que más 
 
 ### Lo que realmente falta antes de llamar esto "ML listo"
 
-- [ ]  Normalización de datos.
-- [ ]  Separación train-test.
-- [ ]  Representación consistente de vectores y matrices.
-- [ ]  Métricas comparables entre modelos.
+- [x]  Normalización de datos.
+- [x]  Separación train-test.
+- [x]  Representación consistente de vectores y matrices.
+- [x]  Métricas comparables entre modelos.
 
 ### Algoritmos prioritarios
 
 ### Regresión Lineal Desde Cero
 
-- [ ]  Implementar mínimos cuadrados: β = (X^T X)^(-1) X^T y
-- [ ]  Implementar regresión lineal por descenso de gradiente
-- [ ]  Función de predicción
-- [ ]  Definir sintaxis: `modelo = linear_regression(X, y)`
-- [ ]  Métricas: MSE, R²
+- [x]  Implementar mínimos cuadrados: β = (X^T X)^(-1) X^T y
+- [x]  Implementar regresión lineal por descenso de gradiente
+- [x]  Función de predicción
+- [x]  Definir sintaxis: `modelo = linear_regression(X, y)`
+- [x]  Métricas: MSE, R²
 
 ### Regresión Logística Desde Cero
 
-- [ ]  Función sigmoide: σ(z) = 1 / (1 + e^(-z))
-- [ ]  Función de costo (log loss)
-- [ ]  Gradient descent
-- [ ]  Función de predicción
-- [ ]  Métricas: accuracy, precision, recall
-- [ ]  Umbral de clasificación configurable
+- [x]  Función sigmoide: σ(z) = 1 / (1 + e^(-z))
+- [x]  Función de costo (log loss)
+- [x]  Gradient descent
+- [x]  Función de predicción
+- [x]  Métricas: accuracy, precision, recall
+- [x]  Umbral de clasificación configurable
 
 ### Algoritmos que conviene priorizar aquí
 
-1. Regresión lineal matricial.
-2. Regresión lineal por descenso de gradiente.
-3. Regresión logística binaria.
-4. K-means como base de clustering.
+1. [x] Regresión lineal matricial.
+2. [x] Regresión lineal por descenso de gradiente.
+3. [x] Regresión logística binaria.
+4. [x] K-means como base de clustering.
 
 ### Por qué esto va antes que redes neuronales
 
@@ -460,43 +460,43 @@ Esta fase no es solo "hacer matrices". Es cerrar el bloque matemático que más 
 
 ### Componentes Base
 
-- [ ]  **Funciones de activación y derivadas:**
-    - [ ]  Sigmoid, Tanh, ReLU, Softmax
-- [ ]  **Funciones de pérdida:**
-    - [ ]  MSE, Binary Cross-Entropy, Categorical Cross-Entropy
-- [ ]  **Inicialización de pesos:**
-    - [ ]  Aleatoria, Xavier/Glorot, He
+- [x]  **Funciones de activación y derivadas:**
+    - [x]  Sigmoid, Tanh, ReLU, Softmax
+- [x]  **Funciones de pérdida:**
+    - [x]  MSE, Binary Cross-Entropy, Categorical Cross-Entropy
+- [x]  **Inicialización de pesos:**
+    - [x]  Aleatoria, Xavier/Glorot, He
 
 ### Orden de trabajo recomendado
 
-1. Activaciones y derivadas.
-2. Funciones de pérdida.
-3. Inicialización de pesos.
-4. Clase `Layer`.
-5. Clase `NeuralNetwork`.
-6. Forward propagation.
-7. Backpropagation.
-8. Mini-batch y ajuste de pesos.
+1. [x] Activaciones y derivadas.
+2. [x] Funciones de pérdida.
+3. [x] Inicialización de pesos.
+4. [x] Clase `Layer`. (Implementado como diccionarios en Micelio)
+5. [x] Clase `NeuralNetwork`. (Implementado como estructura de modelo)
+6. [x] Forward propagation.
+7. [x] Backpropagation.
+8. [x] Mini-batch y ajuste de pesos.
 
 ### Algoritmos que faltan y son realmente necesarios
 
-- [ ]  Capa densa totalmente funcional.
-- [ ]  Backpropagation con gradientes correctos.
-- [ ]  Clasificación multiclase con softmax y one-hot.
-- [ ]  Red para predicción de secuencias simples.
-- [ ]  Autoencoder o equivalente para agrupamiento/representación.
+- [x]  Capa densa totalmente funcional.
+- [x]  Backpropagation con gradientes correctos.
+- [x]  Clasificación multiclase con softmax y one-hot.
+- [x]  Red para predicción de secuencias simples.
+- [x]  Autoencoder o equivalente para agrupamiento/representación.
 
 ### Orden técnico recomendado para deep learning
 
-1. Activaciones y derivadas.
-2. Funciones de pérdida.
-3. Inicialización de pesos.
-4. Capa densa.
-5. Forward propagation.
-6. Backpropagation.
-7. Mini-batch gradient descent.
-8. Clasificación multiclase con softmax.
-9. Autoencoder o red simple de predicción.
+1. [x] Activaciones y derivadas.
+2. [x] Funciones de pérdida.
+3. [x] Inicialización de pesos.
+4. [x] Capa densa.
+5. [x] Forward propagation.
+6. [x] Backpropagation.
+7. [x] Mini-batch gradient descent.
+8. [x] Clasificación multiclase con softmax.
+9. [x] Autoencoder o red simple de predicción.
 
 ### Por qué estos algoritmos importan
 
@@ -506,19 +506,19 @@ Esta fase no es solo "hacer matrices". Es cerrar el bloque matemático que más 
 
 ### Perceptrón Multicapa
 
-- [ ]  Clase `Layer`
-- [ ]  Clase `NeuralNetwork`
-- [ ]  Forward propagation
-- [ ]  Backpropagation (cálculo de gradientes)
-- [ ]  Gradient descent y mini-batch
-- [ ]  Actualización de pesos y biases
-- [ ]  Sintaxis: `red = create_mlp([input, hidden, output])`
+- [x]  Clase `Layer`
+- [x]  Clase `NeuralNetwork`
+- [x]  Forward propagation
+- [x]  Backpropagation (cálculo de gradientes)
+- [x]  Gradient descent y mini-batch
+- [x]  Actualización de pesos y biases
+- [x]  Sintaxis: `red = create_mlp([input, hidden, output])` (Adaptado a `perceptron_multicapa`)
 
 ### Algoritmos de NN
 
-- [ ]  **Agrupamiento:** Autoencoder o K-means
-- [ ]  **Clasificación:** Red multiclase con one-hot
-- [ ]  **Predicción:** Series temporales con ventanas
+- [x]  **Agrupamiento:** Autoencoder o K-means
+- [x]  **Clasificación:** Red multiclase con one-hot
+- [x]  **Predicción:** Series temporales con ventanas
 
 **Entregable:** Framework de Deep Learning desde cero
 
@@ -526,11 +526,11 @@ Esta fase no es solo "hacer matrices". Es cerrar el bloque matemático que más 
 
 ## 🎨 FASE 8: Funciones de Usuario (Semana 9-10)
 
-- [ ]  Definir funciones: `function calcular(x, y) { return x^2 + y^2 }`
-- [ ]  Llamadas a funciones
-- [ ]  Recursión
-- [ ]  Scope (variables locales vs globales)
-- [ ]  Stack de llamadas
+- [x]  Definir funciones: `function calcular(x, y) { return x^2 + y^2 }`
+- [x]  Llamadas a funciones
+- [x]  Recursión
+- [x]  Scope (variables locales vs globales)
+- [x]  Stack de llamadas
 
 **Entregable:** Lenguaje funcionalmente completo
 

@@ -40,7 +40,7 @@ import_stmt : IMPORTAR STRING (COMO ID)? ;
 leer_stmt : LEER ID ;
 imp_stmt : IMP expr ;
 
-if_stmt : SI '(' expr ')' sep* block (sep* SINO sep* block)? ;
+if_stmt : SI '(' expr ')' sep* block (sep* SINO_SI sep* '(' expr ')' sep* block)* (sep* SINO sep* block)? ;
 switch_stmt : SEGUN '(' expr ')' sep* '{' sep* case_block+ '}' ;
 case_block
     : CASO expr ':' sep* (statement sep*)*              #caseClause
@@ -113,6 +113,7 @@ FUNCION : 'funcion' ;
 MATRIZ : 'matriz' ;
 REGRESA : 'regresa' ;
 SI : 'si' ;
+SINO_SI : 'sino_si' ;
 SINO : 'sino' ;
 SEGUN : 'segun' ;
 CASO : 'caso' ;

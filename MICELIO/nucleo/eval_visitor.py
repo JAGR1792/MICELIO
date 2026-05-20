@@ -536,11 +536,17 @@ class EvalVisitor(MicelioVisitor):
         return value
 
     def visitIf_stmt(self, ctx: MicelioParser.If_stmtContext):
-        cond = self.visit(ctx.expr())
-        if cond:
-            return self.visit(ctx.block(0))
-        if ctx.block(1):
-            return self.visit(ctx.block(1))
+        exprs = ctx.expr()
+        blocks = ctx.block()
+        
+        for i in range(len(exprs)):
+            cond = self.visit(exprs[i])
+            if cond:
+                return self.visit(blocks[i])
+                
+        if len(blocks) > len(exprs):
+            return self.visit(blocks[-1])
+            
         return None
 
     def visitSwitch_stmt(self, ctx: MicelioParser.Switch_stmtContext):

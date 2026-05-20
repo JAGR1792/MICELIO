@@ -44,6 +44,11 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MicelioParser#assign_target.
+    def visitAssign_target(self, ctx:MicelioParser.Assign_targetContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MicelioParser#return_stmt.
     def visitReturn_stmt(self, ctx:MicelioParser.Return_stmtContext):
         return self.visitChildren(ctx)
@@ -114,6 +119,21 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MicelioParser#paramNormal.
+    def visitParamNormal(self, ctx:MicelioParser.ParamNormalContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#paramArgs.
+    def visitParamArgs(self, ctx:MicelioParser.ParamArgsContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#paramKwargs.
+    def visitParamKwargs(self, ctx:MicelioParser.ParamKwargsContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MicelioParser#block.
     def visitBlock(self, ctx:MicelioParser.BlockContext):
         return self.visitChildren(ctx)
@@ -124,8 +144,8 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MicelioParser#memberAccess.
-    def visitMemberAccess(self, ctx:MicelioParser.MemberAccessContext):
+    # Visit a parse tree produced by MicelioParser#postfixRoot.
+    def visitPostfixRoot(self, ctx:MicelioParser.PostfixRootContext):
         return self.visitChildren(ctx)
 
 
@@ -154,21 +174,6 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MicelioParser#anonFuncExpr.
-    def visitAnonFuncExpr(self, ctx:MicelioParser.AnonFuncExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by MicelioParser#parenExpr.
-    def visitParenExpr(self, ctx:MicelioParser.ParenExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by MicelioParser#indexExpr.
-    def visitIndexExpr(self, ctx:MicelioParser.IndexExprContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by MicelioParser#postIncDec.
     def visitPostIncDec(self, ctx:MicelioParser.PostIncDecContext):
         return self.visitChildren(ctx)
@@ -179,23 +184,8 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MicelioParser#literalExpr.
-    def visitLiteralExpr(self, ctx:MicelioParser.LiteralExprContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by MicelioParser#unaryMinus.
     def visitUnaryMinus(self, ctx:MicelioParser.UnaryMinusContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by MicelioParser#dictExpr.
-    def visitDictExpr(self, ctx:MicelioParser.DictExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by MicelioParser#mapLiteral.
-    def visitMapLiteral(self, ctx:MicelioParser.MapLiteralContext):
         return self.visitChildren(ctx)
 
 
@@ -204,8 +194,33 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MicelioParser#callExpr.
-    def visitCallExpr(self, ctx:MicelioParser.CallExprContext):
+    # Visit a parse tree produced by MicelioParser#preIncDec.
+    def visitPreIncDec(self, ctx:MicelioParser.PreIncDecContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#andExpr.
+    def visitAndExpr(self, ctx:MicelioParser.AndExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#postfixExprNode.
+    def visitPostfixExprNode(self, ctx:MicelioParser.PostfixExprNodeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#literalExpr.
+    def visitLiteralExpr(self, ctx:MicelioParser.LiteralExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#idExpr.
+    def visitIdExpr(self, ctx:MicelioParser.IdExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#parenExpr.
+    def visitParenExpr(self, ctx:MicelioParser.ParenExprContext):
         return self.visitChildren(ctx)
 
 
@@ -219,18 +234,38 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MicelioParser#preIncDec.
-    def visitPreIncDec(self, ctx:MicelioParser.PreIncDecContext):
+    # Visit a parse tree produced by MicelioParser#dictExpr.
+    def visitDictExpr(self, ctx:MicelioParser.DictExprContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MicelioParser#idExpr.
-    def visitIdExpr(self, ctx:MicelioParser.IdExprContext):
+    # Visit a parse tree produced by MicelioParser#mapLiteral.
+    def visitMapLiteral(self, ctx:MicelioParser.MapLiteralContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MicelioParser#andExpr.
-    def visitAndExpr(self, ctx:MicelioParser.AndExprContext):
+    # Visit a parse tree produced by MicelioParser#anonFuncExpr.
+    def visitAnonFuncExpr(self, ctx:MicelioParser.AnonFuncExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#matrizExpr.
+    def visitMatrizExpr(self, ctx:MicelioParser.MatrizExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#indexSuffix.
+    def visitIndexSuffix(self, ctx:MicelioParser.IndexSuffixContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#callSuffix.
+    def visitCallSuffix(self, ctx:MicelioParser.CallSuffixContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#memberSuffix.
+    def visitMemberSuffix(self, ctx:MicelioParser.MemberSuffixContext):
         return self.visitChildren(ctx)
 
 

@@ -1,0 +1,26 @@
+# Ejemplo 03: Algebra Lineal Avanzada
+importar "matriz.mice" como mat
+
+imp "--- Operaciones con Matrices ---"
+
+var A = [[1, 2, 3], [0, 1, 4], [5, 6, 0]]
+imp "Matriz A:"
+imp A
+
+var det = mat.determinante(A)
+imp "Determinante de A:"
+imp det
+
+si (abs(det) > 0.0001) {
+    imp "Calculando Inversa..."
+    var inv = mat.inversa(A)
+    imp inv
+    
+    imp "Verificando A * inv(A) (debe dar Identidad):"
+    imp mat.multiplicar(A, inv)
+} sino {
+    imp "La matriz no tiene inversa."
+}
+
+imp "Matriz Transpuesta:"
+imp mat.transpuesta(A)

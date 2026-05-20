@@ -117,6 +117,25 @@ def repl() -> None:
 
         if line.strip().lower() in {"exit", "quit", "q"}:
             break
+        
+        # Comandos del Sistema
+        var_line = line.strip().lower()
+        if var_line == ":help":
+            print("\n--- Ayuda de Micelio ---")
+            print(":help          Muestra este mensaje")
+            print(":vars          Lista las variables en el entorno global")
+            print(":quit / exit   Sale del interprete")
+            print("------------------------\n")
+            continue
+            
+        if var_line == ":vars":
+            print("\n--- Variables Globales ---")
+            for k, v in visitor.global_env.values.items():
+                if not k.startswith("__"):
+                    print(f"{k} = {micelio_repr(v)}")
+            print("--------------------------\n")
+            continue
+
         if not line.strip():
             continue
 

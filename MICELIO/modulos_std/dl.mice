@@ -1,0 +1,217 @@
+importar "matriz.mice" como mat
+importar "math.mice" como math
+
+# ===================================================================
+# dl.mice – Módulo de Deep Learning para Micelio
+# API compatible con xor_test.mice
+# ===================================================================
+
+# ─── Utilidades ──────────────────────────────────────────────────────
+
+funcion aplicar(m, f) {
+    var r = []
+    para fila en m {
+        var nueva_fila = []
+        para elemento en fila {
+            nueva_fila.agregar(f(elemento))
+        }
+        r.agregar(nueva_fila)
+    }
+    regresa r
+}
+
+funcion hadamard(m1, m2) {
+    var f = mat.filas(m1)
+    var c = mat.columnas(m1)
+    var r = []
+    var i = 0
+    mientras (i < f) {
+        var fila = []
+        var j = 0
+        mientras (j < c) {
+            fila.agregar(m1[i][j] * m2[i][j])
+            j = j + 1
+        }
+        r.agregar(fila)
+        i = i + 1
+    }
+    regresa r
+}
+
+# ─── Activaciones ────────────────────────────────────────────────────
+
+funcion sigmoid_esc(x) { regresa 1 / (1 + exp(-x)) }
+funcion sigmoid(m) { regresa aplicar(m, sigmoid_esc) }
+funcion sigmoid_derivada(m) {
+    var r = []
+    var f = mat.filas(m)
+    var c = mat.columnas(m)
+    var i = 0
+    mientras (i < f) {
+        var fila = []
+        var j = 0
+        mientras (j < c) {
+            var v = m[i][j]
+            fila.agregar(v * (1 - v))
+            j = j + 1
+        }
+        r.agregar(fila)
+        i = i + 1
+    }
+    regresa r
+}
+
+funcion relu_esc(x) { si (x > 0) { regresa x } regresa 0 }
+funcion relu(m) { regresa aplicar(m, relu_esc) }
+funcion relu_derivada(m) {
+    var r = []
+    var f = mat.filas(m)
+    var c = mat.columnas(m)
+    var i = 0
+    mientras (i < f) {
+        var fila = []
+        var j = 0
+        mientras (j < c) {
+            si (m[i][j] > 0) { fila.agregar(1) } sino { fila.agregar(0) }
+            j = j + 1
+        }
+        r.agregar(fila)
+        i = i + 1
+    }
+    regresa r
+}
+
+funcion softmax(m) {
+    var r = []
+    para fila en m {
+        var max_val = max_lista(fila)
+        var exps = []
+        var suma_exps = 0
+        para x en fila {
+            var v = exp(x - max_val)
+            exps.agregar(v)
+            suma_exps = suma_exps + v
+        }
+        var sf = []
+        para e en exps { sf.agregar(e / suma_exps) }
+        r.agregar(sf)
+    }
+    regresa r
+}
+
+# ─── Inicialización ─────────────────────────────────────────────────
+
+funcion perceptron_multicapa(arquitectura) {
+    var capas = []
+    para conf en arquitectura {
+        var n_in = conf["in"]
+        var n_out = conf["out"]
+        var W = mat.ceros(n_in, n_out)
+        var i = 0
+        mientras (i < n_in) {
+            var j = 0
+            mientras (j < n_out) {
+                W[i][j] = (aleatorio() * 2 - 1) * math.raiz(6 / (n_in + n_out))
+                j = j + 1
+            }
+            i = i + 1
+        }
+        var b = mat.ceros(1, n_out)
+        capas.agregar({"W": W, "b": b, "act": conf["act"]})
+    }
+    regresa {"capas": capas}
+}
+
+# ─── Motor ──────────────────────────────────────────────────────────
+
+funcion forward(modelo, X) {
+    var activaciones = [X]
+    var actual = X
+    para capa en modelo["capas"] {
+        var Z = mat.multiplicar(actual, capa["W"])
+        # Sumar b
+        var f_z = mat.filas(Z)
+        var c_z = mat.columnas(Z)
+        var fi = 0
+        mientras (fi < f_z) {
+            var ci = 0
+            mientras (ci < c_z) {
+                Z[fi][ci] = Z[fi][ci] + capa["b"][0][ci]
+                ci = ci + 1
+            }
+            fi = fi + 1
+        }
+        
+        si (capa["act"] == "relu") { actual = relu(Z) }
+        sino_si (capa["act"] == "sigmoid") { actual = sigmoid(Z) }
+        sino_si (capa["act"] == "softmax") { actual = softmax(Z) }
+        sino { actual = Z }
+        
+        activaciones.agregar(actual)
+    }
+    regresa {"salida": actual, "activaciones": activaciones}
+}
+
+funcion entrenar_red(modelo, X, Y, epochs, lr) {
+    para e en rango(epochs) {
+        var fwd = forward(modelo, X)
+        var pred = fwd["salida"]
+        var activaciones = fwd["activaciones"]
+        
+        var delta = mat.resta_matrices(pred, Y)
+        
+        var i = modelo["capas"].longitud() - 1
+        mientras (i >= 0) {
+            var capa = modelo["capas"][i]
+            var A_prev = activaciones[i]
+            
+            var dW = mat.multiplicar(mat.transpuesta(A_prev), delta)
+            var db = mat.ceros(1, mat.columnas(delta))
+            para fila_d en delta {
+                var c_idx = 0
+                mientras (c_idx < fila_d.longitud()) {
+                    db[0][c_idx] = db[0][c_idx] + fila_d[c_idx]
+                    c_idx = c_idx + 1
+                }
+            }
+            
+            si (i > 0) {
+                var error_oculto = mat.multiplicar(delta, mat.transpuesta(capa["W"]))
+                var act_prev = modelo["capas"][i-1]["act"]
+                si (act_prev == "relu") {
+                    delta = hadamard(error_oculto, relu_derivada(activaciones[i]))
+                } sino_si (act_prev == "sigmoid") {
+                    delta = hadamard(error_oculto, sigmoid_derivada(activaciones[i]))
+                } sino {
+                    delta = error_oculto
+                }
+            }
+            
+            capa["W"] = mat.resta_matrices(capa["W"], mat.escalar(dW, lr))
+            capa["b"] = mat.resta_matrices(capa["b"], mat.escalar(db, lr))
+            
+            i = i - 1
+        }
+        
+        si (e % 200 == 0 o e == epochs - 1) {
+            imp "Epoch " + aTexto(e) + " - Error: " + aTexto(error_mse(Y, pred))
+        }
+    }
+}
+
+funcion error_mse(y_true, y_pred) {
+    var f = mat.filas(y_true)
+    var c = mat.columnas(y_true)
+    var s = 0
+    var i = 0
+    mientras (i < f) {
+        var j = 0
+        mientras (j < c) {
+            var d = y_true[i][j] - y_pred[i][j]
+            s = s + (d * d)
+            j = j + 1
+        }
+        i = i + 1
+    }
+    regresa s / (f * c)
+}

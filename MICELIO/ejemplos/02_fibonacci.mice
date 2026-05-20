@@ -1,0 +1,36 @@
+# Ejemplo 02: Fibonacci en Micelio
+importar "matriz.mice" como mat
+
+# 1. Versión Recursiva Clásica
+funcion fibonacci_recursivo(n) {
+    si (n <= 1) { regresa n }
+    regresa fibonacci_recursivo(n - 1) + fibonacci_recursivo(n - 2)
+}
+
+imp "Fibonacci recursivo (n=10):"
+imp fibonacci_recursivo(10)
+
+# 2. Versión por Exponenciación de Matrices
+# La formula es [[1,1],[1,0]]^n = [[F(n+1), F(n)], [F(n), F(n-1)]]
+funcion fibonacci_matriz(n) {
+    si (n == 0) { regresa 0 }
+    si (n == 1) { regresa 1 }
+    
+    var T = [[1, 1], [1, 0]]
+    var res = [[1, 1], [1, 0]]
+    
+    # Exponenciación simple (podría ser binaria para eficiencia)
+    var i = 1
+    mientras (i < n - 1) {
+        res = mat.multiplicar(res, T)
+        i = i + 1
+    }
+    
+    regresa res[0][0] # F(n)
+}
+
+imp "Fibonacci por matrices (n=10):"
+imp fibonacci_matriz(10)
+
+imp "Calculando n=20 por matrices:"
+imp fibonacci_matriz(20)
