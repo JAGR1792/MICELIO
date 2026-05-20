@@ -1,0 +1,25 @@
+# Ejemplo 09: Clustering K-Means Visual
+importar "../modulos_std/ml.mice" como ml
+importar "../modulos_std/grafico.mice" como g
+
+imp "--- Clustering K-Means ---"
+
+# Generar datos en dos nubes
+var X = [
+    [1.1, 1.2], [0.9, 0.8], [1.0, 1.0], # Grupo 1
+    [5.0, 5.1], [4.8, 4.9], [5.2, 5.0]  # Grupo 2
+]
+
+imp "Entrenando K-Means con k=2..."
+var resultado = ml.k_means(X, 2, 10)
+
+var centroides = resultado["centroides"]
+var asignaciones = resultado["asignaciones"]
+
+imp "Centroides encontrados:"
+imp centroides
+
+# Configurar gráfico
+g.set_titulo("K-Means en Micelio")
+g.scatter(X, asignaciones) # Colorear por cluster
+g.mostrar()

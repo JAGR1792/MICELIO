@@ -1,0 +1,33 @@
+# Ejemplo 12: Clasificacion Multiclase (Tipo Iris)
+importar "../modulos_std/dl.mice" como dl
+
+imp "--- Clasificador Multiclase con Softmax ---"
+
+# Entradas (ej: Sepal length, Sepal width)
+var X = [
+    [5.1, 3.5], [4.9, 3.0], # Clase 0
+    [7.0, 3.2], [6.4, 3.2], # Clase 1
+    [6.3, 3.3], [5.8, 2.7]  # Clase 2
+]
+
+# Salidas One-Hot
+var Y = [
+    [1, 0, 0], [1, 0, 0], # Clase 0
+    [0, 1, 0], [0, 1, 0], # Clase 1
+    [0, 0, 1], [0, 0, 1]  # Clase 2
+]
+
+# Red: 2 -> 5 -> 3
+var arq = [
+    {"in": 2, "out": 5, "act": "relu"},
+    {"in": 5, "out": 3, "act": "softmax"}
+]
+
+var modelo = dl.perceptron_multicapa(arq)
+
+imp "Entrenando clasificador multiclase..."
+dl.entrenar_red(modelo, X, Y, 2000, 0.05)
+
+imp "Prediccion para [5.0, 3.4] (Debe ser cercano a Clase 0):"
+var res = dl.forward(modelo, [[5.0, 3.4]])
+imp res["salida"]

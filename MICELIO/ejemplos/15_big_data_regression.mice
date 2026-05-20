@@ -1,0 +1,31 @@
+# Ejemplo 15: Big Data Regression (100 puntos)
+importar "../modulos_std/ml.mice" como ml
+
+imp "--- Generando Dataset Realista (100 puntos) ---"
+
+var X_data = []
+var Y_data = []
+
+# Generamos y = 2x + 5 + ruido
+para i en rango(100) {
+    var val_x = i * 0.5
+    var ruido = (aleatorio() * 2 - 1) * 2 # Ruido entre -2 y 2
+    var val_y = 2 * val_x + 5 + ruido
+    X_data.agregar(val_x)
+    Y_data.agregar(val_y)
+}
+
+imp "Dataset generado con exito."
+imp "Entrenando Regresion Lineal por Descenso de Gradiente..."
+
+# Usamos una tasa de aprendizaje pequeña para estabilidad
+var modelo = ml.regresion_lineal_descenso(X_data, Y_data, 0.001, 1000)
+
+imp "Resultados finales:"
+imp "Pendiente (Esperada ~2.0): " + aTexto(modelo["pendiente"])
+imp "Intercepcion (Esperada ~5.0): " + aTexto(modelo["intercepcion"])
+
+# Validacion con un punto fuera del rango
+var test_x = 60
+var pred = ml.predecir_lineal(test_x, modelo)
+imp "Prediccion para x=60: " + aTexto(pred)

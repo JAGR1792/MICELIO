@@ -1,5 +1,5 @@
 # Ejemplo 08: Regresión Lineal y Logística
-importar "modulos_std/ml.mice" como ml
+importar "../modulos_std/ml.mice" como ml
 
 imp "--- Regresión Lineal (Venta de Helados según Temperatura) ---"
 

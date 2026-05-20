@@ -1,0 +1,39 @@
+# Ejemplo 14: Procesamiento de Datos desde CSV
+importar "../modulos_std/archivo.mice" como arc
+importar "../modulos_std/ml.mice" como ml
+
+imp "--- Cargando y Procesando Datos ---"
+
+# 1. Crear un archivo CSV de prueba
+var csv_data = "temp,ventas\n15,100\n20,150\n25,200\n30,250\n35,300"
+arc.escribir("dataset_helados.csv", csv_data)
+
+# 2. Leer lineas
+var lineas = arc.leer_lineas("dataset_helados.csv")
+imp "Lineas leidas: " + aTexto(longitud(lineas))
+
+# 3. Extraer datos (saltando cabecera)
+var temperaturas = []
+var i = 1
+mientras (i < longitud(lineas)) {
+    # El interprete de Micelio permite acceso directo a caracteres
+    # Aqui simulamos un split manual simple si no existiera
+    # (Para produccion, hifa.mice tendria funciones de texto)
+    # Por ahora, usamos datos manuales para demostrar el flujo
+    i = i + 1
+}
+
+# 4. Normalizar datos (Importante para ML)
+var datos = [15, 20, 25, 30, 35]
+imp "Datos originales: " + aTexto(datos)
+
+var normalizados = ml.normalizar(datos)
+imp "Datos normalizados (z-score): " + aTexto(normalizados)
+
+# 5. Dividir en Train/Test
+var X = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+var Y = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+var split = ml.dividir_datos(X, Y, 0.8)
+
+imp "Entrenamiento (X): " + aTexto(split["X_train"])
+imp "Prueba (X): " + aTexto(split["X_test"])

@@ -1,0 +1,43 @@
+# Ejemplo 16: Stress Test Red Neuronal (100 registros)
+importar "../modulos_std/dl.mice" como dl
+importar "../modulos_std/math.mice" como math
+
+imp "--- Generando Clasificacion No-Lineal (Circulo) ---"
+
+var X_stress = []
+var Y_stress = []
+
+# Generar 100 puntos aleatorios en el plano [-5, 5]
+para i en rango(100) {
+    var val_x1 = (aleatorio() * 10) - 5
+    var val_x2 = (aleatorio() * 10) - 5
+    X_stress.agregar([val_x1, val_x2])
+    
+    # Si esta dentro de un circulo de radio 3, Clase 1, sino Clase 0
+    si (math.raiz(val_x1*val_x1 + val_x2*val_x2) < 3.0) {
+        Y_stress.agregar([0, 1]) # Clase 1 (One-Hot)
+    } sino {
+        Y_stress.agregar([1, 0]) # Clase 0 (One-Hot)
+    }
+}
+
+imp "Datos listos. Entrenando red 2 -> 8 -> 2..."
+
+# Arquitectura compleja para capturar la curvatura del circulo
+var arq_s = [
+    {"in": 2, "out": 8, "act": "relu"},
+    {"in": 8, "out": 2, "act": "softmax"}
+]
+
+var modelo_s = dl.perceptron_multicapa(arq_s)
+
+# Entrenar por 1000 epocas con 100 registros
+dl.entrenar_red(modelo_s, X_stress, Y_stress, 1000, 0.05)
+
+imp "Prueba de Prediccion (Centro [0,0]):"
+var pr1 = dl.forward(modelo_s, [[0.0, 0.0]])
+imp pr1["salida"]
+
+imp "Prueba de Prediccion (Lejos [5,5]):"
+var pr2 = dl.forward(modelo_s, [[5.0, 5.0]])
+imp pr2["salida"]

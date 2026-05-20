@@ -1,159 +1,144 @@
-# 🍄 Manual Maestro de MICELIO: El Lenguaje de la Esencia Artificial
+# 🍄 LIBRO BLANCO DE MICELIO (MICELIO WHITE PAPER)
+**Versión: 2.0 | El Lenguaje de la Esencia Artificial**
 
-Bienvenido a la documentación oficial de **MICELIO**. Este manual está diseñado para llevarte desde el "Hola Mundo" hasta la implementación de redes neuronales profundas, todo bajo un enfoque de **programación funcional** y **DSL para Machine Learning**.
-
----
-
-## 💎 1. Filosofía del Lenguaje
-Micelio es un lenguaje de dominio específico (DSL) cuya meta es eliminar las "cajas negras" (librerías externas como Scikit-Learn o Numpy) para que el estudiante implemente los algoritmos desde su base matemática.
-
-**Principales Pilares:**
-1. **Todo es Micelio:** Las matemáticas, matrices y redes están escritas en el propio lenguaje.
-2. **Funcionalismo:** Las funciones son ciudadanos de primera clase.
-3. **Simplicidad Pedagógica:** Errores que te enseñan qué hiciste mal.
+Micelio es un lenguaje de programación de dominio específico (DSL) diseñado para la implementación de algoritmos de Inteligencia Artificial desde su base matemática, siguiendo un paradigma de programación funcional y estructural.
 
 ---
 
-## 🛠️ 2. Guía Rápida de Sintaxis
+## 📑 CONTENIDO
+1. [Introducción y Filosofía](#1-introducción-y-filosofía)
+2. [Guía de Sintaxis Completa](#2-guía-de-sintaxis-completa)
+3. [El Paradigma Funcional](#3-el-paradigma-funcional)
+4. [Álgebra Lineal desde Cero](#4-álgebra-lineal-desde-cero)
+5. [Machine Learning Clásico](#5-machine-learning-clásico)
+6. [Deep Learning: El Motor de Redes Neuronales](#6-deep-learning-el-motor-de-redes-neuronales)
+7. [Visualización y I/O](#7-visualización-y-io)
+8. [Guía para el Estudiante (Sklearn to Micelio)](#8-guía-para-el-estudiante)
 
-### Variables y Constantes
+---
+
+## 1. Introducción y Filosofía
+Micelio nace bajo la premisa "Para entender, hay que construir". A diferencia de otros lenguajes que dependen de librerías como NumPy o Scikit-Learn, Micelio obliga a que cada operación matricial, cada derivada y cada ajuste de pesos sea explícito y comprensible.
+
+---
+
+## 2. Guía de Sintaxis Completa
+
+### Variables y Ámbito (Scope)
 ```micelio
-var nombre = "Micelio"  # Variable mutable
-const PI = 3.1415       # Constante
+var x = 10         # Variable global o local al bloque
+const E = 2.718    # Constante inmutable
 ```
 
-### Tipos de Datos
-- **Números:** `10`, `3.14`
-- **Textos:** `"Hola"`
-- **Listas:** `[1, 2, 3]`
-- **Diccionarios:** `{"clave": "valor"}`
-- **Booleanos:** `verdadero`, `falso`
-- **Nulo:** `nulo`
+### Estructuras de Datos
+- **Listas:** Dinámicas y heterogéneas. `var l = [1, "dos", [3]]`. Soportan `.agregar(v)` y `.longitud()`.
+- **Diccionarios:** Pares clave-valor. `var d = {"in": 4, "out": 2}`.
+- **Sets:** Colecciones de elementos únicos. `var s = set(1, 2, 2)`.
 
-### Control de Flujo
+### Control de Flujo Avanzado
 ```micelio
 # Condicionales
-si (x > 0) { ... } sino_si (x < 0) { ... } sino { ... }
+si (condicion) { ... } sino_si (otra) { ... } sino { ... }
 
 # Ciclos
-mientras (condicion) { ... }
-para i en rango(10) { ... }
-para elemento en lista { ... }
+mientras (x < 10) { x++ }
+para i en rango(0, 10, 1) { imp i } # inicio, fin, paso
+para elemento en mi_lista { imp elemento }
 ```
 
 ---
 
-## 🧩 3. Programación Funcional Avanzada
+## 3. El Paradigma Funcional
+Micelio trata a las funciones como **ciudadanos de primera clase**.
 
-Micelio brilla en su capacidad funcional. Puedes encadenar operaciones usando el operador **Pipe** (`|>`).
-
-### Map, Filter y Reduce
+### Funciones de Orden Superior
 ```micelio
-var lista = [1, 2, 3, 4, 5]
-
-# Obtener suma de cuadrados de los pares
-var resultado = lista 
-    |> filter(funcion(x) { regresa x % 2 == 0 }) 
-    |> map(funcion(x) { regresa x * x }) 
-    |> reduce(funcion(a, b) { regresa a + b }, 0)
+funcion ejecutar(f, x) { regresa f(x) }
+var res = ejecutar(funcion(n){ regresa n * n }, 5)
 ```
 
-### Closures
+### El Operador Pipe (`|>`)
+Permite encadenar transformaciones de datos de forma elegante:
 ```micelio
-funcion crear_sumador(n) {
-    regresa funcion(x) { regresa x + n }
+var resultado = datos |> filter(es_par) |> map(cuadrado) |> reduce(sumar, 0)
+```
+
+### Closures y Currificación
+```micelio
+funcion potencia(n) {
+    regresa funcion(x) { regresa x ** n }
 }
-var suma5 = crear_sumador(5)
-imp suma5(10) # Resultado: 15
+var al_cubo = potencia(3)
+imp al_cubo(2) # 8
 ```
 
 ---
 
-## 🔲 4. Álgebra Lineal (matriz.mice)
+## 4. Álgebra Lineal desde Cero (`matriz.mice`)
+El corazón matemático de Micelio.
 
-Micelio incluye un motor matricial robusto escrito desde cero.
-
-```micelio
-importar "matriz.mice" como mat
-
-var A = [[1, 2], [3, 4]]
-var B = [[5, 6], [7, 8]]
-
-var C = mat.multiplicar(A, B)  # Producto matricial
-var det = mat.determinante(A)   # LU o Sarrus
-var inv = mat.inversa(A)        # Gauss-Jordan
-```
+- `mat.multiplicar(A, B)`: Producto matricial (O(n^3)).
+- `mat.determinante(M)`: Implementación de LU para matrices grandes y Sarrus para 3x3.
+- `mat.inversa(M)`: Eliminación de Gauss-Jordan con pivoteo parcial.
+- `mat.transpuesta(M)`: Rotación de ejes.
 
 ---
 
-## 🧠 5. Machine Learning (ml.mice y dl.mice)
+## 5. Machine Learning Clásico (`ml.mice`)
+Implementaciones estructurales de algoritmos base.
 
-Aquí es donde Micelio cumple su propósito como DSL para IA.
+### Regresión Lineal Matricial
+Resuelve `beta = (X'X)^-1 X'y` usando el motor de álgebra lineal de Micelio.
 
-### Neurona Artificial (Perceptrón)
-Puedes programar una neurona manualmente definiendo sus pesos y función de activación:
+### K-Means Clustering
+Algoritmo iterativo de asignación de centroides con soporte visual mediante `grafico.mice`.
+
+---
+
+## 6. Deep Learning: El Motor de Redes Neuronales (`dl.mice`)
+Un framework completo de redes neuronales profundas.
+
+### Arquitectura Modular
 ```micelio
-funcion neurona(X, W, b) {
-    var z = (X[0]*W[0] + X[1]*W[1]) + b
-    regresa 1 / (1 + exp(-z)) # Activación Sigmoide
-}
-```
-
-### Regresión Lineal y Logística
-```micelio
-importar "ml.mice" como ml
-
-var modelo = ml.regresion_lineal(X, Y)
-var prediccion = ml.predecir_lineal(nuevo_x, modelo)
-```
-
-### Redes Neuronales Profundas (MLP)
-Micelio soporta redes multicapa con Backpropagation:
-
-```micelio
-importar "dl.mice" como dl
-
-# Definir arquitectura
 var arq = [
-    {"in": 4, "out": 10, "act": "relu"},
-    {"in": 10, "out": 3, "act": "softmax"}
+    {"in": 2, "out": 4, "act": "relu"},
+    {"in": 4, "out": 2, "act": "softmax"}
 ]
+```
 
-var red = dl.perceptron_multicapa(arq)
-dl.entrenar_red(red, X_train, Y_train, epochs=1000, lr=0.1)
+### Forward & Backpropagation
+- **Forward:** Propaga la señal calculando `Z = WX + b`.
+- **Backward:** Calcula gradientes usando la regla de la cadena y actualiza pesos mediante SGD (Stochastic Gradient Descent).
+
+### Funciones de Activación
+- **ReLU:** `max(0, x)` para capas ocultas.
+- **Sigmoid:** Para clasificación binaria.
+- **Softmax:** Para clasificación multiclase (probabilidades normalizadas).
+
+---
+
+## 7. Visualización y I/O
+
+### Graficación (`grafico.mice`)
+Micelio renderiza sus propios buffers de imagen.
+```micelio
+g.set_titulo("Curva de Aprendizaje")
+g.plot(X_epochs, Y_loss)
+g.mostrar() # Genera y abre un archivo PPM/BMP
 ```
 
 ---
 
-## 📈 6. Visualización y Datos
+## 8. Guía para el Estudiante
 
-### Gráficas (grafico.mice)
-Genera archivos PPM que pueden convertirse a imágenes:
-```micelio
-importar "grafico.mice" como g
-g.plot(X, Y)
-g.mostrar()
-```
-
-### Archivos (archivo.mice)
-Maneja tus datasets CSV o TXT:
-```micelio
-importar "archivo.mice" como arc
-var datos = arc.leer("dataset.csv")
-```
+| Tarea | Scikit-Learn / Numpy | Micelio |
+| :--- | :--- | :--- |
+| Multiplicar Matrices | `A @ B` | `mat.multiplicar(A, B)` |
+| Inversa | `np.linalg.inv(A)` | `mat.inversa(A)` |
+| Entrenar Red | `MLP.fit(X, y)` | `dl.entrenar_red(m, X, Y, ep, lr)` |
+| Predicción | `MLP.predict(X)` | `dl.forward(m, X)["salida"]` |
+| Plotear | `plt.scatter(x, y)` | `g.scatter(X_puntos, clases)` |
 
 ---
 
-## 🎓 7. Guía para el Estudiante (Requerimientos del Profesor)
-
-Si estás replicando el cuaderno de **RNA Intro**, aquí tienes cómo mapear las funciones de Scikit-Learn a Micelio:
-
-| Concepto Python (Sklearn) | Concepto Micelio |
-| :--- | :--- |
-| `Perceptron.fit()` | `ml.regresion_logistica()` o `dl.entrenar_red()` |
-| `MLPClassifier()` | `dl.perceptron_multicapa()` |
-| `np.dot(A, B)` | `mat.multiplicar(A, B)` |
-| `plt.plot()` | `grafico.plot()` |
-| `Sigmoid` / `ReLU` | `dl.sigmoid()` / `dl.relu()` |
-
-Para ejemplos completos, revisa la carpeta `/ejemplos` en la raíz del proyecto.
+Para más detalles, consulta la carpeta `/ejemplos` con sus 14 scripts demostrativos.

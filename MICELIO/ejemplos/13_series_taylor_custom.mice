@@ -1,0 +1,42 @@
+# Ejemplo 13: Matematicas desde la Esencia (Taylor)
+
+imp "--- Calculo de e^x usando Serie de Taylor Manual ---"
+
+# e^x = 1 + x + x^2/2! + x^3/3! + ...
+funcion mi_exponencial(x, terminos) {
+    var suma = 1.0
+    var termino = 1.0
+    var n = 1
+    
+    mientras (n < terminos) {
+        termino = termino * x / n
+        suma = suma + termino
+        n = n + 1
+    }
+    regresa suma
+}
+
+imp "e^1 con 10 terminos: " + aTexto(mi_exponencial(1, 10))
+imp "e^1 con 20 terminos: " + aTexto(mi_exponencial(1, 20))
+imp "Valor real aprox: 2.718281828"
+
+imp "---"
+
+# Calculo de PI usando serie de Leibniz
+# pi/4 = 1 - 1/3 + 1/5 - 1/7 + ...
+funcion calcular_pi(iteraciones) {
+    var suma = 0.0
+    var n = 0
+    mientras (n < iteraciones) {
+        var t = 1.0 / (2 * n + 1)
+        si (n % 2 == 0) {
+            suma = suma + t
+        } sino {
+            suma = suma - t
+        }
+        n = n + 1
+    }
+    regresa suma * 4
+}
+
+imp "Estimacion de PI con 1000 iteraciones: " + aTexto(calcular_pi(1000))

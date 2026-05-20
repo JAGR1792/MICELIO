@@ -1,0 +1,38 @@
+# Ejemplo 11: Funcionalismo Extremo y Currificacion
+
+imp "--- Currificacion y Composicion ---"
+
+# Funcion que devuelve una funcion (Currying)
+funcion multiplicador(a) {
+    regresa funcion(b) {
+        regresa a * b
+    }
+}
+
+var por_diez = multiplicador(10)
+var por_cien = multiplicador(100)
+
+imp "10 * 5 = " + aTexto(por_diez(5))
+imp "100 * 5 = " + aTexto(por_cien(5))
+
+# Composicion: f(g(x))
+funcion componer(f, g) {
+    regresa funcion(x) {
+        regresa f(g(x))
+    }
+}
+
+var suma1 = funcion(x) { regresa x + 1 }
+var duplicar = funcion(x) { regresa x * 2 }
+
+var operacion_compleja = componer(duplicar, suma1) # (x+1)*2
+
+imp "Operacion (5+1)*2 = " + aTexto(operacion_compleja(5))
+
+# Uso de Pipe para legibilidad extrema
+var lista = [1, 2, 3, 4]
+var res = lista 
+    |> map(suma1) 
+    |> map(duplicar)
+    
+imp "Lista transformada con Pipes: " + aTexto(res)

@@ -1,5 +1,5 @@
 # Ejemplo 03: Algebra Lineal Avanzada
-importar "matriz.mice" como mat
+importar "../modulos_std/matriz.mice" como mat
 
 imp "--- Operaciones con Matrices ---"
 
