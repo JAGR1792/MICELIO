@@ -5,10 +5,7 @@ importar "../modulos_std/grafico.mice" como g
 imp "--- Clustering K-Means ---"
 
 # Generar datos en dos nubes
-var X = [
-    [1.1, 1.2], [0.9, 0.8], [1.0, 1.0], # Grupo 1
-    [5.0, 5.1], [4.8, 4.9], [5.2, 5.0]  # Grupo 2
-]
+var X = [[1.1, 1.2], [0.9, 0.8], [1.0, 1.0], [5.0, 5.1], [4.8, 4.9], [5.2, 5.0]]
 
 imp "Entrenando K-Means con k=2..."
 var resultado = ml.k_means(X, 2, 10)

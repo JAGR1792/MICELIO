@@ -5,25 +5,14 @@ importar "../modulos_std/dl.mice" como dl
 imp "--- Entrenamiento de Caperucita Roja ---"
 
 # Entradas (Big Ears, Big Teeth, Handsome, Wrinkled)
-var X = [
-    [1, 1, 0, 0], # Lobo
-    [0, 1, 1, 0], # Abuelita
-    [0, 0, 0, 1]  # Cazador
-]
+var X = [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 0, 1]]
 
 # Salidas (Scream, Hug, Food, Kiss)
-var Y = [
-    [1, 0, 0, 0], # Gritar ante el lobo
-    [0, 0, 1, 1], # Comida y Beso para abuelita
-    [0, 1, 1, 0]  # Abrazo y Comida para cazador
-]
+var Y = [[1, 0, 0, 0], [0, 0, 1, 1], [0, 1, 1, 0]]
 
 # Definimos una arquitectura MLP:
 # Entrada (4) -> Oculta (3) -> Salida (4)
-var arq = [
-    {"in": 4, "out": 3, "act": "relu"},
-    {"in": 3, "out": 4, "act": "sigmoid"}
-]
+var arq = [{"in": 4, "out": 3, "act": "relu"}, {"in": 3, "out": 4, "act": "sigmoid"}]
 
 var modelo = dl.perceptron_multicapa(arq)
 

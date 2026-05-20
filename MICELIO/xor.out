@@ -1,0 +1,9 @@
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.prefix, expected /home/antonio/Documents/MICELIO/.venv, got /home/antonio/Documents/MICELIO/MICELIO/../.venv
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.exec_prefix, expected /home/antonio/Documents/MICELIO/.venv, got /home/antonio/Documents/MICELIO/MICELIO/../.venv
+Error de (sintaxis)
+Que paso: extraneous input '\n' expecting {'[', ']', '(', '{', 'funcion', 'matriz', 'set', 'dict', BOOL, 'nulo', 'no', '++', '--', '-', NUMBER, STRING, ID}
+Donde: linea 3, columna 9
+  3 | var X = [
+    |          ^
+Por que pasa: Hay una estructura que no coincide con la gramatica de Micelio.
+Como arreglarlo: Revisa parentesis, comas y orden de la sentencia cerca del simbolo marcado.

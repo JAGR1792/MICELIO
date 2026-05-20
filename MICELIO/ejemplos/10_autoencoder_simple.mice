@@ -4,18 +4,10 @@ importar "../modulos_std/dl.mice" como dl
 imp "--- Red Neuronal Autoencoder ---"
 
 # Datos: Patrones de 4 bits
-var X = [
-    [1, 0, 0, 1],
-    [0, 1, 1, 0],
-    [1, 1, 1, 1],
-    [0, 0, 0, 0]
-]
+var X = [[1, 0, 0, 1], [0, 1, 1, 0], [1, 1, 1, 1], [0, 0, 0, 0]]
 
 # Arquitectura: 4 (In) -> 2 (Latent) -> 4 (Out)
-var arq = [
-    {"in": 4, "out": 2, "act": "relu"},    # Encoder
-    {"in": 2, "out": 4, "act": "sigmoid"} # Decoder
-]
+var arq = [{"in": 4, "out": 2, "act": "relu"}, {"in": 2, "out": 4, "act": "sigmoid"}]
 
 var modelo = dl.perceptron_multicapa(arq)
 

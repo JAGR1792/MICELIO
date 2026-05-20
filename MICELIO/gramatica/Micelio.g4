@@ -86,7 +86,7 @@ primary
     : literal                                                         #literalExpr
     | ID                                                              #idExpr
     | '(' expr ')'                                                    #parenExpr
-    | '[' (expr (',' expr)*)? ']'                                     #listExpr
+    | '[' sep* (expr (sep* ',' sep* expr)* sep*)? ']'                 #listExpr
     | SET '(' (expr (',' expr)*)? ')'                                 #setExpr
     | DICT '(' (keyValue (',' keyValue)*)? ')'                        #dictExpr
     | '{' (keyValue (',' keyValue)*)? '}'                             #mapLiteral
