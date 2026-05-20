@@ -386,51 +386,64 @@ _PLOT_STATE = {
 }
 
 _GUI_STYLE_STATE = {
-    "theme": "ocean",
+    "theme": "caelestia",
 }
+
+# Colores Catppuccin Frappe para terminal
+CLR_BLUE = "\033[38;2;140;170;238m"
+CLR_TEXT = "\033[38;2;198;208;245m"
+BOLD = "\033[1m"
+RESET = "\033[0m"
 
 
 def _gtk_apply_theme(theme_name: str) -> bool:
     try:
         import gi
-
         gi.require_version("Gtk", "3.0")
         from gi.repository import Gdk, Gtk
     except Exception:
         return False
 
     palette = {
+        "caelestia": {
+            "bg": "#131317",
+            "surface": "#1f1f23",
+            "text": "#e4e1e7",
+            "muted": "#8f909a",
+            "accent": "#b7c4ff", # primary
+            "accent_text": "#1e2d60",
+        },
         "ocean": {
-            "bg": "#0f172a",
-            "surface": "#1e293b",
-            "text": "#e2e8f0",
-            "muted": "#93c5fd",
-            "accent": "#22d3ee",
-            "accent_text": "#06202a",
+            "bg": "#303446",
+            "surface": "#414559",
+            "text": "#c6d0f5",
+            "muted": "#838ba7",
+            "accent": "#8ca0f3",
+            "accent_text": "#303446",
         },
         "forest": {
-            "bg": "#0f1f17",
-            "surface": "#1b4332",
-            "text": "#e8f5e9",
-            "muted": "#95d5b2",
-            "accent": "#74c69d",
-            "accent_text": "#0b1a13",
+            "bg": "#303446",
+            "surface": "#414559",
+            "text": "#c6d0f5",
+            "muted": "#a6d189",
+            "accent": "#a6d189", # Green
+            "accent_text": "#303446",
         },
         "sunset": {
-            "bg": "#2b1a17",
-            "surface": "#4a2c2a",
-            "text": "#fff1e6",
-            "muted": "#ffcab0",
-            "accent": "#ff8c42",
-            "accent_text": "#2b1303",
+            "bg": "#303446",
+            "surface": "#414559",
+            "text": "#c6d0f5",
+            "muted": "#ef9f76",
+            "accent": "#ef9f76", # Peach
+            "accent_text": "#303446",
         },
         "mono": {
-            "bg": "#1a1a1a",
-            "surface": "#262626",
-            "text": "#f4f4f5",
-            "muted": "#d4d4d8",
-            "accent": "#a1a1aa",
-            "accent_text": "#18181b",
+            "bg": "#232634",
+            "surface": "#292c3c",
+            "text": "#c6d0f5",
+            "muted": "#949cbb",
+            "accent": "#b5bfe2",
+            "accent_text": "#232634",
         },
     }
 
@@ -443,27 +456,34 @@ def _gtk_apply_theme(theme_name: str) -> bool:
     window {{
         background-color: {p['bg']};
         color: {p['text']};
+        border-radius: 12px;
     }}
     label {{
         color: {p['text']};
+        font-family: "JetBrains Mono", "Cascadia Code", "monospace";
     }}
     frame {{
-        border-color: {p['muted']};
+        border: 1px solid {p['muted']};
+        border-radius: 10px;
     }}
     entry, textview text, textview {{
         background-color: {p['surface']};
         color: {p['text']};
-        caret-color: {p['accent']};
+        border-radius: 6px;
+        padding: 4px;
     }}
     button {{
         background: {p['accent']};
         color: {p['accent_text']};
-        border-radius: 8px;
-        border: 1px solid {p['muted']};
-        padding: 6px 10px;
+        border-radius: 10px;
+        font-weight: bold;
+        padding: 8px 16px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }}
     button:hover {{
         background: {p['muted']};
+        transition: 0.2s;
     }}
     """
 
@@ -484,10 +504,10 @@ def _gtk_apply_theme(theme_name: str) -> bool:
 
 
 def _gui_set_theme(name: Any) -> str:
-    allowed = {"ocean", "forest", "sunset", "mono"}
+    allowed = {"caelestia", "ocean", "forest", "sunset", "mono"}
     theme = str(name).strip().lower()
     if theme not in allowed:
-        theme = "ocean"
+        theme = "caelestia"
     _GUI_STYLE_STATE["theme"] = theme
     return theme
 
@@ -497,7 +517,7 @@ def _gui_get_theme() -> str:
 
 
 def _gui_list_themes() -> list[str]:
-    return ["ocean", "forest", "sunset", "mono"]
+    return ["caelestia", "ocean", "forest", "sunset", "mono"]
 
 
 def _plot_reset(width: Any, height: Any, margin: Any) -> list[int]:
@@ -814,6 +834,20 @@ def _plot_mostrar(path: Any, title: Any, xlabel: Any, ylabel: Any) -> str:
 
 
 def _gui_alert(message: Any, title: Any = "Micelio") -> None:
+    # Intentamos notificacion de sistema primero para ese feeling "based"
+    notify_send = shutil.which("notify-send")
+    if notify_send:
+        try:
+            subprocess.run([
+                notify_send,
+                "-a", "Micelio",
+                "-i", "dialog-information",
+                str(title),
+                str(message)
+            ], check=False)
+        except Exception:
+            pass
+
     zenity = shutil.which("zenity")
     if zenity is not None:
         try:
@@ -822,7 +856,8 @@ def _gui_alert(message: Any, title: Any = "Micelio") -> None:
         except Exception:
             pass
 
-    print(str(message))
+    print(f"\n{BOLD}{CLR_BLUE}󰋼 {title}{RESET}")
+    print(f"{CLR_TEXT}{message}{RESET}\n")
     return None
 
 
