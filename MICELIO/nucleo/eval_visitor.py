@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import os
+import re
 
 from antlr4 import CommonTokenStream, InputStream
 from antlr4 import ParserRuleContext
@@ -37,6 +38,7 @@ class EvalVisitor(MicelioVisitor):
         self.modules = module_table()
         self.current_dir = os.path.abspath(base_dir or os.getcwd())
         self.loaded_modules: dict[str, dict[str, object]] = {}
+        self._visit_dispatch: dict[type, object] = {}
 
         # ─── 1. Inyectar primitivas Python (funciones __*)
         # Estas son las operaciones de bajo nivel que requieren Python
@@ -111,7 +113,23 @@ class EvalVisitor(MicelioVisitor):
         for name, fn in builtins.items():
             if name not in self.global_env.values:
                 self.global_env.define(name, fn)
-    
+        
+        # ─── 4. Poblar tabla de despacho rápido para visit* — elimina hasattr() por nodo
+        for attr_name in dir(MicelioParser):
+            if attr_name.endswith('Context'):
+                ctx_cls = getattr(MicelioParser, attr_name)
+                method_name = 'visit' + attr_name[:-7]
+                method = getattr(self, method_name, None)
+                if method is not None:
+                    self._visit_dispatch[ctx_cls] = method
+
+    # ─── Despacho rápido: reemplaza tree.accept(self) → O(1) dict lookup ───
+    def visit(self, tree):
+        method = self._visit_dispatch.get(type(tree))
+        if method is not None:
+            return method(tree)
+        return tree.accept(self)
+
     def _cargar_builtins_micelio(self):
         """
         Carga automáticamente el archivo modulos_std/builtins.mice
@@ -445,17 +463,14 @@ class EvalVisitor(MicelioVisitor):
         name = target.ID().getText()
         value = self.visit(ctx.expr())
         indexes = [self.visit(expr_ctx) for expr_ctx in target.expr()]
-        cache_key = id(ctx)
-        target_env = self._assign_env_cache.get(cache_key)
-        if (
-            target_env is None
-            or not self._is_env_visible(target_env)
-            or name not in target_env.values
-        ):
+        # Fast path: variable en el scope actual
+        env = self.env
+        if name in env.values:
+            target_env = env
+        else:
             target_env = self._resolve_env_for_name(name)
             if target_env is None:
                 raise MicelioRuntimeError(f"Variable '{name}' no definida")
-            self._assign_env_cache[cache_key] = target_env
 
         if indexes:
             container = target_env.values[name]
@@ -766,17 +781,14 @@ class EvalVisitor(MicelioVisitor):
 
     def visitIdExpr(self, ctx: MicelioParser.IdExprContext):
         name = ctx.ID().getText()
-        cache_key = id(ctx)
-        target_env = self._id_env_cache.get(cache_key)
-        if (
-            target_env is None
-            or not self._is_env_visible(target_env)
-            or name not in target_env.values
-        ):
-            target_env = self._resolve_env_for_name(name)
-            if target_env is None:
-                raise MicelioRuntimeError(f"Variable '{name}' no definida")
-            self._id_env_cache[cache_key] = target_env
+        # Fast path: variable en el scope actual (el caso más común)
+        env = self.env
+        if name in env.values:
+            return env.values[name]
+        # Slow path: recorrer cadena de padres
+        target_env = self._resolve_env_for_name(name)
+        if target_env is None:
+            raise MicelioRuntimeError(f"Variable '{name}' no definida")
         return target_env.values[name]
 
     def visitParenExpr(self, ctx: MicelioParser.ParenExprContext):
