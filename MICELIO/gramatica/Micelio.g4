@@ -78,6 +78,10 @@ expr
     | expr NEWLINE* PIPE NEWLINE* expr                                #pipeExpr
     ;
 
+listItem : expr                                                        #normalListItem
+         | ELLIPSIS expr                                               #spreadListItem
+         ;
+
 postfixExpr
     : primary postfixSuffix*                                          #postfixExprNode
     ;
@@ -86,7 +90,7 @@ primary
     : literal                                                         #literalExpr
     | ID                                                              #idExpr
     | '(' expr ')'                                                    #parenExpr
-    | '[' sep* (expr (sep* ',' sep* expr)* sep*)? ']'                 #listExpr
+    | '[' sep* (listItem (sep* ',' sep* listItem)* sep*)? ']'         #listExpr
     | SET '(' (expr (',' expr)*)? ')'                                 #setExpr
     | DICT '(' (keyValue (',' keyValue)*)? ')'                        #dictExpr
     | '{' (keyValue (',' keyValue)*)? '}'                             #mapLiteral
@@ -139,6 +143,7 @@ NO : 'no' ;
 IN : 'in' ;
 PIPE : '|>' ;
 DOTMUL : '.*' ;
+ELLIPSIS : '...' ;
 INC_OP : '++' ;
 DEC_OP : '--' ;
 

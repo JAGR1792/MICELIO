@@ -795,7 +795,17 @@ class EvalVisitor(MicelioVisitor):
         return self.visit(ctx.expr())
 
     def visitListExpr(self, ctx: MicelioParser.ListExprContext):
-        return [self.visit(e) for e in ctx.expr()]
+        result = []
+        for item in ctx.listItem():
+            if isinstance(item, MicelioParser.SpreadListItemContext):
+                val = self.visit(item.expr())
+                if isinstance(val, (list, tuple)):
+                    result.extend(val)
+                else:
+                    raise MicelioRuntimeError(f"... solo funciona con listas, no con {type(val).__name__}")
+            else:
+                result.append(self.visit(item.expr()))
+        return result
 
     def visitSetExpr(self, ctx: MicelioParser.SetExprContext):
         return set(self.visit(e) for e in ctx.expr())
