@@ -154,16 +154,40 @@ mientras (i < 5) {
     i = i + 1
 }
 
-# for
+# for (sobre lista)
 para elemento en [1, 2, 3] {
     imp elemento
 }
 
-# switch
+# for (rango numérico)
+para i = 1 hasta 5 {
+    imp i                         # 1, 2, 3, 4, 5
+}
+para i = 0 hasta 10 inc 2 {
+    imp i                         # 0, 2, 4, 6, 8, 10
+}
+para i = 5 hasta 1 inc -1 {
+    imp i                         # 5, 4, 3, 2, 1
+}
+
+# switch (sin break automático — efecto fall-through)
 segun (x) {
-    caso 1 { imp "uno" }
-    caso 2 { imp "dos" }
-    defecto { imp "otro" }
+    caso 1:
+        imp "uno"
+        romper                    # sale del segun
+    caso 2:
+        imp "dos"
+    caso 3:
+        imp "tres"
+    defecto:
+        imp "otro"
+}
+
+# romper / continuar en bucles
+para i = 1 hasta 10 {
+    si (i == 5) { romper }
+    si (i % 2 == 0) { continuar }
+    imp i                         # 1, 3
 }
 ```
 
@@ -196,18 +220,45 @@ var datos = [1, 2, 3, 4, 5]
 var duplicados = map(funcion (x) { regresa x * 2 }, datos)
 var pares = filter(funcion (x) { regresa x % 2 == 0 }, datos)
 var suma = reduce(funcion (acc, x) { regresa acc + x }, datos, 0)
+```
 
-# Pipe operator (inserta el valor como SEGUNDO argumento)
-var resultado = datos
-    |> map(funcion (x) { x * 2 })            # map(funcion, datos)
-    |> filter(funcion (x) { x > 5 })         # filter(funcion, resultado_anterior)
-    |> reduce(funcion (acc, x) { acc + x }, 0)
+### Recursión
 
-imp resultado
+```mice
+funcion factorial(n) {
+    si (n <= 1) { regresa 1 }
+    sino { regresa n * factorial(n - 1) }
+}
+imp factorial(5)                              # 120
+```
 
-# Funciones anónimas (lambdas)
-var doble = funcion (x) { x * 2 }
-var impares = filter(funcion (x) { x % 2 == 1 }, [1, 2, 3, 4, 5])
+### Parámetros variables (\*args y \*\*kwargs)
+
+```mice
+# *args: lista de argumentos posicionales variables
+funcion sumar_todos(*numeros) {
+    var total = 0
+    para n en numeros { total = total + n }
+    regresa total
+}
+imp sumar_todos(1, 2, 3, 4)                   # 10
+
+# **kwargs: diccionario de argumentos con nombre
+funcion mostrar_opciones(**opciones) {
+    para clave en opciones.claves() {
+        imp clave + ": " + aTexto(opciones[clave])
+    }
+}
+mostrar_opciones(color="rojo", tamano=10)     # color: rojo / tamano: 10
+
+# Combinación
+funcion ejemplo(normal, *args, **kwargs) {
+    imp "normal: " + aTexto(normal)
+    imp "args: " + aTexto(args)
+    imp "kwargs: " + aTexto(kwargs)
+}
+ejemplo(5, 1, 2, 3, x=10, y=20)
+# normal: 5, args: [1,2,3], kwargs: {"x":10,"y":20}
 ```
 
 ### Entrada/Salida
@@ -268,6 +319,30 @@ leer a, b
 | Nulo      | `nulo`                     | Ausencia de valor            |
 | Funcion   | `funcion (x) { regresa x }`| Función de primera clase     |
 
+### Conversiones entre tipos
+
+MICELIO **no** realiza conversiones automáticas implícitas (tipado fuerte). No se puede sumar un número con un texto; se debe convertir explícitamente.
+
+| Función | Descripción | Ejemplo |
+|---|---|---|
+| `aNumero(valor)` | Convierte a número (detecta prefijos 0b, 0o, 0x) | `aNumero("FF", 16)` → 255 |
+| `aEntero(valor)` | Trunca a entero | `aEntero(3.14)` → 3 |
+| `aFlotante(valor)` | Convierte a flotante | `aFlotante(3)` → 3.0 |
+| `aTexto(valor)` | Convierte cualquier valor a texto | `aTexto(42)` → "42" |
+| `aBooleano(valor)` | 0→falso, vacío→falso, nulo→falso | `aBooleano(5)` → verdadero |
+| `aCaracter(codigo)` | Código numérico a carácter | `aCaracter(65)` → "A" |
+| `aCodigo(caracter)` | Carácter a código numérico | `aCodigo("A")` → 65 |
+| `aBinario(n)` | A binario (base 2) | `aBinario(10)` → "1010" |
+| `aOctal(n)` | A octal (base 8) | `aOctal(64)` → "100" |
+| `aHexadecimal(n)` | A hexadecimal | `aHexadecimal(255)` → "ff" |
+| `aBase(n, base)` | A cualquier base 2-36 | `aBase(100, 5)` → "400" |
+| `desdeBinario(t)` | Desde binario | `desdeBinario("1010")` → 10 |
+| `desdeOctal(t)` | Desde octal | `desdeOctal("12")` → 10 |
+| `desdeHexadecimal(t)` | Desde hexadecimal | `desdeHexadecimal("A")` → 10 |
+| `desdeBase(t, base)` | Desde cualquier base | `desdeBase("400", 5)` → 100 |
+| `aBaseComplemento(n, base, bits)` | Complemento a dos | `aBaseComplemento(-1, 2, 8)` → "11111111" |
+| `aBaseFraccion(n, base, precision)` | Fracción en otra base | `aBaseFraccion(0.5, 2)` → "0.1" |
+
 ### Métodos incorporados
 
 Todas las colecciones tienen métodos nativos:
@@ -289,6 +364,68 @@ Todas las colecciones tienen métodos nativos:
 
 # Set
 #{1, 2, 3}.longitud()     # 3
+```
+
+### Tipos en detalle
+
+**Número**: Representa enteros y flotantes como float de doble precisión. No hay distinción explícita; el lenguaje maneja la conversión automáticamente.
+
+```mice
+var entero = 42
+var flotante = 3.14
+var negativo = -7
+var suma = 5 + 3.2    # 8.2
+```
+
+**Booleano**: Valores `verdadero` y `falso`. Operadores lógicos `y`, `o`, `no` con cortocircuito.
+
+```mice
+si (x > 0 y x < 10) { imp "entre 0 y 10" }
+si (no activo) { imp "inactivo" }
+```
+
+**Texto**: Cadenas entre comillas dobles o simples. Acceso por índice, concatenación con `+`.
+
+```mice
+var saludo = "Hola"
+var nombre = 'Mundo'
+imp saludo + " " + nombre     # "Hola Mundo"
+imp saludo[0]                 # "H"
+imp saludo.longitud()         # 4
+```
+
+**Lista**: Colección ordenada mutable. Cualquier tipo de elemento.
+
+```mice
+var mixta = [1, "dos", verdadero, [3, 4]]
+mixta.agregar(5)
+mixta[0] = 10
+var primer = primero(mixta)
+```
+
+**Conjunto**: Elementos únicos sin orden. Operaciones: unión, intersección, diferencia.
+
+```mice
+var a = set(1, 2, 3)
+var b = set(3, 4, 5)
+imp 2 in a                  # verdadero
+a.agregar(6)
+```
+
+**Diccionario**: Pares clave-valor. Claves de tipo inmutable.
+
+```mice
+var d = dict("nombre", "Ana", "edad", 30)
+d["pais"] = "Peru"
+imp d.claves()              # ["nombre", "edad", "pais"]
+```
+
+**Función**: Objetos de primera clase. Asignables, pasables y retornables.
+
+```mice
+var doble = funcion (x) { x * 2 }
+var aplicar = funcion (f, v) { f(v) }
+imp aplicar(doble, 5)       # 10
 ```
 
 ---
@@ -846,7 +983,7 @@ O desde VS Code: Extensiones ⋮ → Install from VSIX.
 
 ---
 
-## 9. Desarrollo
+## 9. Desarrollo (mantenimiento)
 
 ### Regenerar lexer/parser desde la gramática
 
@@ -904,6 +1041,164 @@ imp capa                 # "local" — la global fue modificada
 ```
 
 Para evitar colisiones, las funciones globales deben tener nombres únicos que no sean reutilizados como variables locales (ej: `crear_capa` en lugar de `capa`).
+
+---
+
+## 9. Gramática completa (ANTLR4)
+
+La gramática completa del lenguaje en notación ANTLR. Es el punto de partida para generar el lexer y parser.
+
+```
+grammar Micelio;
+
+program : sep* (statement sep*)* EOF ;
+
+statement
+    : simple_stmt
+    | compound_stmt
+    ;
+
+simple_stmt
+    : var_decl
+    | const_decl
+    | assignment
+    | return_stmt
+    | break_stmt
+    | continue_stmt
+    | import_stmt
+    | leer_stmt
+    | imp_stmt
+    | expr
+    ;
+
+compound_stmt
+    : if_stmt
+    | switch_stmt
+    | while_stmt
+    | for_stmt
+    | func_def
+    | block
+    ;
+
+var_decl : VAR ID (',' ID)* ('=' expr (',' expr)*)? ;
+const_decl : CONST ID '=' expr ;
+assignment : assign_target '=' expr ;
+assign_target : ID ('[' expr ']')* ;
+return_stmt : REGRESA expr? ;
+break_stmt : ROMPER ;
+continue_stmt : CONTINUAR ;
+import_stmt : IMPORTAR STRING (COMO ID)? ;
+leer_stmt : LEER ID ;
+imp_stmt : IMP expr ;
+
+if_stmt : SI '(' expr ')' sep* block (sep* SINO_SI sep* '(' expr ')' sep* block)* (sep* SINO sep* block)? ;
+switch_stmt : SEGUN '(' expr ')' sep* '{' sep* case_block+ '}' ;
+case_block
+    : CASO expr ':' sep* (statement sep*)*
+    | DEFECTO ':' sep* (statement sep*)*
+    ;
+while_stmt : MIENTRAS '(' expr ')' sep* block ;
+for_stmt
+    : PARA ID '=' expr HASTA expr (INC expr)? sep* block
+    | PARA ID EN expr sep* block
+    ;
+
+func_def : FUNCION ID '(' param_list? ')' sep* block ;
+param_list : param_item (',' param_item)* ;
+param_item : ID | MUL ID | POW ID ;
+block : '{' sep* (statement sep*)* '}' ;
+
+expr
+    : postfixExpr
+    | op=(INC_OP | DEC_OP) expr
+    | expr op=(INC_OP | DEC_OP)
+    | '-' expr
+    | NO expr
+    | expr op=(MUL | DIV | MOD | DOTMUL) expr
+    | expr op=(PLUS | MINUS) expr
+    | expr op=POW expr
+    | expr op=(EQ | NE | LT | LE | GT | GE) expr
+    | expr Y expr
+    | expr O expr
+    | expr IN expr
+    | expr NEWLINE* PIPE NEWLINE* expr
+    ;
+
+primary
+    : literal
+    | ID
+    | '(' expr ')'
+    | '[' sep* (expr (sep* ',' sep* expr)* sep*)? ']'
+    | SET '(' (expr (',' expr)*)? ')'
+    | DICT '(' (keyValue (',' keyValue)*)? ')'
+    | '{' (keyValue (',' keyValue)*)? '}'
+    | FUNCION '(' param_list? ')' block          # función anónima
+    | MATRIZ '(' expr ')'
+    ;
+
+postfixSuffix
+    : '[' expr ']'
+    | '(' exprList? ')'
+    | '.' ID
+    ;
+
+keyValue : expr ':' expr ;
+exprList : expr (',' expr)* ;
+literal : NUMBER | STRING | BOOL | NULL ;
+sep : ';' | NEWLINE+ ;
+```
+
+Palabras reservadas: `var`, `const`, `funcion`, `matriz`, `regresa`, `si`, `sino_si`, `sino`, `segun`, `caso`, `defecto`, `para`, `hasta`, `inc`, `en`, `mientras`, `romper`, `continuar`, `leer`, `imp`, `importar`, `como`, `set`, `dict`, `verdadero`, `falso`, `nulo`, `y`, `o`, `no`, `in`.
+
+## 10. Implementación con patrón Visitor
+
+La evaluación se realiza mediante un visitor que recorre el AST generado por ANTLR. El flujo completo:
+
+```
+archivo.mice
+     │
+     ▼
+main.py (preprocesador)
+  ├── azúcar sintáctico: leer a,b → __leer_multi("a,b")
+  ├── a,b = expr → __asignar_multi("a,b", expr)
+  └── x += 1 → x = x + (1)
+     │
+     ▼
+ANTLR4 Lexer → tokens
+     │
+     ▼
+ANTLR4 Parser → árbol de parseo
+     │
+     ▼
+EvalVisitor (eval_visitor.py)
+  ├── tabla de despacho: O(1) por nodo del AST
+  ├── fast env lookup: scope local primero
+  ├── evalúa expresiones y sentencias
+  └── delega a runtime functions
+     │
+     ▼
+Runtime (runtime.py)
+  ├── Environment: tabla de símbolos con alcance dinámico
+  ├── FunctionValue: funciones MICELIO con clausuras
+  ├── BoundMethod: métodos nativos en colecciones
+  └── make_builtins(): funciones incorporadas
+     │
+     ▼
+Salida (consola, archivos, imágenes PNG, ventanas GTK, HTTP)
+```
+
+### Pipeline de optimizaciones
+
+1. **Preprocesador** (`main.py`): transforma azúcar sintáctico antes del parseo
+2. **Parseo** (ANTLR4): genera AST con reglas semánticas de la gramática
+3. **Evaluación** (`EvalVisitor`):
+   - Tabla de despacho: `dict[type → method]` — evita `hasattr()` por nodo
+   - Búsqueda rápida de variables: verifica `self.env` primero (cubre ~90%)
+   - Asignación rápida: mismo principio
+4. **Runtime** (`runtime.py`):
+   - Funciones builtin en Python para operaciones críticas
+   - Operadores nativos para matrices (`+`, `-`, `*`)
+   - Backend PIL nativo para gráficos
 
 ---
 

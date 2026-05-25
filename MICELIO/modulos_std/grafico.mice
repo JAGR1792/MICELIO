@@ -84,6 +84,25 @@ funcion _dibujar_ejes() {
     __grafico_linea(left, top, left, bottom, _axis_r, _axis_g, _axis_b, 2)
 }
 
+funcion _formatear_numero(n) {
+    var s = ""
+    var v = n
+    si (v < 0) {
+        s = "-"
+        v = -v
+    }
+    var entero = aEntero(v)
+    si (v == entero) {
+        regresa s + aTexto(entero)
+    }
+    var dec = aEntero((v - entero) * 10 + 0.5)
+    si (dec > 9) {
+        entero = entero + 1
+        dec = 0
+    }
+    regresa s + aTexto(entero) + "." + aTexto(dec)
+}
+
 funcion _dibujar_ticks(xmin, xmax, ymin, ymax) {
     var left = _MARGEN
     var right = _ANCHO - _MARGEN
@@ -97,13 +116,13 @@ funcion _dibujar_ticks(xmin, xmax, ymin, ymax) {
         __grafico_linea(tx, ty, tx, ty + 5, _axis_r, _axis_g, _axis_b, 2)
 
         var vx = xmin + ((i * (xmax - xmin)) / pasos)
-        __grafico_texto(tx - 10, ty + 6, aTexto(aEntero(vx)), _text_r, _text_g, _text_b, 10)
+        __grafico_texto(tx - 10, ty + 6, _formatear_numero(vx), _text_r, _text_g, _text_b, 10)
 
         var ly = bottom - aEntero((i * (bottom - top)) / pasos)
         __grafico_linea(left - 5, ly, left, ly, _axis_r, _axis_g, _axis_b, 2)
 
         var vy = ymin + ((i * (ymax - ymin)) / pasos)
-        __grafico_texto(4, ly - 6, aTexto(aEntero(vy)), _text_r, _text_g, _text_b, 10)
+        __grafico_texto(4, ly - 6, _formatear_numero(vy), _text_r, _text_g, _text_b, 10)
         i = i + 1
     }
 }

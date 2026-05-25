@@ -9,4 +9,9 @@ venv/
 env/
 ENV/
 .venv
+
+# PDFs de referencia
 /docs/*.pdf
+
+# Gráficos generados
+graficos/
