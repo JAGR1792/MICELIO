@@ -1,0 +1,34 @@
+# ─── Ilustracion: Puntos XOR en 2D ────────────────────────────────
+#   Muestra los 4 puntos del XOR clasico coloreados por clase
+#   Demuestra que NO son linealmente separables
+# ────────────────────────────────────────────────────────────────────
+importar "../modulos_std/grafico.mice" como g
+
+var xs = [0, 0, 1, 1]
+var ys = [0, 1, 0, 1]
+
+# Clase 0: (0,0) y (1,1) → azul
+# Clase 1: (0,1) y (1,0) → rojo
+var c0x = [0, 1]; var c0y = [0, 1]
+var c1x = [0, 1]; var c1y = [1, 0]
+
+g.iniciar_grafico(-0.6, 1.6, -0.6, 1.6)
+g.titulo("Problema XOR — No Linealmente Separable")
+g.etiquetas("x1", "x2")
+
+# Clase 0 en azul
+g.pintar_puntos(c0x, c0y, 60, 100, 200, 14)
+g.texto(25, 35, "Clase 0: (0,0) y (1,1)", 60, 100, 200)
+
+# Clase 1 en rojo coral
+g.pintar_puntos(c1x, c1y, 200, 60, 60, 14)
+g.texto(25, 55, "Clase 1: (0,1) y (1,0)", 200, 60, 60)
+
+# Linea punteada imaginaria para mostrar que no hay separacion lineal
+g.color_linea(241, 196, 15)
+g.linea_sobre_grafico([-0.2, 1.2], [0.5, 0.5])
+g.texto(430, 170, "Ninguna recta separa ambas clases", 241, 196, 15)
+
+g.guardar("ejemplos/graficos/ilustra_xor_puntos.png")
+imp "Guardado: graficos/ilustra_xor_puntos.png"
+g.mostrar()

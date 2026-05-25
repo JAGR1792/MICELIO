@@ -1,0 +1,45 @@
+# ─── Ilustracion: Funciones de Activacion ──────────────────────────
+#   Grafica sigmoide y ReLU en el mismo plano para comparacion visual
+# ────────────────────────────────────────────────────────────────────
+importar "../modulos_std/grafico.mice" como g
+
+funcion sigmoide(x) {
+    regresa 1 / (1 + exp(-x))
+}
+
+funcion relu(x) {
+    si (x > 0) { regresa x }
+    regresa 0
+}
+
+# Generar puntos (-6 a 6, 120 puntos)
+var xs = []
+var ys_sig = []
+var ys_relu = []
+var i = 0
+mientras (i < 120) {
+    var xv = -6 + (i * 12 / 119)
+    xs.agregar(xv)
+    ys_sig.agregar(sigmoide(xv))
+    ys_relu.agregar(relu(xv))
+    i = i + 1
+}
+
+# Fondo con rejilla
+g.iniciar_grafico(-6, 6, -0.5, 6.5)
+g.titulo("Funciones de Activacion")
+g.etiquetas("x", "f(x)")
+
+# Sigmoide en azul verdoso
+g.color_linea(46, 204, 113)
+g.linea_sobre_grafico(xs, ys_sig)
+g.texto(200, 70, "Sigmoide", 46, 204, 113)
+
+# ReLU en dorado
+g.color_linea(241, 196, 15)
+g.linea_sobre_grafico(xs, ys_relu)
+g.texto(400, 70, "ReLU", 241, 196, 15)
+
+g.guardar("ejemplos/graficos/ilustra_activaciones.png")
+imp "Guardado: graficos/ilustra_activaciones.png"
+g.mostrar()

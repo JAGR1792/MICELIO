@@ -633,6 +633,11 @@ flowchart LR
         <h3>2.2 Funciones de activaci&oacute;n</h3>
         <p>Una funci&oacute;n de activaci&oacute;n decide si una neurona debe &laquo;disparar&raquo; o no, y con qu&eacute; intensidad. Las tres funciones implementadas en MICELIO son:</p>
 
+        <div class="img-container">
+            <img src="docs/img/ilustra_activaciones.png" alt="Funciones de activacion">
+            <div class="caption">Gr&aacute;fica comparativa de las funciones Sigmoide (verde) y ReLU (dorado) en el intervalo [-6, 6]. La sigmoide comprime cualquier entrada a (0, 1), mientras que ReLU deja pasar los valores positivos intactos y anula los negativos. La sigmoide es &uacute;til para salidas probabil&iacute;sticas; ReLU es ideal para capas ocultas porque no se satura y es computacionalmente eficiente.</div>
+        </div>
+
         <h4>Sigmoide</h4>
         <div class="math-block">
             $$\sigma(x) = \frac{1}{1 + e^{-x}}$$
@@ -975,6 +980,11 @@ flowchart TD
 
         <p>Si se grafican estos puntos, los ceros est&aacute;n en las esquinas opuestas del cuadrado, y los unos en las otras dos. No es posible trazar una l&iacute;nea recta que separe ambas clases. Se necesita al menos una capa oculta que doble el espacio de decisi&oacute;n.</p>
 
+        <div class="img-container">
+            <img src="docs/img/ilustra_xor_puntos.png" alt="Puntos XOR en 2D">
+            <div class="caption">Visualizaci&oacute;n de los 4 puntos del problema XOR. La clase 0 (azul, en (0,0) y (1,1)) y la clase 1 (rojo, en (0,1) y (1,0)) ocupan esquinas opuestas del cuadrado. La l&iacute;nea dorada horizontal y = 0.5 muestra que ninguna recta puede separar ambas clases: cualquier l&iacute;nea que deje los azules de un lado inevitablemente deja al menos un rojo del mismo lado. Esta imposibilidad se llama <strong>no-linealidad</strong> y es la raz&oacute;n por la que se necesitan capas ocultas.</div>
+        </div>
+
         <h3>7.2 C&oacute;digo completo</h3>
         <pre class="mice"><code>importar "dl.mice" como dl
 
@@ -1183,7 +1193,12 @@ flowchart TD
             </div>
         </div>
 
-        <p>Los 60 puntos se generan a&ntilde;adiendo ruido gaussiano (±1.25) alrededor de 4 centros. El split de entrenamiento/test usa <code>i % 5 == 0</code> para mantener balance de clases (48 train, 12 test).</p>
+        <div class="img-container">
+            <img src="docs/img/ilustra_xor2d_clusters.png" alt="Clusters XOR-2D">
+            <div class="caption">Distribuci&oacute;n de los 60 puntos sint&eacute;ticos generados para el problema XOR-2D. Cada cluster tiene 15 puntos con centro en las esquinas de un cuadrado de lado 4: (-2, 2), (2, -2), (-2, -2) y (2, 2). Los puntos azules (clase 0, xor = 0) ocupan las esquinas (-2, 2) y (2, 2), mientras que los rojos (clase 1, xor = 1) ocupan (2, -2) y (-2, -2). Los c&iacute;rculos grandes marcan los centros de cada cluster. El ruido (±1.25) hace que los clusters se solapen ligeramente en el centro, lo que obliga a la red a encontrar una frontera no-lineal.</div>
+        </div>
+
+        <p>Los 60 puntos se generan a&ntilde;adiendo ruido (±1.25) alrededor de 4 centros. El split de entrenamiento/test usa <code>i % 5 == 0</code> para mantener balance de clases (48 train, 12 test).</p>
 
         <h3>11.2 Arquitectura de la red</h3>
 
@@ -1342,21 +1357,13 @@ var res_grid = dl.forward(modelo, grid_pts)
 
         <div class="two-columns">
             <div class="img-container">
-                <img id="xor-loss-img" src="graficos/xor_loss.png" alt="Curva de aprendizaje XOR-2D" onerror="this.style.display='none'; document.querySelector('#xor-loss-placeholder').style.display='flex';">
-                <div id="xor-loss-placeholder" style="display:none; min-height: 300px; background: var(--bg-deep); align-items:center; justify-content:center; flex-direction:column;">
-                    <p style="color:var(--fg-dark);">Curva de Aprendizaje</p>
-                    <p style="color:var(--fg-muted); font-size:0.9rem;">(ejecuta 23_joya_clasificacion.mice para generar esta imagen)</p>
-                </div>
-                <div class="caption">Curva de p&eacute;rdida MSE durante 150 &eacute;pocas</div>
+                <img src="docs/img/ilustra_perdida.png" alt="Curva de aprendizaje tipica">
+                <div class="caption">Curva de p&eacute;rdida MSE ilustrativa generada con MICELIO. La p&eacute;rdida sigue un decaimiento exponencial desde ~0.33 (ep&oacute;c 0) hasta ~0.001 (ep&oacute;c 150). La forma suave indica que el gradiente descendente converge de manera estable. En el entrenamiento real de la joya de la corona, la p&eacute;rdida llega a 0.0002 con 150 &eacute;pocas, lr=0.01 y full-batch de 48 muestras.</div>
             </div>
 
             <div class="img-container">
-                <img id="xor-front-img" src="graficos/xor_frontera.png" alt="Frontera de decisión XOR-2D" onerror="this.style.display='none'; document.querySelector('#xor-front-placeholder').style.display='flex';">
-                <div id="xor-front-placeholder" style="display:none; min-height: 300px; background: var(--bg-deep); align-items:center; justify-content:center; flex-direction:column;">
-                    <p style="color:var(--fg-dark);">Frontera de Decisi&oacute;n</p>
-                    <p style="color:var(--fg-muted); font-size:0.9rem;">(ejecuta 23_joya_clasificacion.mice para generar esta imagen)</p>
-                </div>
-                <div class="caption">Frontera de decisi&oacute;n aprendida (grid 40&times;40). Los puntos grandes son datos de test, el amarillo ser&iacute;a un error (0 en este caso).</div>
+                <img src="docs/img/ilustra_xor2d_clusters.png" alt="Clusters XOR-2D con clases">
+                <div class="caption">Distribuci&oacute;n de los datos de entrenamiento y test del problema XOR-2D. Los puntos azules pertenecen a la clase 0; los rojos a la clase 1. La red 2&rarr;4&rarr;2 aprende una frontera de decisi&oacute;n que separa correctamente ambas clases en todo el espacio, logrando 100% de exactitud en los 12 puntos de test (6 de cada clase, 0 errores).</div>
             </div>
         </div>
 

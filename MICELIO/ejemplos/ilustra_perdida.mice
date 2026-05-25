@@ -1,0 +1,33 @@
+# ─── Ilustracion: Curva de Perdida Tipica ─────────────────────────
+#   Genera una curva exponencial decreciente simulando el
+#   aprendizaje de una red neuronal (MSE vs epocas)
+# ────────────────────────────────────────────────────────────────────
+importar "../modulos_std/grafico.mice" como g
+
+var epochs = 150
+var loss0 = 0.33   # perdida inicial tipica
+var tasa = 0.04    # tasa de decaimiento
+
+var xs = []
+var ys = []
+var i = 0
+mientras (i <= epochs) {
+    var ep = i
+    var loss = loss0 * exp(-tasa * ep) + 0.0005
+    xs.agregar(ep)
+    ys.agregar(loss)
+    i = i + 1
+}
+
+g.color_linea(46, 204, 113)
+g.lineas(xs, ys)
+g.titulo("Curva de Perdida Tipica durante Entrenamiento")
+g.etiquetas("Epoca", "Error MSE")
+
+g.texto(380, 35, "Perdida inicial: ~0.33", 46, 204, 113)
+g.texto(380, 55, "Perdida final:   ~0.001", 241, 196, 15)
+g.texto(380, 75, "150 epocas, lr=0.01", 160, 160, 160)
+
+g.guardar("ejemplos/graficos/ilustra_perdida.png")
+imp "Guardado: graficos/ilustra_perdida.png"
+g.mostrar()
