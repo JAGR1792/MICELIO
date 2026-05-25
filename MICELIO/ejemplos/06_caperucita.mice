@@ -18,6 +18,7 @@ var modelo = dl.perceptron_multicapa(arq)
 
 # Entrenamos la red
 imp "Iniciando entrenamiento..."
+# los argumentos de esta funcion son modelo, X, Y, iteraciones, tasa de aprendizaje
 dl.entrenar_red(modelo, X, Y, 5000, 0.2)
 
 # Prueba con un caso nuevo (Lobo disfrazado)

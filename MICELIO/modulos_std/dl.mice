@@ -8,75 +8,54 @@ importar "math.mice" como math
 
 # ─── Utilidades ──────────────────────────────────────────────────────
 
-funcion aplicar(m, f) {
-    var r = []
-    para fila en m {
-        var nueva_fila = []
-        para elemento en fila {
-            nueva_fila.agregar(f(elemento))
-        }
-        r.agregar(nueva_fila)
-    }
-    regresa r
-}
-
 funcion hadamard(m1, m2) {
-    var f = mat.filas(m1)
-    var c = mat.columnas(m1)
-    var r = []
-    var i = 0
-    mientras (i < f) {
-        var fila = []
-        var j = 0
-        mientras (j < c) {
-            fila.agregar(m1[i][j] * m2[i][j])
-            j = j + 1
-        }
-        r.agregar(fila)
-        i = i + 1
-    }
-    regresa r
+    regresa m1 .* m2
 }
 
 # ─── Activaciones ────────────────────────────────────────────────────
 
-funcion sigmoid_esc(x) { regresa 1 / (1 + exp(-x)) }
-funcion sigmoid(m) { regresa aplicar(m, sigmoid_esc) }
+funcion sigmoid(m) {
+    var r = []
+    para fila en m {
+        var nf = []
+        para x en fila {
+            nf.agregar(1 / (1 + exp(-x)))
+        }
+        r.agregar(nf)
+    }
+    regresa r
+}
 funcion sigmoid_derivada(m) {
     var r = []
-    var f = mat.filas(m)
-    var c = mat.columnas(m)
-    var i = 0
-    mientras (i < f) {
-        var fila = []
-        var j = 0
-        mientras (j < c) {
-            var v = m[i][j]
-            fila.agregar(v * (1 - v))
-            j = j + 1
+    para fila en m {
+        var nf = []
+        para v en fila {
+            nf.agregar(v * (1 - v))
         }
-        r.agregar(fila)
-        i = i + 1
+        r.agregar(nf)
     }
     regresa r
 }
 
-funcion relu_esc(x) { si (x > 0) { regresa x } regresa 0 }
-funcion relu(m) { regresa aplicar(m, relu_esc) }
+funcion relu(m) {
+    var r = []
+    para fila en m {
+        var nf = []
+        para x en fila {
+            si (x > 0) { nf.agregar(x) } sino { nf.agregar(0) }
+        }
+        r.agregar(nf)
+    }
+    regresa r
+}
 funcion relu_derivada(m) {
     var r = []
-    var f = mat.filas(m)
-    var c = mat.columnas(m)
-    var i = 0
-    mientras (i < f) {
-        var fila = []
-        var j = 0
-        mientras (j < c) {
-            si (m[i][j] > 0) { fila.agregar(1) } sino { fila.agregar(0) }
-            j = j + 1
+    para fila en m {
+        var nf = []
+        para v en fila {
+            si (v > 0) { nf.agregar(1) } sino { nf.agregar(0) }
         }
-        r.agregar(fila)
-        i = i + 1
+        r.agregar(nf)
     }
     regresa r
 }
@@ -129,18 +108,12 @@ funcion forward(modelo, X) {
     var actual = X
     para capa en modelo["capas"] {
         var Z = mat.multiplicar(actual, capa["W"])
-        # Sumar b
-        var f_z = mat.filas(Z)
-        var c_z = mat.columnas(Z)
-        var fi = 0
-        mientras (fi < f_z) {
-            var ci = 0
-            mientras (ci < c_z) {
-                Z[fi][ci] = Z[fi][ci] + capa["b"][0][ci]
-                ci = ci + 1
-            }
-            fi = fi + 1
+        # Sumar b (broadcasting con + nativo)
+        var bias_mat = []
+        para fila_z en Z {
+            bias_mat.agregar(capa["b"][0])
         }
+        Z = Z + bias_mat
         
         si (capa["act"] == "relu") { actual = relu(Z) }
         sino_si (capa["act"] == "sigmoid") { actual = sigmoid(Z) }
@@ -154,17 +127,9 @@ funcion forward(modelo, X) {
 
 funcion entrenar_red(modelo, X, Y, epochs, lr) {
     para e en rango(epochs) {
-        si (e % 50 == 0 o e == epochs - 1) {
-            imp "[dl] checkpoint inicio epoch " + aTexto(e)
-        }
-
         var fwd = forward(modelo, X)
         var pred = fwd["salida"]
         var activaciones = fwd["activaciones"]
-
-        si (e % 50 == 0 o e == epochs - 1) {
-            imp "[dl] checkpoint forward epoch " + aTexto(e)
-        }
         
         var delta = mat.resta_matrices(pred, Y)
         
@@ -199,10 +164,6 @@ funcion entrenar_red(modelo, X, Y, epochs, lr) {
             capa["b"] = mat.resta_matrices(capa["b"], mat.escalar(db, lr))
             
             i = i - 1
-        }
-
-        si (e % 50 == 0 o e == epochs - 1) {
-            imp "[dl] checkpoint update epoch " + aTexto(e)
         }
         
         si (e % 200 == 0 o e == epochs - 1) {

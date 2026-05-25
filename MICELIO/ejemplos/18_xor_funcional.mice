@@ -1,0 +1,185 @@
+# Ejemplo 18: XOR como un solo pipeline con |>
+# CADA operación es un paso en la cadena: contexto |> paso1() |> paso2()
+importar "../modulos_std/dl.mice" como dl
+importar "../modulos_std/ml.mice" como ml
+importar "../modulos_std/matriz.mice" como mat
+importar "../modulos_std/math.mice" como math
+
+# ══════════════════════════════════════════════════════════════════════
+# 1.  FUNCIONES AUXILIARES
+# ══════════════════════════════════════════════════════════════════════
+
+funcion matriz_map(f, M) {
+    regresa map(funcion(fila) { map(f, fila) }, M)
+}
+
+funcion softmax_fila(fila) {
+    var max_v = max_lista(fila)
+    var exps = map(funcion(x) { exp(x - max_v) }, fila)
+    regresa map(funcion(e) { e / reduce(funcion(s, x) { s + x }, exps, 0) }, exps)
+}
+
+# ══════════════════════════════════════════════════════════════════════
+# 2.  CLAUSURA: CAPA COMO FUNCIÓN
+# ══════════════════════════════════════════════════════════════════════
+
+funcion crear_capa(W, b, act) {
+    regresa funcion(X) {
+        var Z = mat.multiplicar(X, W)
+        var B = []
+        para r en Z { B.agregar(b[0]) }
+        Z = Z + B
+        si (act == "relu") {
+            regresa matriz_map(funcion(x) { si (x > 0) { x } sino { 0 } }, Z)
+        }
+        sino_si (act == "softmax") { regresa map(softmax_fila, Z) }
+        sino { regresa Z }
+    }
+}
+
+# ══════════════════════════════════════════════════════════════════════
+# 3.  PASOS DEL PIPELINE
+#     Cada paso recibe un contexto (dict), lo procesa, y lo retorna
+# ══════════════════════════════════════════════════════════════════════
+
+# Paso 1: inicializar pesos
+funcion init_pesos(ctx) {
+    var capas = []
+    para conf en ctx["arq"] {
+        var escala = math.raiz(6 / (conf["in"] + conf["out"]))
+        var W = mat.ceros(conf["in"], conf["out"])
+        var i = 0
+        mientras (i < conf["in"]) {
+            var j = 0
+            mientras (j < conf["out"]) {
+                W[i][j] = (aleatorio() * 2 - 1) * escala
+                j = j + 1
+            }
+            i = i + 1
+        }
+        capas.agregar({"W": W, "b": mat.ceros(1, conf["out"]), "act": conf["act"]})
+    }
+    ctx["capas"] = capas
+    # Crear clausuras para forward con pipe
+    var fns = []
+    para c en capas { fns.agregar(crear_capa(c["W"], c["b"], c["act"])) }
+    ctx["fns"] = fns
+    ctx["modelo"] = {"capas": capas}
+    regresa ctx
+}
+
+# Paso 2: forward inicial
+funcion forward_ini(ctx) {
+    ctx["pred_ini"] = ctx["fns"][1](ctx["fns"][0](ctx["X"]))
+    regresa ctx
+}
+
+# Paso 3: error inicial (MSE)
+funcion error_ini(ctx) {
+    var s = 0
+    var f = longitud(ctx["Y"])
+    var c = longitud(ctx["Y"][0])
+    var i = 0
+    mientras (i < f) {
+        var j = 0
+        mientras (j < c) {
+            var d = ctx["Y"][i][j] - ctx["pred_ini"][i][j]
+            s = s + d * d
+            j = j + 1
+        }
+        i = i + 1
+    }
+    ctx["err_ini"] = s / (f * c)
+    regresa ctx
+}
+
+# Paso 4: entrenar
+funcion entrenar_red(ctx) {
+    dl.entrenar_red(ctx["modelo"], ctx["X"], ctx["Y"], ctx["epochs"], ctx["lr"])
+    # Reconstruir clausuras con pesos entrenados
+    var fns = []
+    para c en ctx["modelo"]["capas"] {
+        fns.agregar(crear_capa(c["W"], c["b"], c["act"]))
+    }
+    ctx["fns"] = fns
+    regresa ctx
+}
+
+# Paso 5: forward final
+funcion forward_fin(ctx) {
+    ctx["pred"] = ctx["fns"][1](ctx["fns"][0](ctx["X"]))
+    regresa ctx
+}
+
+# Paso 6: error final
+funcion error_fin(ctx) {
+    var s = 0
+    var f = longitud(ctx["Y"])
+    var c = longitud(ctx["Y"][0])
+    var i = 0
+    mientras (i < f) {
+        var j = 0
+        mientras (j < c) {
+            var d = ctx["Y"][i][j] - ctx["pred"][i][j]
+            s = s + d * d
+            j = j + 1
+        }
+        i = i + 1
+    }
+    ctx["err_fin"] = s / (f * c)
+    regresa ctx
+}
+
+# Paso 7: evaluar con ml
+funcion evaluar(ctx) {
+    var argmax = funcion(fila) { si (fila[0] >= fila[1]) { 0 } sino { 1 } }
+    ctx["pred_clases"] = map(argmax, ctx["pred"])
+    ctx["reales"] = map(argmax, ctx["Y"])
+    ctx["exactitud"] = ml.exactitud(ctx["pred_clases"], ctx["reales"])
+    ctx["f1"] = ml.f1_score(ctx["pred_clases"], ctx["reales"])
+    ctx["confusion"] = ml.matriz_confusion(ctx["pred_clases"], ctx["reales"])
+    regresa ctx
+}
+
+# Paso 8: reportar
+funcion reportar(ctx) {
+    imp "╔══════════════════════════════════════════════╗"
+    imp "║  XOR PIPELINE COMPLETO                       ║"
+    imp "╚══════════════════════════════════════════════╝"
+    imp "Error inicial: " + aTexto(ctx["err_ini"])
+    imp "Error final:   " + aTexto(ctx["err_fin"])
+    imp "Prediccion: " + aTexto(ctx["pred"])
+    imp "Esperado:   [[1,0],[0,1],[0,1],[1,0]]"
+    imp "Clases: " + aTexto(ctx["pred_clases"]) + " = " + aTexto(ctx["reales"])
+    imp "Exactitud: " + aTexto(ctx["exactitud"]) + " | F1: " + aTexto(ctx["f1"])
+    imp "Matriz confusion: " + aTexto(ctx["confusion"])
+    regresa ctx
+}
+
+# ══════════════════════════════════════════════════════════════════════
+# 4.  UNA SOLA PIPE DE PRINCIPIO A FIN
+# ══════════════════════════════════════════════════════════════════════
+
+var X = [[0,0], [0,1], [1,0], [1,1]]
+var Y = [[1,0], [0,1], [0,1], [1,0]]
+var arq = [{"in":2, "out":8, "act":"relu"}, {"in":8, "out":2, "act":"softmax"}]
+
+# Pipeline completo: el contexto fluye por cada |> como ÚNICO argumento
+var resultado = {"X": X, "Y": Y, "arq": arq, "lr": 0.3, "epochs": 500}
+    |> init_pesos()
+    |> forward_ini()
+    |> error_ini()
+    |> entrenar_red()
+    |> forward_fin()
+    |> error_fin()
+    |> evaluar()
+    |> reportar()
+
+# ctx |> init_pesos()   → init_pesos(ctx)   → agrega "capas", "fns", "modelo"
+# ctx |> forward_ini()  → forward_ini(ctx)  → agrega "pred_ini"
+# ctx |> error_ini()    → error_ini(ctx)    → agrega "err_ini"
+# ctx |> entrenar_red() → entrenar_red(ctx) → entrena, reconstruye clausuras
+# ctx |> forward_fin()  → forward_fin(ctx)  → agrega "pred"
+# ctx |> error_fin()    → error_fin(ctx)    → agrega "err_fin"
+# ctx |> evaluar()      → evaluar(ctx)      → agrega "exactitud", "f1", "confusion"
+# ctx |> reportar()     → reportar(ctx)     → imprime todo

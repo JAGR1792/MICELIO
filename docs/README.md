@@ -1,6 +1,7 @@
 # Documentación de MICELIO
 
 - **`DOCUMENTACION.md`**: documentación completa (recomendado para empezar)
+- **`DEEP_LEARNING_MICELIO.md`**: Deep Learning: forward/backpropagation, activaciones, ejemplos XOR, Caperucita, autoencoder, softmax
 - `lenguaje.md`: sintaxis y semántica detallada
 - `estructura-proyecto.md`: mapa de carpetas y responsabilidades
 - `runtime.md`: arquitectura de ejecución, entorno y builtins

@@ -93,70 +93,28 @@ funcion transpuesta(m) {
     regresa result
 }
 
-# Suma dos matrices
+# Suma dos matrices (usa operador nativo + para matrices)
 funcion suma_matrices(m1, m2) {
     si (filas(m1) != filas(m2) o columnas(m1) != columnas(m2)) {
         __error("Suma: matrices deben tener las mismas dimensiones")
     }
-    var result = []
-    var i = 0
-    mientras (i < filas(m1)) {
-        var fila = []
-        var j = 0
-        mientras (j < columnas(m1)) {
-            fila.agregar(m1[i][j] + m2[i][j])
-            j = j + 1
-        }
-        result.agregar(fila)
-        i = i + 1
-    }
-    regresa result
+    regresa m1 + m2
 }
 
-# Resta dos matrices
+# Resta dos matrices (usa operador nativo - para matrices)
 funcion resta_matrices(m1, m2) {
     si (filas(m1) != filas(m2) o columnas(m1) != columnas(m2)) {
         __error("Resta: matrices deben tener las mismas dimensiones")
     }
-    var result = []
-    var i = 0
-    mientras (i < filas(m1)) {
-        var fila = []
-        var j = 0
-        mientras (j < columnas(m1)) {
-            fila.agregar(m1[i][j] - m2[i][j])
-            j = j + 1
-        }
-        result.agregar(fila)
-        i = i + 1
-    }
-    regresa result
+    regresa m1 - m2
 }
 
-# Multiplica dos matrices
+# Multiplica dos matrices (usa operador nativo * para matrices)
 funcion multiplicar(m1, m2) {
     si (columnas(m1) != filas(m2)) {
         __error("Multiplicación: columnas de m1 deben igualar filas de m2")
     }
-    var result = []
-    var i = 0
-    mientras (i < filas(m1)) {
-        var fila = []
-        var j = 0
-        mientras (j < columnas(m2)) {
-            var suma = 0
-            var k = 0
-            mientras (k < columnas(m1)) {
-                suma = suma + (m1[i][k] * m2[k][j])
-                k = k + 1
-            }
-            fila.agregar(suma)
-            j = j + 1
-        }
-        result.agregar(fila)
-        i = i + 1
-    }
-    regresa result
+    regresa m1 * m2
 }
 
 # Multiplica matriz por escalar

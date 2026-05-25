@@ -3,6 +3,8 @@
 # Implementación de modelos simples desde cero
 # ===================================================================
 
+importar "math.mice" como math
+
 # Divide datos en entrenamiento y prueba
 funcion dividir_datos(X, Y, proporcion_train) {
     var n = X.longitud()
@@ -42,7 +44,7 @@ funcion varianza(valores) {
 
 # Calcula desviación estándar
 funcion desviacion_estandar(valores) {
-    regresa __exp_nativo(varianza(valores) / 2)
+    regresa math.raiz(varianza(valores))
 }
 
 # Normaliza valores (z-score)
@@ -120,7 +122,7 @@ funcion k_means(X, k, iteraciones) {
 funcion distancia_euclidiana(p1, p2) {
     si (tipo(p1) == "numero" y tipo(p2) == "numero") {
         var d = p1 - p2
-        regresa __exp_nativo((d * d) / 2)
+        regresa math.raiz(d * d)
     }
     var suma = 0
     var i = 0
@@ -129,7 +131,7 @@ funcion distancia_euclidiana(p1, p2) {
         suma = suma + (diff * diff)
         i = i + 1
     }
-    regresa __exp_nativo(suma / 2)
+    regresa math.raiz(suma)
 }
 
 # Calcula matriz de confusión
@@ -202,8 +204,7 @@ funcion f1_score(predichos, reales) {
 
 # Función Sigmoide
 funcion sigmoid(z) {
-    # Usamos __exp_nativo directamente para evitar problemas de importación
-    regresa 1.0 / (1.0 + __exp_nativo(-z))
+    regresa 1.0 / (1.0 + exp(-z))
 }
 
 # Derivada de Sigmoide

@@ -76,9 +76,40 @@ funcion alguno(predicado, lista) {
 
 # ─── Ordenamiento ────────────────────────────────────────────────────
 
-# Ordena una lista usando el algoritmo nativo (Timsort)
+funcion _particion(lista, bajo, alto) {
+    var pivote = lista[alto]
+    var i = bajo - 1
+    var j = bajo
+    mientras (j < alto) {
+        si (lista[j] <= pivote) {
+            i = i + 1
+            var temp = lista[i]
+            lista[i] = lista[j]
+            lista[j] = temp
+        }
+        j = j + 1
+    }
+    var temp = lista[i + 1]
+    lista[i + 1] = lista[alto]
+    lista[alto] = temp
+    regresa i + 1
+}
+
+funcion _quick_sort(lista, bajo, alto) {
+    si (bajo < alto) {
+        var pi = _particion(lista, bajo, alto)
+        _quick_sort(lista, bajo, pi - 1)
+        _quick_sort(lista, pi + 1, alto)
+    }
+}
+
 funcion ordenar(lista) {
-    regresa __ordenar_nativo(lista)
+    var copia = []
+    para elem en lista {
+        copia.agregar(elem)
+    }
+    _quick_sort(copia, 0, copia.longitud() - 1)
+    regresa copia
 }
 
 # ─── Conversiones de tipos ──────────────────────────────────────────
@@ -172,9 +203,10 @@ funcion concatenar(lista1, lista2) {
 
 # ─── Números aleatorios ────────────────────────────────────────────
 
-# Genera un número aleatorio entre 0 y 1
+var _semilla = 123456789
 funcion aleatorio() {
-    regresa __aleatorio()
+    _semilla = (_semilla * 1103515245 + 12345) % 2147483648
+    regresa _semilla / 2147483648.0
 }
 
 # ─── Funciones matemáticas ────────────────────────────────────────
@@ -206,9 +238,24 @@ funcion minimo(a, b) {
     }
 }
 
-# Exponencial (e^x)
+# Exponencial (e^x) por serie de Taylor (desenrollado, 6 terminos)
 funcion exp(x) {
-    regresa __exp_nativo(x)
+    var neg = falso
+    si (x < 0) {
+        x = -x
+        neg = verdadero
+    }
+    var s = 1.0 + x
+    var t = x
+    t = t * x / 2; s = s + t
+    t = t * x / 3; s = s + t
+    t = t * x / 4; s = s + t
+    t = t * x / 5; s = s + t
+    t = t * x / 6; s = s + t
+    si (neg) {
+        regresa 1.0 / s
+    }
+    regresa s
 }
 
 # ─── Máximo y mínimo de una colección ──────────────────────────────
