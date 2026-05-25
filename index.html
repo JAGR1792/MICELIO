@@ -11,28 +11,13 @@
     <!-- Mermaid (diagrams) -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
-        function temaMermaidConfig(oscuro) {
-            return oscuro ? {
-                background: '#1a120e',
-                primaryColor: '#2c2018',
-                primaryTextColor: '#e8ddd0',
-                primaryBorderColor: '#d4835a',
-                lineColor: '#d4835a',
-                secondaryColor: '#241a14',
-                tertiaryColor: '#1a120e',
-                clusterBkg: '#2c2018',
-                clusterBorder: '#d4835a',
-                nodeBorder: '#d4835a',
-                nodeTextColor: '#e8ddd0',
-                edgeLabelBackground: '#1a120e',
-                fontFamily: 'DM Sans, sans-serif',
-                titleColor: '#e8ddd0',
-                mainBkg: '#2c2018',
-                textColor: '#e8ddd0',
-                labelTextColor: '#e8ddd0',
-                labelBackground: '#2c2018'
-            } : {
-                background: '#fffcf8',
+        var esOscuro = localStorage.getItem('tema') === 'dark' ||
+            (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                background: '#f8f1eb',
                 primaryColor: '#f4ece4',
                 primaryTextColor: '#2c1810',
                 primaryBorderColor: '#c76b4a',
@@ -50,15 +35,7 @@
                 textColor: '#2c1810',
                 labelTextColor: '#2c1810',
                 labelBackground: '#fffcf8'
-            };
-        }
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'base',
-            themeVariables: temaMermaidConfig(
-                localStorage.getItem('tema') === 'dark' ||
-                (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            )
+            }
         });
     </script>
 
@@ -692,46 +669,24 @@
         </ul>
     </nav>
     <div class="theme-toggle" onclick="alternarTema()" role="button" tabindex="0">
-        <span class="icon" id="toggle-icon">&#x25D0;</span>
-        <span class="label" id="toggle-label">Oscuro</span>
+        <span class="icon">&#x25D0;</span>
+        <span class="label">Cambiar tema</span>
     </div>
     <script>
         (function() {
-            var tema = localStorage.getItem('tema');
-            if (tema === 'dark' || (tema === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            if (localStorage.getItem('tema') === 'dark' ||
+                (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.setAttribute('data-theme', 'dark');
-                var icon = document.getElementById('toggle-icon');
-                var label = document.getElementById('toggle-label');
-                if (icon) icon.innerHTML = '&#x2601;';
-                if (label) label.textContent = 'Claro';
             }
         })();
         function alternarTema() {
             var html = document.documentElement;
-            var icon = document.getElementById('toggle-icon');
-            var label = document.getElementById('toggle-label');
             if (html.getAttribute('data-theme') === 'dark') {
-                html.removeAttribute('data-theme');
                 localStorage.setItem('tema', 'light');
-                if (icon) icon.innerHTML = '&#x25D0;';
-                if (label) label.textContent = 'Oscuro';
             } else {
-                html.setAttribute('data-theme', 'dark');
                 localStorage.setItem('tema', 'dark');
-                if (icon) icon.innerHTML = '&#x2601;';
-                if (label) label.textContent = 'Claro';
             }
-            if (typeof mermaid !== 'undefined') {
-                var oscuro = html.getAttribute('data-theme') === 'dark';
-                mermaid.initialize({
-                    theme: 'base',
-                    themeVariables: temaMermaidConfig(oscuro)
-                });
-                document.querySelectorAll('.mermaid').forEach(function(el) {
-                    el.removeAttribute('data-processed');
-                });
-                mermaid.run();
-            }
+            location.reload();
         }
     </script>
 </aside>
