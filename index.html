@@ -11,11 +11,8 @@
     <!-- Mermaid (diagrams) -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
-        var temaMermaid = function() {
-            var esOscuro = localStorage.getItem('tema') === 'oscuro' ||
-                (localStorage.getItem('tema') === null &&
-                 window.matchMedia('(prefers-color-scheme: dark)').matches);
-            return esOscuro ? {
+        function temaMermaidConfig(oscuro) {
+            return oscuro ? {
                 background: '#1a120e',
                 primaryColor: '#2c2018',
                 primaryTextColor: '#e8ddd0',
@@ -54,11 +51,14 @@
                 labelTextColor: '#2c1810',
                 labelBackground: '#fffcf8'
             };
-        }();
+        }
         mermaid.initialize({
             startOnLoad: true,
             theme: 'base',
-            themeVariables: temaMermaid
+            themeVariables: temaMermaidConfig(
+                localStorage.getItem('tema') === 'dark' ||
+                (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            )
         });
     </script>
 
@@ -721,7 +721,12 @@
                 if (icon) icon.innerHTML = '&#x2601;';
                 if (label) label.textContent = 'Claro';
             }
-            if (typeof mermaid !== 'undefined' && mermaid.run) {
+            if (typeof mermaid !== 'undefined') {
+                var oscuro = html.getAttribute('data-theme') === 'dark';
+                mermaid.initialize({
+                    theme: 'base',
+                    themeVariables: temaMermaidConfig(oscuro)
+                });
                 document.querySelectorAll('.mermaid').forEach(function(el) {
                     el.removeAttribute('data-processed');
                 });
