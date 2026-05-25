@@ -4,108 +4,94 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>$title$ -- MICELIO</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg-page:#f7f2ec;--bg-main:#fefcf9;--bg-surface:#f0e8df;--fg-primary:#1a0f0a;--fg-secondary:#5c4a3a;--fg-muted:#8c7a6a;--accent:#b85c3a;--accent-hover:#d46a46;--accent-soft:rgba(184,92,58,0.08);--accent-code:#b85c3a;--accent-amber:#c9852a;--code-bg:#1a0f0a;--code-fg:#e6d4c0;--border-light:rgba(184,92,58,0.1);--border-med:rgba(184,92,58,0.2);--radius:12px;--radius-sm:6px;--font-body:'Inter',system-ui,-apple-system,sans-serif;--font-display:'Playfair Display',Georgia,serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--mermaid-bg:#f4eee7;--mermaid-pad:12px;--nav-width:260px}
-[data-theme="dark"]{--bg-page:#14100c;--bg-main:#1c1612;--bg-surface:#241e18;--fg-primary:#e6ddd4;--fg-secondary:#b8a898;--fg-muted:#887a6a;--accent:#d4835a;--accent-hover:#e09a76;--accent-soft:rgba(212,131,90,0.12);--accent-code:#d4835a;--accent-amber:#d4a030;--code-bg:#0d0906;--code-fg:#e6ddd4;--border-light:rgba(212,131,90,0.12);--border-med:rgba(212,131,90,0.22);--mermaid-bg:#2a221c}
-html{scroll-behavior:smooth;scroll-padding-top:1rem}
-body{background:var(--bg-page);color:var(--fg-primary);font-family:var(--font-body);font-weight:400;line-height:1.7;margin:0;min-height:100vh}
-.theme-floating{position:fixed;bottom:1.5rem;right:1.5rem;z-index:1000;width:48px;height:48px;border-radius:50%;border:1px solid var(--border-med);background:var(--bg-surface);color:var(--fg-primary);font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,0.12);transition:all .2s;backdrop-filter:blur(8px)}
-.theme-floating:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(1.05)}
+:root{--bg:#f7f2ec;--bg-card:#fefcf9;--bg-side:#f0e8df;--fg:#1a0f0a;--fg2:#5c4a3a;--fg3:#8c7a6a;--accent:#b85c3a;--accent2:rgba(184,92,58,0.08);--accent3:#c9852a;--code-bg:#1a0f0a;--code-fg:#e6d4c0;--border:rgba(184,92,58,0.1);--border2:rgba(184,92,58,0.2);--r:12px;--r2:6px;--font:'system-ui','-apple-system','Segoe UI','Roboto','Helvetica Neue',sans-serif;--font-display:'Georgia','Times New Roman',serif;--font-mono:'Cascadia Code','JetBrains Mono','Fira Code','Consolas',monospace;--mermaid-bg:#f4eee7;--nav:260px}
+[data-theme="dark"]{--bg:#14100c;--bg-card:#1c1612;--bg-side:#241e18;--fg:#e6ddd4;--fg2:#b8a898;--fg3:#887a6a;--accent:#d4835a;--accent2:rgba(212,131,90,0.12);--accent3:#d4a030;--code-bg:#0d0906;--code-fg:#e6ddd4;--border:rgba(212,131,90,0.12);--border2:rgba(212,131,90,0.22);--mermaid-bg:#2a221c}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.7;margin:0;min-height:100vh}
 .wrapper{display:flex;max-width:1200px;margin:0 auto;min-height:100vh}
-.sidebar{position:sticky;top:0;height:100vh;width:var(--nav-width);flex-shrink:0;overflow-y:auto;padding:2rem 1rem;border-right:1px solid var(--border-light);background:var(--bg-surface)}
+.sidebar{position:sticky;top:0;height:100vh;width:var(--nav);flex-shrink:0;overflow-y:auto;padding:2rem 1rem;border-right:1px solid var(--border);background:var(--bg-side)}
 .sidebar-logo{font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--accent);text-decoration:none;display:block;margin-bottom:1.5rem}
-.sidebar-logo small{display:block;font-family:var(--font-body);font-size:0.7rem;font-weight:400;color:var(--fg-muted);margin-top:0.1rem}
-.toc-title{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--fg-muted);margin-bottom:0.75rem}
-.sidebar a{display:block;padding:0.3rem 0.5rem;font-size:0.85rem;color:var(--fg-secondary);text-decoration:none;border-radius:var(--radius-sm);transition:all .15s;line-height:1.4}
-.sidebar a:hover{background:var(--accent-soft);color:var(--accent)}
+.sidebar-logo small{display:block;font-family:var(--font);font-size:0.7rem;font-weight:400;color:var(--fg3);margin-top:0.1rem}
+.toc-tit{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--fg3);margin-bottom:0.75rem}
+.sidebar a{display:block;padding:0.3rem 0.5rem;font-size:0.85rem;color:var(--fg2);text-decoration:none;border-radius:var(--r2);line-height:1.4}
+.sidebar a:hover{background:var(--accent2);color:var(--accent)}
 .sidebar a.toc-h2{padding-left:1.2rem;font-size:0.8rem}
-.sidebar a.toc-h3{padding-left:2rem;font-size:0.78rem;color:var(--fg-muted)}
-.sidebar a.toc-h4{padding-left:2.8rem;font-size:0.75rem;color:var(--fg-muted)}
-.sidebar-toggle{display:none;background:none;border:none;color:var(--fg-primary);font-size:1.5rem;cursor:pointer;padding:0.5rem;position:fixed;top:0.5rem;left:0.5rem;z-index:999}
+.sidebar a.toc-h3{padding-left:2rem;font-size:0.78rem;color:var(--fg3)}
+.sidebar-toggle{display:none;background:none;border:none;color:var(--fg);font-size:1.5rem;cursor:pointer;padding:0.5rem;position:fixed;top:0.5rem;left:0.5rem;z-index:999}
 .content{flex:1;padding:3rem 3rem 6rem;max-width:840px;margin:0 auto}
-h1{font-family:var(--font-display);font-size:2.6rem;font-weight:700;margin:0 0 0.5rem;color:var(--accent);line-height:1.2}
-h2{font-family:var(--font-body);font-size:1.5rem;font-weight:700;margin:3rem 0 0.75rem;color:var(--fg-primary);border-bottom:1px solid var(--border-light);padding-bottom:0.4rem}
-h3{font-size:1.15rem;font-weight:600;margin:2rem 0 0.5rem;color:var(--accent-amber)}
-h4{font-size:1rem;font-weight:600;margin:1.5rem 0 0.5rem;color:var(--fg-secondary)}
+h1{font-family:var(--font-display);font-size:2.5rem;font-weight:700;margin:0 0 0.5rem;color:var(--accent);line-height:1.2}
+h2{font-size:1.4rem;font-weight:700;margin:3rem 0 0.75rem;color:var(--fg);border-bottom:1px solid var(--border);padding-bottom:0.4rem}
+h3{font-size:1.1rem;font-weight:600;margin:2rem 0 0.5rem;color:var(--accent3)}
+h4{font-size:1rem;font-weight:600;margin:1.5rem 0 0.5rem;color:var(--fg2)}
 p{margin:0 0 1rem}
 a{color:var(--accent);text-decoration:none}
-a:hover{color:var(--accent-hover);text-decoration:underline}
-strong{color:var(--fg-primary)}
+a:hover{color:var(--accent);text-decoration:underline}
 ul,ol{margin:0 0 1.5rem 1.5rem}
 li{margin-bottom:0.3rem}
-code{font-family:var(--font-mono);font-size:0.85em;background:var(--accent-soft);color:var(--accent-code);padding:0.1rem 0.5rem;border-radius:4px}
-pre{background:var(--code-bg);color:var(--code-fg);padding:1.25rem 1.5rem;border-radius:var(--radius);overflow-x:auto;font-family:var(--font-mono);font-size:0.85rem;line-height:1.6;margin:0 0 1.5rem}
+code{font-family:var(--font-mono);font-size:0.85em;background:var(--accent2);color:var(--accent);padding:0.1rem 0.5rem;border-radius:4px}
+pre{background:var(--code-bg);color:var(--code-fg);padding:1.25rem 1.5rem;border-radius:var(--r);overflow-x:auto;font-family:var(--font-mono);font-size:0.85rem;line-height:1.6;margin:0 0 1.5rem}
 pre code{background:transparent;color:inherit;padding:0;font-size:inherit}
-blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);padding:0.75rem 1.25rem;margin:0 0 1.5rem;border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--fg-secondary)}
-hr{border:none;border-top:1px solid var(--border-light);margin:2rem 0}
+blockquote{border-left:3px solid var(--accent);background:var(--accent2);padding:0.75rem 1.25rem;margin:0 0 1.5rem;border-radius:0 var(--r2) var(--r2) 0;color:var(--fg2)}
+hr{border:none;border-top:1px solid var(--border);margin:2rem 0}
 table{width:100%;border-collapse:collapse;margin:0 0 1.5rem;font-size:0.9rem}
-th,td{border:1px solid var(--border-light);padding:0.5rem 0.75rem;text-align:left}
-th{background:var(--bg-surface);font-weight:600;color:var(--fg-primary)}
-tr:nth-child(even){background:var(--accent-soft)}
-.mermaid{background:var(--mermaid-bg);border-radius:var(--radius);padding:var(--mermaid-pad);margin:0 0 1.5rem;overflow-x:auto;text-align:center}
-.mermaid svg{max-width:100%}
-.back-link{display:inline-flex;align-items:center;gap:0.4rem;margin-bottom:2rem;font-size:0.85rem;color:var(--fg-muted);padding:0.4rem 0.8rem;border-radius:var(--radius-sm);border:1px solid var(--border-light);transition:all .15s}
-.back-link:hover{background:var(--accent-soft);color:var(--accent);text-decoration:none}
+th,td{border:1px solid var(--border);padding:0.5rem 0.75rem;text-align:left}
+th{background:var(--bg-side);font-weight:600}
+tr:nth-child(even){background:var(--accent2)}
+.mermaid{background:var(--mermaid-bg);border-radius:var(--r);padding:12px;margin:0 0 1.5rem;overflow-x:auto;text-align:center}
+.back{display:inline-flex;align-items:center;gap:0.4rem;margin-bottom:2rem;font-size:0.85rem;color:var(--fg3);padding:0.4rem 0.8rem;border-radius:var(--r2);border:1px solid var(--border)}
+.back:hover{background:var(--accent2);color:var(--accent);text-decoration:none}
+.toggle{position:fixed;bottom:1.5rem;right:1.5rem;z-index:1000;width:44px;height:44px;border-radius:50%;border:1px solid var(--border2);background:var(--bg-side);color:var(--fg);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.toggle:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 @media(max-width:900px){
 .sidebar{position:fixed;left:-280px;z-index:100;transition:left .25s;box-shadow:2px 0 20px rgba(0,0,0,0.15)}
 .sidebar.open{left:0}
 .sidebar-toggle{display:block}
 .content{padding:2rem 1.5rem 5rem}
-.theme-floating{bottom:1rem;right:1rem;width:42px;height:42px;font-size:1.2rem}
 }
 </style>
 </head>
 <body>
-<button class="sidebar-toggle" id="sidebarToggle">&#x2630;</button>
+<button class="sidebar-toggle" id="menuBtn">&#x2630;</button>
 <nav class="sidebar" id="sidebar">
-  <a class="sidebar-logo" href="../index.html">
-    MICELIO
-    <small>$title$</small>
-  </a>
-  <div class="toc-title">Contenido</div>
+  <a class="sidebar-logo" href="../index.html">MICELIO<small>$title$</small></a>
+  <div class="toc-tit">Contenido</div>
   <div id="toc"></div>
 </nav>
 <div class="wrapper">
 <div class="content">
-<a class="back-link" href="../index.html">&larr; Volver al inicio</a>
+<a class="back" href="../index.html">&larr; Volver al inicio</a>
 $body$
 </div>
 </div>
-<button class="theme-floating" id="themeToggle">&#x25D0;</button>
+<button class="toggle" id="themeBtn">&#x25D0;</button>
 <script>
-(function(){var t=localStorage.getItem('tema');if(t==='dark'||(t===null&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})()
-document.getElementById('themeToggle').addEventListener('click',function(){
- var html=document.documentElement;
- if(html.getAttribute('data-theme')==='dark'){html.removeAttribute('data-theme');localStorage.setItem('tema','light')}
- else{html.setAttribute('data-theme','dark');localStorage.setItem('tema','dark')}
-})
-(function(){
- var toc=document.getElementById('toc');if(!toc)return;
- var items=[];var sel='h1,h2,h3,h4';
- var content=document.querySelector('.content');if(!content)return;
- var headers=content.querySelectorAll(sel);
- if(headers.length===0){toc.innerHTML='<span style="color:var(--fg-muted);font-size:0.85rem">(sin secciones)</span>';return}
- for(var i=0;i<headers.length;i++){
-  var el=headers[i];var txt=el.textContent.trim();
-  var id=el.id||txt.toLowerCase().replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g,'-').replace(/^-+/,'').replace(/-+$$/g,'');
-  if(!id)id='sec'+i;el.id=id;
-  items.push({tag:el.tagName.toLowerCase(),id:id,text:txt})
+try{(function(){var t;try{t=localStorage.getItem('tema')}catch(e){}if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})()}catch(e){}
+try{document.getElementById('themeBtn').onclick=function(){
+ var h=document.documentElement;
+ if(h.getAttribute('data-theme')==='dark'){h.removeAttribute('data-theme');try{localStorage.setItem('tema','light')}catch(e){}}
+ else{h.setAttribute('data-theme','dark');try{localStorage.setItem('tema','dark')}catch(e){}}
+}}catch(e){}
+try{(function(){
+ var t=document.getElementById('toc');if(!t)return;
+ var c=document.querySelector('.content');if(!c)return;
+ var h=c.querySelectorAll('h1,h2,h3,h4');if(!h.length){t.innerHTML='<span style="color:var(--fg3);font-size:0.85rem">(sin secciones)</span>';return}
+ for(var i=0;i<h.length;i++){
+  var e=h[i];var txt=e.textContent.trim();
+  var id=e.id||txt.toLowerCase().replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g,'-').replace(/^-+/,'').replace(/-+$$/g,'');
+  if(!id)id='s'+i;e.id=id;
+  var a=document.createElement('a');
+  var tag=e.tagName.toLowerCase();
+  if(tag==='h2')a.className='toc-h2';else if(tag==='h3')a.className='toc-h3';else if(tag==='h4')a.className='toc-h4';
+  a.href='#'+id;a.textContent=txt;t.appendChild(a)
  }
- for(var i=0;i<items.length;i++){
-  var it=items[i];var a=document.createElement('a');
-  if(it.tag==='h2')a.className='toc-h2';else if(it.tag==='h3')a.className='toc-h3';else if(it.tag==='h4')a.className='toc-h4';
-  a.href='#'+it.id;a.textContent=it.text;toc.appendChild(a)
- }
-})();
-document.getElementById('sidebarToggle').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('open')});
-document.addEventListener('click',function(e){
- var s=document.getElementById('sidebar');var st=document.getElementById('sidebarToggle');
- if(s.classList.contains('open')&&!s.contains(e.target)&&e.target!==st){s.classList.remove('open')}
-});
+})()}catch(e){}
+try{document.getElementById('menuBtn').onclick=function(){document.getElementById('sidebar').classList.toggle('open')}}catch(e){}
+try{document.addEventListener('click',function(e){
+ var s=document.getElementById('sidebar');var b=document.getElementById('menuBtn');
+ if(s.classList.contains('open')&&!s.contains(e.target)&&e.target!==b){s.classList.remove('open')}
+})}catch(e){}
 </script>
 </body>
 </html>

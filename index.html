@@ -11,8 +11,8 @@
     <!-- Mermaid (diagrams) -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
-        var esOscuro = localStorage.getItem('tema') === 'dark' ||
-            (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var esOscuro = false;
+        try { esOscuro = localStorage.getItem('tema') === 'dark' || (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches); } catch(e) {};
         mermaid.initialize({
             startOnLoad: true,
             theme: 'base',
@@ -673,19 +673,14 @@
         <span class="label">Cambiar tema</span>
     </div>
     <script>
-        (function() {
+        try {
             if (localStorage.getItem('tema') === 'dark' ||
                 (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.setAttribute('data-theme', 'dark');
             }
-        })();
+        } catch(e) {}
         function alternarTema() {
-            var html = document.documentElement;
-            if (html.getAttribute('data-theme') === 'dark') {
-                localStorage.setItem('tema', 'light');
-            } else {
-                localStorage.setItem('tema', 'dark');
-            }
+            try { localStorage.setItem('tema', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); } catch(e) {}
             location.reload();
         }
     </script>
