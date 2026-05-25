@@ -6,6 +6,101 @@
     ],
     "description": "Inserta una declaracion de importacion con alias"
   },
+  "Funcion": {
+    "prefix": "fun",
+    "body": [
+      "funcion ${1:nombre}(${2:parametros}) {",
+      "  ${3:cuerpo}",
+      "}"
+    ],
+    "description": "Define una funcion"
+  },
+  "Si condicional": {
+    "prefix": "si",
+    "body": [
+      "si (${1:condicion}) {",
+      "  ${2:cuerpo}",
+      "}"
+    ],
+    "description": "Bloque condicional if"
+  },
+  "Si sino condicional": {
+    "prefix": "sino",
+    "body": [
+      "si (${1:condicion}) {",
+      "  ${2:cuerpo}",
+      "} sino {",
+      "  ${3:alternativa}",
+      "}"
+    ],
+    "description": "Bloque condicional if/else"
+  },
+  "Para cada": {
+    "prefix": "para",
+    "body": [
+      "para ${1:elemento} en ${2:lista} {",
+      "  ${3:cuerpo}",
+      "}"
+    ],
+    "description": "Iteracion sobre una lista"
+  },
+  "Mientras": {
+    "prefix": "mientras",
+    "body": [
+      "mientras (${1:condicion}) {",
+      "  ${2:cuerpo}",
+      "}"
+    ],
+    "description": "Bucle condicional while"
+  },
+  "Var declaracion": {
+    "prefix": "var",
+    "body": [
+      "var ${1:nombre} = ${2:valor}"
+    ],
+    "description": "Declara una variable mutable"
+  },
+  "Const declaracion": {
+    "prefix": "const",
+    "body": [
+      "const ${1:nombre} = ${2:valor}"
+    ],
+    "description": "Declara una constante"
+  },
+  "Regresa": {
+    "prefix": "regresa",
+    "body": [
+      "regresa ${1:valor}"
+    ],
+    "description": "Retorna un valor de una funcion"
+  },
+  "Matriz 2D": {
+    "prefix": "matriz",
+    "body": [
+      "[",
+      "  [${1:0}, ${2:0}],",
+      "  [${3:0}, ${4:0}]",
+      "]"
+    ],
+    "description": "Literal de matriz bidimensional"
+  },
+  "Diccionario": {
+    "prefix": "dict",
+    "body": [
+      "dict(",
+      "  \"${1:clave}\", ${2:valor},",
+      "  \"${3:clave}\", ${4:valor}",
+      ")"
+    ],
+    "description": "Crea un diccionario con pares clave/valor"
+  },
+  "Set": {
+    "prefix": "set",
+    "body": [
+      "set(${1:elementos})"
+    ],
+    "description": "Crea un conjunto"
+  },
   "Pipe: composicion basica": {
     "prefix": "pipe",
     "body": [
@@ -52,5 +147,54 @@
       "  |> reduce(funcion (${5:acc}, ${2:x}) { ${6:acc + x} }, ${7:0})"
     ],
     "description": "Inserta plantilla map/filter/ordenar/reduce con |>"
+  },
+  "Red neuronal: capa": {
+    "prefix": "capa",
+    "body": [
+      "var ${1:capa} = ${2:crear_capa}.fc(${3:entradas}, ${4:salidas})"
+    ],
+    "description": "Crea una capa fully-connected para red neuronal"
+  },
+  "Red neuronal: entrenar": {
+    "prefix": "entrenar",
+    "body": [
+      "para ${1:epoca} en rango(${2:500}) {",
+      "  var ${3:pred} = ${4:red}.forward(${5:entrada})",
+      "  var ${6:error} = ${4:red}.backward(${5:entrada}, ${7:objetivo})",
+      "  si (${1:epoca} % 100 == 0) {",
+      "    imp(\"Epoca \" + ${1:epoca} + \" - Error: \" + ${6:error})",
+      "  }",
+      "}"
+    ],
+    "description": "Bucle de entrenamiento para red neuronal"
+  },
+  "Grafico: inicializar": {
+    "prefix": "grafico",
+    "body": [
+      "__grafico_reset(${1:800}, ${2:600})",
+      "__grafico_draw_axes(${1:800}, ${2:600}, ${3:10})",
+      "__grafico_set_pixel(${4:x}, ${5:y}, ${6:255}, ${7:0}, ${8:0})",
+      "__grafico_guardar(\"${9:salida}.png\")"
+    ],
+    "description": "Inicializa un grafico y dibuja un pixel"
+  },
+  "Leer archivo": {
+    "prefix": "leer",
+    "body": [
+      "var ${1:contenido} = leer(\"${2:archivo.txt}\")"
+    ],
+    "description": "Lee el contenido de un archivo"
+  },
+  "Prueba unitaria": {
+    "prefix": "test",
+    "body": [
+      "# Test: ${1:descripcion}",
+      "si (${2:expresion} == ${3:esperado}) {",
+      "  imp(\"OK: ${1}\")",
+      "} sino {",
+      "  imp(\"FALLO: ${1} - se obtuvo \" + aTexto(${2:expresion}))",
+      "}"
+    ],
+    "description": "Estructura basica para prueba unitaria"
   }
 }
