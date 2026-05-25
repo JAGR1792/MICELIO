@@ -33,26 +33,17 @@ var _text_g = 50
 var _text_b = 50
 
 var _usar_marcadores = verdadero
-var _tam_marcador = 2
+var _tam_marcador = 3
 var _last_xmin = 0
 var _last_xmax = 1
 var _last_ymin = 0
 var _last_ymax = 1
 
-funcion _abs(v) {
-    si (v < 0) {
-        regresa -v
-    }
-    regresa v
-}
-
 funcion _min_lista(xs) {
     var m = xs[0]
     var i = 1
     mientras (i < longitud(xs)) {
-        si (xs[i] < m) {
-            m = xs[i]
-        }
+        si (xs[i] < m) { m = xs[i] }
         i = i + 1
     }
     regresa m
@@ -62,157 +53,10 @@ funcion _max_lista(xs) {
     var m = xs[0]
     var i = 1
     mientras (i < longitud(xs)) {
-        si (xs[i] > m) {
-            m = xs[i]
-        }
+        si (xs[i] > m) { m = xs[i] }
         i = i + 1
     }
     regresa m
-}
-
-funcion _fila_glifo(ch, row) {
-    si (ch == "0") {
-        si (row == 0) { regresa "###" }
-        si (row == 1) { regresa "# #" }
-        si (row == 2) { regresa "# #" }
-        si (row == 3) { regresa "# #" }
-        regresa "###"
-    }
-    si (ch == "1") {
-        si (row == 0) { regresa " ##" }
-        si (row == 1) { regresa "  #" }
-        si (row == 2) { regresa "  #" }
-        si (row == 3) { regresa "  #" }
-        regresa " ###"
-    }
-    si (ch == "2") {
-        si (row == 0) { regresa "###" }
-        si (row == 1) { regresa "  #" }
-        si (row == 2) { regresa "###" }
-        si (row == 3) { regresa "#  " }
-        regresa "###"
-    }
-    si (ch == "3") {
-        si (row == 0) { regresa "###" }
-        si (row == 1) { regresa "  #" }
-        si (row == 2) { regresa " ##" }
-        si (row == 3) { regresa "  #" }
-        regresa "###"
-    }
-    si (ch == "4") {
-        si (row == 0) { regresa "# #" }
-        si (row == 1) { regresa "# #" }
-        si (row == 2) { regresa "###" }
-        si (row == 3) { regresa "  #" }
-        regresa "  #"
-    }
-    si (ch == "5") {
-        si (row == 0) { regresa "###" }
-        si (row == 1) { regresa "#  " }
-        si (row == 2) { regresa "###" }
-        si (row == 3) { regresa "  #" }
-        regresa "###"
-    }
-    si (ch == "6") {
-        si (row == 0) { regresa "###" }
-        si (row == 1) { regresa "#  " }
-        si (row == 2) { regresa "###" }
-        si (row == 3) { regresa "# #" }
-        regresa "###"
-    }
-    si (ch == "7") {
-        si (row == 0) { regresa "###" }
-        si (row == 1) { regresa "  #" }
-        si (row == 2) { regresa "  #" }
-        si (row == 3) { regresa "  #" }
-        regresa "  #"
-    }
-    si (ch == "8") {
-        si (row == 0) { regresa "###" }
-        si (row == 1) { regresa "# #" }
-        si (row == 2) { regresa "###" }
-        si (row == 3) { regresa "# #" }
-        regresa "###"
-    }
-    si (ch == "9") {
-        si (row == 0) { regresa "###" }
-        si (row == 1) { regresa "# #" }
-        si (row == 2) { regresa "###" }
-        si (row == 3) { regresa "  #" }
-        regresa "###"
-    }
-    si (ch == "-") {
-        si (row == 2) { regresa "###" }
-        regresa "   "
-    }
-    regresa "   "
-}
-
-funcion _dibujar_texto(x, y0, texto, r, g, b) {
-    var t = aTexto(texto)
-    var i = 0
-    mientras (i < longitud(t)) {
-        var ch = t[i]
-        var row = 0
-        mientras (row < 5) {
-            var patron = _fila_glifo(ch, row)
-            var col = 0
-            mientras (col < 3) {
-                si (patron[col] == "#") {
-                    __grafico_set_pixel(x + (i * 4) + col, y0 + row, r, g, b)
-                }
-                col = col + 1
-            }
-            row = row + 1
-        }
-        i = i + 1
-    }
-}
-
-funcion _dibujar_linea(x0, y0, x1, y1, r, g, b) {
-    var dx = _abs(x1 - x0)
-    var sx = -1
-    si (x0 < x1) {
-        sx = 1
-    }
-
-    var dy = -_abs(y1 - y0)
-    var sy = -1
-    si (y0 < y1) {
-        sy = 1
-    }
-
-    var err = dx + dy
-
-    mientras (verdadero) {
-        __grafico_set_pixel(x0, y0, r, g, b)
-
-        si (x0 == x1 y y0 == y1) {
-            romper
-        }
-
-        var e2 = 2 * err
-        si (e2 >= dy) {
-            err = err + dy
-            x0 = x0 + sx
-        }
-        si (e2 <= dx) {
-            err = err + dx
-            y0 = y0 + sy
-        }
-    }
-}
-
-funcion _dibujar_marcador(px, py) {
-    var dx = -_tam_marcador
-    mientras (dx <= _tam_marcador) {
-        var dy = -_tam_marcador
-        mientras (dy <= _tam_marcador) {
-            __grafico_set_pixel(px + dx, py + dy, _point_r, _point_g, _point_b)
-            dy = dy + 1
-        }
-        dx = dx + 1
-    }
 }
 
 funcion _dibujar_rejilla() {
@@ -220,26 +64,13 @@ funcion _dibujar_rejilla() {
     var right = _ANCHO - _MARGEN
     var top = _MARGEN
     var bottom = _ALTO - _MARGEN
-
     var pasos = 8
-
     var i = 1
     mientras (i < pasos) {
         var xv = left + aEntero((i * (right - left)) / pasos)
         var yv = top + aEntero((i * (bottom - top)) / pasos)
-
-        var ypix = top
-        mientras (ypix <= bottom) {
-            __grafico_set_pixel(xv, ypix, _grid_r, _grid_g, _grid_b)
-            ypix = ypix + 1
-        }
-
-        var xpix = left
-        mientras (xpix <= right) {
-            __grafico_set_pixel(xpix, yv, _grid_r, _grid_g, _grid_b)
-            xpix = xpix + 1
-        }
-
+        __grafico_linea(xv, top, xv, bottom, _grid_r, _grid_g, _grid_b, 1)
+        __grafico_linea(left, yv, right, yv, _grid_r, _grid_g, _grid_b, 1)
         i = i + 1
     }
 }
@@ -249,18 +80,8 @@ funcion _dibujar_ejes() {
     var right = _ANCHO - _MARGEN
     var top = _MARGEN
     var bottom = _ALTO - _MARGEN
-
-    var x = left
-    mientras (x <= right) {
-        __grafico_set_pixel(x, bottom, _axis_r, _axis_g, _axis_b)
-        x = x + 1
-    }
-
-    var ypix = top
-    mientras (ypix <= bottom) {
-        __grafico_set_pixel(left, ypix, _axis_r, _axis_g, _axis_b)
-        ypix = ypix + 1
-    }
+    __grafico_linea(left, bottom, right, bottom, _axis_r, _axis_g, _axis_b, 2)
+    __grafico_linea(left, top, left, bottom, _axis_r, _axis_g, _axis_b, 2)
 }
 
 funcion _dibujar_ticks(xmin, xmax, ymin, ymax) {
@@ -269,29 +90,26 @@ funcion _dibujar_ticks(xmin, xmax, ymin, ymax) {
     var top = _MARGEN
     var bottom = _ALTO - _MARGEN
     var pasos = 8
-
     var i = 0
     mientras (i <= pasos) {
         var tx = left + aEntero((i * (right - left)) / pasos)
         var ty = bottom
-        _dibujar_linea(tx, ty, tx, ty + 5, _axis_r, _axis_g, _axis_b)
+        __grafico_linea(tx, ty, tx, ty + 5, _axis_r, _axis_g, _axis_b, 2)
 
         var vx = xmin + ((i * (xmax - xmin)) / pasos)
-        _dibujar_texto(tx - 8, ty + 8, aTexto(aEntero(vx)), _text_r, _text_g, _text_b)
+        __grafico_texto(tx - 10, ty + 6, aTexto(aEntero(vx)), _text_r, _text_g, _text_b, 10)
 
         var ly = bottom - aEntero((i * (bottom - top)) / pasos)
-        _dibujar_linea(left - 5, ly, left, ly, _axis_r, _axis_g, _axis_b)
+        __grafico_linea(left - 5, ly, left, ly, _axis_r, _axis_g, _axis_b, 2)
 
         var vy = ymin + ((i * (ymax - ymin)) / pasos)
-        _dibujar_texto(3, ly - 2, aTexto(aEntero(vy)), _text_r, _text_g, _text_b)
-
+        __grafico_texto(4, ly - 6, aTexto(aEntero(vy)), _text_r, _text_g, _text_b, 10)
         i = i + 1
     }
 }
 
 funcion estilo(nombre) {
     var n = aTexto(nombre)
-
     si (n == "claro") {
         _line_r = 36; _line_g = 88; _line_b = 216
         _point_r = 220; _point_g = 40; _point_b = 40
@@ -301,7 +119,6 @@ funcion estilo(nombre) {
         _text_r = 50; _text_g = 50; _text_b = 50
         regresa "claro"
     }
-
     si (n == "oscuro") {
         _line_r = 124; _line_g = 189; _line_b = 255
         _point_r = 255; _point_g = 135; _point_b = 135
@@ -311,7 +128,6 @@ funcion estilo(nombre) {
         _text_r = 210; _text_g = 210; _text_b = 210
         regresa "oscuro"
     }
-
     si (n == "ocean") {
         _line_r = 16; _line_g = 108; _line_b = 176
         _point_r = 0; _point_g = 151; _point_b = 167
@@ -321,7 +137,6 @@ funcion estilo(nombre) {
         _text_r = 32; _text_g = 64; _text_b = 80
         regresa "ocean"
     }
-
     si (n == "retro") {
         _line_r = 140; _line_g = 80; _line_b = 32
         _point_r = 200; _point_g = 120; _point_b = 48
@@ -331,26 +146,17 @@ funcion estilo(nombre) {
         _text_r = 90; _text_g = 70; _text_b = 40
         regresa "retro"
     }
-
     regresa "desconocido"
 }
 
 funcion marcadores(activo, tamano) {
     _usar_marcadores = activo
     var t = aEntero(tamano)
-    si (t < 1) {
-        t = 1
-    }
-    si (t > 5) {
-        t = 5
-    }
+    si (t < 1) { t = 1 }
+    si (t > 8) { t = 8 }
     _tam_marcador = t
     regresa [_usar_marcadores, _tam_marcador]
 }
-
-# ------------------------------------------------------------------
-# Nuevas utilidades para visualizaciones compuestas (no resetean)
-# ------------------------------------------------------------------
 
 funcion iniciar_grafico(xmin, xmax, ymin, ymax) {
     __grafico_reset(_ANCHO, _ALTO, _MARGEN)
@@ -377,39 +183,28 @@ funcion pintar_puntos(xs, ys, r, g, b, tam) {
     var spany = _last_ymax - _last_ymin
     si (spanx == 0) { spanx = 1 }
     si (spany == 0) { spany = 1 }
+    var ts = aEntero(tam)
 
     var i = 0
     mientras (i < longitud(xs)) {
-        var px = left + aEntero(( (xs[i] - _last_xmin) * (right - left)) / spanx)
-        var py = bottom - aEntero(( (ys[i] - _last_ymin) * (bottom - top)) / spany)
-
-        var dx = -aEntero(tam)
-        mientras (dx <= aEntero(tam)) {
-            var dy = -aEntero(tam)
-            mientras (dy <= aEntero(tam)) {
-                __grafico_set_pixel(px + dx, py + dy, aEntero(r), aEntero(g), aEntero(b))
-                dy = dy + 1
-            }
-            dx = dx + 1
-        }
+        var px = left + aEntero(((xs[i] - _last_xmin) * (right - left)) / spanx)
+        var py = bottom - aEntero(((ys[i] - _last_ymin) * (bottom - top)) / spany)
+        __grafico_circulo(px, py, ts, aEntero(r), aEntero(g), aEntero(b), verdadero)
         i = i + 1
     }
     regresa longitud(xs)
 }
 
 funcion pintar_mapa(xs, ys, clases, color0, color1) {
-    # xs, ys: grid points; clases: lista de 0/1
     si (longitud(xs) != longitud(ys) o longitud(xs) != longitud(clases)) {
         imp "Error: pintar_mapa requiere listas x,y,clases del mismo tamano"
         regresa nulo
     }
     var i = 0
     mientras (i < longitud(xs)) {
-        si (clases[i] == 1) {
-            __grafico_set_pixel(aEntero(xs[i]), aEntero(ys[i]), color1[0], color1[1], color1[2])
-        } sino {
-            __grafico_set_pixel(aEntero(xs[i]), aEntero(ys[i]), color0[0], color0[1], color0[2])
-        }
+        var c = color1
+        si (clases[i] == 0) { c = color0 }
+        __grafico_set_pixel(aEntero(xs[i]), aEntero(ys[i]), c[0], c[1], c[2])
         i = i + 1
     }
     regresa longitud(xs)
@@ -477,7 +272,7 @@ funcion lineas(x, ys) {
     mientras ((i + 1) < longitud(puntos)) {
         var p0 = puntos[i]
         var p1 = puntos[i + 1]
-        _dibujar_linea(aEntero(p0[0]), aEntero(p0[1]), aEntero(p1[0]), aEntero(p1[1]), _line_r, _line_g, _line_b)
+        __grafico_linea(aEntero(p0[0]), aEntero(p0[1]), aEntero(p1[0]), aEntero(p1[1]), _line_r, _line_g, _line_b, 2)
         i = i + 1
     }
 
@@ -485,7 +280,7 @@ funcion lineas(x, ys) {
         i = 0
         mientras (i < longitud(puntos)) {
             var p = puntos[i]
-            _dibujar_marcador(aEntero(p[0]), aEntero(p[1]))
+            __grafico_circulo(aEntero(p[0]), aEntero(p[1]), _tam_marcador, _point_r, _point_g, _point_b, verdadero)
             i = i + 1
         }
     }
@@ -528,7 +323,7 @@ funcion dispersion(x, ys) {
     mientras (i < longitud(x)) {
         var px = left + aEntero(((x[i] - xmin) * (right - left)) / spanx)
         var py = bottom - aEntero(((ys[i] - ymin) * (bottom - top)) / spany)
-        _dibujar_marcador(px, py)
+        __grafico_circulo(px, py, _tam_marcador, _point_r, _point_g, _point_b, verdadero)
         i = i + 1
     }
 
@@ -553,9 +348,7 @@ funcion histograma(datos, bins) {
 
     var vmin = _min_lista(datos)
     var vmax = _max_lista(datos)
-    si (vmin == vmax) {
-        vmax = vmin + 1
-    }
+    si (vmin == vmax) { vmax = vmin + 1 }
 
     var left = _MARGEN
     var right = _ANCHO - _MARGEN
@@ -563,9 +356,7 @@ funcion histograma(datos, bins) {
     var bottom = _ALTO - _MARGEN
     var plot_w = right - left
     var bin_w = aEntero(plot_w / b)
-    si (bin_w < 1) {
-        bin_w = 1
-    }
+    si (bin_w < 1) { bin_w = 1 }
 
     var ancho_bin = (vmax - vmin) / b
     var counts = []
@@ -575,30 +366,20 @@ funcion histograma(datos, bins) {
     mientras (j < b) {
         var low = vmin + (j * ancho_bin)
         var high = low + ancho_bin
-        si (j == (b - 1)) {
-            high = vmax + 0.000001
-        }
-
+        si (j == (b - 1)) { high = vmax + 0.000001 }
         var c = 0
         var i = 0
         mientras (i < longitud(datos)) {
             var v = datos[i]
-            si (v >= low y v < high) {
-                c = c + 1
-            }
+            si (v >= low y v < high) { c = c + 1 }
             i = i + 1
         }
-
         counts.agregar(c)
-        si (c > max_count) {
-            max_count = c
-        }
+        si (c > max_count) { max_count = c }
         j = j + 1
     }
 
-    si (max_count <= 0) {
-        max_count = 1
-    }
+    si (max_count <= 0) { max_count = 1 }
 
     _dibujar_ticks(vmin, vmax, 0, max_count)
 
@@ -607,49 +388,48 @@ funcion histograma(datos, bins) {
         var count = counts[j]
         var bar_h = aEntero((count * (bottom - top)) / max_count)
         var x0 = left + (j * bin_w)
-        var x1 = x0 + bin_w - 1
-        si (x1 > right) {
-            x1 = right
-        }
         var y0 = bottom - bar_h
-
-        var xpix = x0
-        mientras (xpix <= x1) {
-            var ypix = y0
-            mientras (ypix <= bottom) {
-                __grafico_set_pixel(xpix, ypix, _bar_r, _bar_g, _bar_b)
-                ypix = ypix + 1
-            }
-            xpix = xpix + 1
-        }
-
+        __grafico_rectangulo(x0, y0, bin_w - 1, bar_h, _bar_r, _bar_g, _bar_b, verdadero)
         j = j + 1
     }
 
     regresa counts
 }
 
+funcion _termina_en(texto, sufijo) {
+    var t = aTexto(texto)
+    var s = aTexto(sufijo)
+    var lt = longitud(t)
+    var ls = longitud(s)
+    si (ls > lt) { regresa falso }
+    var i = 0
+    mientras (i < ls) {
+        si (t[lt - ls + i] != s[i]) { regresa falso }
+        i = i + 1
+    }
+    regresa verdadero
+}
+
 funcion guardar(path) {
-    regresa __grafico_guardar(path, _titulo, _xlabel, _ylabel)
+    var p = aTexto(path)
+    si (no (_termina_en(p, ".png") o _termina_en(p, ".ppm"))) {
+        p = p + ".png"
+    }
+    regresa __grafico_guardar(p, _titulo, _xlabel, _ylabel)
 }
 
 funcion mostrar() {
-    regresa __grafico_mostrar("grafico.ppm", _titulo, _xlabel, _ylabel)
+    var p = __grafico_guardar("grafico.png", _titulo, _xlabel, _ylabel)
+    regresa __grafico_mostrar(p, _titulo, _xlabel, _ylabel)
 }
 
 funcion texto(x, y0, texto_str, r, g, b) {
-    # Dibuja texto en coordenadas de pixeles usando el glifo interno
-    var xx = aEntero(x)
-    var yy = aEntero(y0)
-    var rr = aEntero(r)
-    var gg = aEntero(g)
-    var bb = aEntero(b)
-    _dibujar_texto(xx, yy, texto_str, rr, gg, bb)
+    __grafico_texto(aEntero(x), aEntero(y0), aTexto(texto_str), aEntero(r), aEntero(g), aEntero(b), 12)
     regresa nulo
 }
 
 # ------------------------------------------------------------------
-# Funciones de layout y dibujo de grafos (consolidado aquí)
+# Funciones de layout y dibujo de grafos
 # ------------------------------------------------------------------
 
 funcion _layout_circular(n) {
@@ -666,8 +446,6 @@ funcion _layout_circular(n) {
 }
 
 funcion dibujar_grafo(nodos, aristas, ancho, alto) {
-    # nodos: lista de etiquetas (texto) o diccionarios {"label":..., "x":..., "y":...}
-    # aristas: lista de pares [i,j] indices de nodos
     si (ancho == nulo) { ancho = 1 }
     si (alto == nulo) { alto = 1 }
 
@@ -679,9 +457,7 @@ funcion dibujar_grafo(nodos, aristas, ancho, alto) {
         var nd = nodos[i]
         si (tipo(nd) == "dict") {
             si (nd["x"] == nulo o nd["y"] == nulo) { has_coords = falso }
-        } sino {
-            has_coords = falso
-        }
+        } sino { has_coords = falso }
         i = i + 1
     }
 
@@ -701,42 +477,29 @@ funcion dibujar_grafo(nodos, aristas, ancho, alto) {
         }
     }
 
-    # Iniciar grafico con bounds
     iniciar_grafico(0, ancho, 0, alto)
 
-    # Dibujar aristas
     i = 0
     mientras (i < longitud(aristas)) {
         var e = aristas[i]
-        var a = e[0]
-        var b = e[1]
-        var x0 = coords[a][0]
-        var y0 = coords[a][1]
-        var x1 = coords[b][0]
-        var y1 = coords[b][1]
-        lineas([x0, x1], [y0, y1])
+        var a = e[0]; var b = e[1]
+        lineas([coords[a][0], coords[b][0]], [coords[a][1], coords[b][1]])
         i = i + 1
     }
 
-    # Dibujar nodos
-    var xs = []
-    var ys = []
+    var xs = []; var ys = []
     i = 0
     mientras (i < n) {
-        xs.agregar(coords[i][0])
-        ys.agregar(coords[i][1])
+        xs.agregar(coords[i][0]); ys.agregar(coords[i][1])
         i = i + 1
     }
     pintar_puntos(xs, ys, 0, 100, 200, 3)
 
-    # Etiquetas
     i = 0
     mientras (i < n) {
         var label = nodos[i]
         si (tipo(label) == "dict") { label = label["label"] }
-        var lx = aEntero(coords[i][0]) + 6
-        var ly = aEntero(coords[i][1]) - 6
-        texto(lx, ly, aTexto(label), 50, 50, 50)
+        texto(aEntero(coords[i][0]) + 6, aEntero(coords[i][1]) - 6, aTexto(label), 50, 50, 50)
         i = i + 1
     }
 
@@ -759,7 +522,6 @@ funcion linea_sobre_grafico(xs, ys) {
     var bottom = _ALTO - _MARGEN
     var spanx = _last_xmax - _last_xmin
     var spany = _last_ymax - _last_ymin
-
     si (spanx == 0) { spanx = 1 }
     si (spany == 0) { spany = 1 }
 
@@ -776,7 +538,7 @@ funcion linea_sobre_grafico(xs, ys) {
     mientras ((i + 1) < longitud(puntos)) {
         var p0 = puntos[i]
         var p1 = puntos[i + 1]
-        _dibujar_linea(aEntero(p0[0]), aEntero(p0[1]), aEntero(p1[0]), aEntero(p1[1]), _line_r, _line_g, _line_b)
+        __grafico_linea(aEntero(p0[0]), aEntero(p0[1]), aEntero(p1[0]), aEntero(p1[1]), _line_r, _line_g, _line_b, 2)
         i = i + 1
     }
 
@@ -784,7 +546,7 @@ funcion linea_sobre_grafico(xs, ys) {
         i = 0
         mientras (i < longitud(puntos)) {
             var p = puntos[i]
-            _dibujar_marcador(aEntero(p[0]), aEntero(p[1]))
+            __grafico_circulo(aEntero(p[0]), aEntero(p[1]), _tam_marcador, _point_r, _point_g, _point_b, verdadero)
             i = i + 1
         }
     }

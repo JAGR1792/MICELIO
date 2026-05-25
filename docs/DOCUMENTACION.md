@@ -2,6 +2,37 @@
 
 **MICELIO** es un lenguaje de programación interpretado en español, con paradigma funcional, diseñado para enseñar fundamentos de programación y evolucionar hacia ciencia de datos, machine learning y deep learning. Construido desde cero usando ANTLR4 y Python (patrón Visitor), sin librerías externas de ML/DL.
 
+## Filosofía
+
+### Cero dependencias externas de ML/DL
+Todo algoritmo de machine learning y deep learning está escrito en MICELIO puro (`ml.mice`, `dl.mice`). Las únicas dependencias Python son para el intérprete mismo (ANTLR runtime) y para funcionalidades accesorias (PIL para gráficos, GTK para GUI).
+
+### Reemplazo de funciones nativas de Python
+Todas las operaciones matemáticas que originalmente delegaban a Python han sido reescritas como implementaciones MICELIO puras:
+
+| Función Nativa Python | Reemplazo MICELIO | Técnica |
+|---|---|---|
+| `math.exp` | `exp(x)` en `builtins.mice` | Serie de Taylor (6 términos, desenrollado, potencias incrementales) |
+| `random.random` | `aleatorio()` en `builtins.mice` | LCG (Linear Congruential Generator) |
+| `sorted()` | `ordenar()` en `builtins.mice` | Quicksort (in-place, partición Lomuto) |
+
+Esto garantiza que MICELIO sea autocontenido: el intérprete puede ejecutarse con una sola dependencia Python (`antlr4-python3-runtime`) y todo el resto está en MICELIO puro.
+
+### Optimizaciones del intérprete
+El evaluador (`eval_visitor.py`) ha sido optimizado para rendimiento sin alterar la semántica del lenguaje:
+
+- **Tabla de despacho**: reemplaza `hasattr()` por nodo del AST con un `dict[type → method]` — O(1) por nodo visitado
+- **Búsqueda rápida de variables**: `visitIdExpr` verifica el scope local (`self.env`) primero, cubriendo ~90% de los accesos
+- **Asignación rápida**: mismo principio, verifica scope local antes de recorrer la cadena de entornos
+- **Operadores nativos en matrices**: `suma_matrices`, `resta_matrices`, `multiplicar` usan los operadores `+`, `-`, `*` de Python (son sintaxis MICELIO, su implementación es un detalle interno)
+
+### Control de versiones
+El proyecto se publica en GitHub con releases numeradas (`0.1.0`, `0.2.0`, `0.3.0`). Cada entrega incluye:
+1. El intérprete MICELIO completo
+2. La biblioteca estándar en MICELIO puro
+3. La extensión VS Code empaquetada como `.vsix`
+4. Ejemplos ejecutables de cada módulo
+
 ---
 
 ## Índice
@@ -51,7 +82,7 @@ python3 main.py archivo.mice  # ejecutar archivo
 
 | Dependencia    | Función                          |
 |----------------|----------------------------------|
-| Pillow (PIL)   | Convertir PPM a PNG              |
+| Pillow (PIL)   | Backend gráfico nativo (PNG, líneas, texto TrueType) |
 | PyGObject (GTK)| Ventanas GUI nativas             |
 | Flask          | Servidor web demo (Hifa)         |
 | ImageMagick    | Fallback de conversión de imagen |
@@ -166,13 +197,17 @@ var duplicados = map(funcion (x) { regresa x * 2 }, datos)
 var pares = filter(funcion (x) { regresa x % 2 == 0 }, datos)
 var suma = reduce(funcion (acc, x) { regresa acc + x }, datos, 0)
 
-# Pipe operator
+# Pipe operator (inserta el valor como SEGUNDO argumento)
 var resultado = datos
-    |> map(funcion (x) { regresa x * 2 })
-    |> filter(funcion (x) { regresa x > 5 })
-    |> reduce(funcion (acc, x) { regresa acc + x }, 0)
+    |> map(funcion (x) { x * 2 })            # map(funcion, datos)
+    |> filter(funcion (x) { x > 5 })         # filter(funcion, resultado_anterior)
+    |> reduce(funcion (acc, x) { acc + x }, 0)
 
 imp resultado
+
+# Funciones anónimas (lambdas)
+var doble = funcion (x) { x * 2 }
+var impares = filter(funcion (x) { x % 2 == 1 }, [1, 2, 3, 4, 5])
 ```
 
 ### Entrada/Salida
@@ -415,7 +450,7 @@ importar "dl.mice" como dl
 
 ### 5.6 grafico.mice
 
-Motor gráfico que genera imágenes PPM (convertidas a PNG si Pillow está disponible).
+Motor gráfico con backend PIL nativo. Todas las primitivas de dibujo (líneas, círculos, texto, rectángulos) se delegan a PIL ImageDraw, produciendo PNG con anti-aliasing y texto TrueType. Si PIL no está instalado, cae automáticamente a PPM con dibujo pixel por pixel.
 
 ```mice
 importar "grafico.mice" como grafico
@@ -423,21 +458,37 @@ importar "grafico.mice" como grafico
 
 | Función                                          | Descripción                        |
 |--------------------------------------------------|------------------------------------|
-| `grafico.iniciar_grafico(ancho, alto)`           | Inicializa un gráfico              |
+| `grafico.iniciar_grafico(xmin, xmax, ymin, ymax)` | Inicializa lienzo con ejes        |
 | `grafico.titulo(texto)`                          | Define título                      |
 | `grafico.etiquetas(xlabel, ylabel)`              | Etiquetas de ejes                  |
-| `grafico.lineas(xs, ys, color)`                  | Dibuja líneas                      |
+| `grafico.lineas(xs, ys)`                         | Gráfico de líneas                  |
 | `grafico.dispersion(xs, ys)`                     | Gráfico de dispersión              |
 | `grafico.histograma(datos, bins)`                | Histograma                         |
-| `grafico.guardar(archivo)`                       | Guarda como PNG/PPM                |
+| `grafico.guardar(archivo)`                       | Guarda como PNG                    |
 | `grafico.mostrar()`                              | Muestra la imagen                  |
-| `grafico.pintar_mapa(titulo)`                    | Prepara el lienzo                  |
-| `grafico.pintar_puntos(puntos)`                  | Dibuja puntos                      |
+| `grafico.pintar_mapa(xs, ys, clases, c0, c1)`    | Mapa de clasificación              |
+| `grafico.pintar_puntos(xs, ys, r, g, b, tam)`    | Dibuja puntos como círculos        |
 | `grafico.color_linea(r, g, b)`                   | Define color de línea              |
-| `grafico.dibujar_grafo(nodos, aristas)`          | Dibuja un grafo (layout circular)  |
-| `grafico.linea_sobre_grafico(x1, y1, x2, y2)`    | Línea directa sobre gráfico        |
-| `grafico.texto(texto, x, y)`                     | Texto en coordenadas               |
+| `grafico.dibujar_grafo(nodos, aristas, w, h)`    | Dibuja un grafo (layout circular)  |
+| `grafico.linea_sobre_grafico(xs, ys)`            | Línea directa sobre gráfico        |
+| `grafico.texto(texto, x, y, r, g, b)`            | Texto TrueType en coordenadas      |
 | `grafico.estilo(tema)`                           | Tema: claro, oscuro, ocean, retro  |
+| `grafico.marcadores(activo, tamano)`             | Configurar marcadores              |
+
+**Primitivas de dibujo de bajo nivel** (accesibles como `__grafico_*`):
+
+| Función                                            | Descripción                          |
+|----------------------------------------------------|--------------------------------------|
+| `__grafico_reset(ancho, alto, margen)`             | Crear lienzo                         |
+| `__grafico_set_pixel(x, y, r, g, b)`               | Pixel individual                     |
+| `__grafico_linea(x1, y1, x2, y2, r, g, b, grosor)` | Línea anti-aliased                   |
+| `__grafico_rectangulo(x, y, w, h, r, g, b, fill)`  | Rectángulo relleno/borde             |
+| `__grafico_circulo(xc, yc, radio, r, g, b, fill)`   | Círculo relleno/borde                |
+| `__grafico_texto(x, y, texto, r, g, b, tamano)`    | Texto TrueType con tamaño            |
+| `__grafico_poligono(puntos, r, g, b, fill)`         | Polígono                             |
+| `__grafico_limpiar(r, g, b)`                        | Limpiar lienzo con color             |
+| `__grafico_guardar(ruta, título, xlabel, ylabel)`   | Exportar PNG                         |
+| `__grafico_mostrar(ruta, título, xlabel, ylabel)`   | Mostrar en ventana GTK               |
 
 ### 5.7 gui.mice
 
@@ -591,6 +642,7 @@ python3 main.py ejemplos/01_basico.mice
 | `16_stress_test_nn.mice`              | Prueba de estrés de red neuronal               |
 | `17_debug_xor.mice`                   | Depuración de red XOR                          |
 | `18_mini_batch_visual.mice`           | Entrenamiento mini-batch con visualización     |
+| `18_xor_funcional.mice`               | XOR en pipeline funcional con `|>`             |
 | `19_grafico_simple.mice`              | Grafo simple                                   |
 | `20_grafico_seno_coseno.mice`         | Seno y coseno superpuestos                     |
 | `21_grafico_histograma.mice`          | Histograma                                     |
@@ -757,8 +809,8 @@ MICELIO/
 | Archivo           | Líneas | Propósito                                    |
 |-------------------|--------|----------------------------------------------|
 | `main.py`         | ~200   | Entrada CLI, REPL, preprocesador             |
-| `eval_visitor.py` | ~1024  | Evaluación semántica del árbol ANTLR         |
-| `runtime.py`      | ~2035  | Entorno, tipos, builtins, gráficos, GUI, web |
+| `eval_visitor.py` | ~1036  | Evaluación semántica (con tabla de despacho, fast env lookup) |
+| `runtime.py`      | ~2282  | Entorno, tipos, builtins, gráficos PIL, GUI, Hifa |
 | `pedagogicos.py`  | ~197   | Errores pedagógicos con formato ANSI         |
 | `Micelio.g4`      | ~163   | Gramática completa del lenguaje              |
 
@@ -768,22 +820,29 @@ MICELIO/
 
 ### Extensión VS Code
 
-La extensión `micelio-vscode` provee resaltado de sintaxis, snippets y autocompletado para archivos `.mice` y `.micelio`.
+La extensión `micelio-vscode` (`.vsix`) provee un entorno de desarrollo completo para archivos `.mice` y `.micelio`.
 
 **Instalación:**
 
 ```bash
-cd micelio-vscode
-./install-local.sh
+code --install-extension micelio-vscode/extension_unpacked/extension/micelio-syntax-0.3.0.vsix
 ```
 
-O desde VS Code: Extensiones → Install from VSIX → seleccionar `micelio-vscode/extension_unpacked/`.
+O desde VS Code: Extensiones ⋮ → Install from VSIX.
 
-Incluye:
-- Resaltado de sintaxis (TextMate grammar)
-- Snippets: `fun`, `si`, `para`, `mientras`, `imp`, `leer`, `pipe`
-- Continuación automática con Enter después de `|>`
-- Configuración de comentarios, brackets y auto-cierre
+**Características:**
+
+| Característica               | Descripción                                              |
+|------------------------------|----------------------------------------------------------|
+| Resaltado de sintaxis        | TextMate grammar con keywords, builtins, operadores      |
+| Autocompletado               | Keywords, builtins, símbolos locales, miembros de módulos via `alias.` |
+| Información al hover         | Documentación de cada keyword y función builtin          |
+| Ayuda de firmas              | Parámetros de funciones builtin al escribir `(`          |
+| Esquema de documento         | Outline con funciones y variables del archivo            |
+| Ir a definición              | Salta a definición local o en módulos importados         |
+| Snippets                     | `fun`, `si`, `sino`, `para`, `mientras`, `var`, `const`, `regresa`, `matriz`, `dict`, `capa`, `entrenar`, `grafico`, `leer`, `test`, `pipe*` |
+| Pipe operator                | Enter después de `|>` inserta automáticamente nuevo `|>` |
+| Auto-cierre                  | `{}`, `[]`, `()`, `""`                                   |
 
 ---
 
@@ -802,6 +861,16 @@ antlr4 -Dlanguage=Python3 gramatica/Micelio.g4 -o generado/gramatica -no-listene
 antlr4-python3-runtime==4.13.1
 ```
 
+### Rendimiento
+
+| Operación | Antes | Después | Técnica |
+|---|---|---|---|
+| XOR 500 épocas | ~150s (3.3 ep/s) | ~17s (29 ep/s) | Operadores nativos `+`, `-`, `*`, `.*` en matrices |
+| Búsqueda de variable | `hasattr` por nodo + cadena de entornos | Scope local O(1) + tabla de despacho | Fast env lookup + dispatch table |
+| Gráficos (seno/coseno) | PPM + PIL batch | PIL nativo directo | Backend PIL ImageDraw con anti-aliasing |
+
+---
+
 ### Pruebas
 
 Los ejemplos en `MICELIO/ejemplos/` funcionan como pruebas informales:
@@ -811,6 +880,32 @@ python3 main.py ejemplos/01_basico.mice
 python3 main.py ejemplos/07_perceptron_simple.mice
 python3 main.py ejemplos/08_regresion.mice
 ```
+
+### Limitaciones conocidas
+
+- **Literales dict multilínea** no son soportados por el parser: `{\n "clave": valor\n}` causa error. Usar `dict("clave", valor)` en su lugar.
+- **Importaciones desde REPL** no funcionan correctamente. Ejecutar archivos `.mice` para usar módulos.
+- **Nuevas líneas dentro de llamadas a función**: el parser puede rechazar saltos de línea entre argumentos. Mantener cada llamada en una línea.
+
+### Alcance de variables (scope dinámico)
+
+MICELIO usa **scope dinámico**: las variables locales de una función llamada pueden sobrescribir variables globales del mismo nombre.
+
+```mice
+var capa = "global"
+
+funcion ejemplo() {
+    var capa = "local"   # Esto SOBRESCRIBE la global "capa"
+    imp capa             # "local"
+}
+
+ejemplo()
+imp capa                 # "local" — la global fue modificada
+```
+
+Para evitar colisiones, las funciones globales deben tener nombres únicos que no sean reutilizados como variables locales (ej: `crear_capa` en lugar de `capa`).
+
+---
 
 ### Errores pedagógicos
 

@@ -405,6 +405,8 @@ funcion entrenar_red(modelo, X, Y, epochs, lr) {
         }
     }
 }
+
+
 ```
 
 El parametro `modelo` se modifica **in-place**: los pesos se actualizan directamente sobre la estructura del modelo, no se retorna un nuevo modelo.

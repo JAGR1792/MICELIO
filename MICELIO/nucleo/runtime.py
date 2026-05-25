@@ -377,13 +377,52 @@ def elementwise_mul(left: Any, right: Any) -> Any:
     raise MicelioRuntimeError("Operacion .*, tipos no compatibles")
 
 
-_PLOT_STATE = {
+# ─── Estado global del motor de gráficos ─────────────────────────────
+# Soporta dos backends:
+#   PIL — dibujo vectorial nativo con anti-aliasing, texto TrueType, PNG directo
+#   PPM — fallback cuando PIL no está disponible (pixel array, requiere conversión externa)
+_PLOT_STATE: dict[str, Any] = {
     "width": 800,
     "height": 500,
     "margin": 48,
-    "pixels": [],
+    "pixels": [],               # fallback para modo PPM
+    "image": None,              # PIL.Image cuando el backend PIL está activo
+    "draw": None,               # PIL.ImageDraw asociado
     "last_path": None,
+    "_pil_cache": None,         # tuple (Image, ImageDraw, ImageFont) o None
 }
+
+
+def _ensure_pil() -> bool:
+    """Intenta cargar PIL una sola vez (lazy). Retorna True si está disponible."""
+    if _PLOT_STATE.get("_pil_cache") is not None:
+        return _PLOT_STATE["_pil_cache"][0] is not None
+    try:
+        from PIL import Image as _PIL_Image, ImageDraw as _PIL_Draw
+        try:
+            from PIL import ImageFont as _PIL_Font
+        except ImportError:
+            _PIL_Font = None  # type: ignore[assignment]
+        _PLOT_STATE["_pil_cache"] = (_PIL_Image, _PIL_Draw, _PIL_Font)
+        return True
+    except ImportError:
+        _PLOT_STATE["_pil_cache"] = (None, None, None)
+        return False
+
+
+def _pil_image() -> Any:
+    c = _PLOT_STATE.get("_pil_cache")
+    return c[0] if c else None
+
+
+def _pil_draw() -> Any:
+    c = _PLOT_STATE.get("_pil_cache")
+    return c[1] if c else None
+
+
+def _pil_font() -> Any:
+    c = _PLOT_STATE.get("_pil_cache")
+    return c[2] if c else None
 
 _GUI_STYLE_STATE = {
     "theme": "caelestia",
@@ -520,6 +559,7 @@ def _gui_list_themes() -> list[str]:
     return ["caelestia", "ocean", "forest", "sunset", "mono"]
 
 
+
 def _plot_reset(width: Any, height: Any, margin: Any) -> list[int]:
     w = int(to_number(width))
     h = int(to_number(height))
@@ -532,16 +572,27 @@ def _plot_reset(width: Any, height: Any, margin: Any) -> list[int]:
     _PLOT_STATE["width"] = w
     _PLOT_STATE["height"] = h
     _PLOT_STATE["margin"] = m
-    _PLOT_STATE["pixels"] = [
-        [[255, 255, 255] for _ in range(w)]
-        for _ in range(h)
-    ]
     _PLOT_STATE["last_path"] = None
+
+    if _ensure_pil():
+        PIL_Img = _pil_image()
+        img = PIL_Img.new("RGB", (w, h), (255, 255, 255))  # type: ignore[union-attr]
+        _PLOT_STATE["image"] = img
+        _PLOT_STATE["draw"] = _pil_draw().Draw(img)  # type: ignore[union-attr]
+        _PLOT_STATE["pixels"] = []
+    else:
+        _PLOT_STATE["pixels"] = [
+            [[255, 255, 255] for _ in range(w)]
+            for _ in range(h)
+        ]
+        _PLOT_STATE["image"] = None
+        _PLOT_STATE["draw"] = None
+
     return [w, h, m]
 
 
 def _plot_set_pixel(x: Any, y: Any, r: Any, g: Any, b: Any) -> None:
-    if not _PLOT_STATE["pixels"]:
+    if _PLOT_STATE["image"] is None and not _PLOT_STATE["pixels"]:
         _plot_reset(800, 500, 48)
 
     px = int(to_number(x))
@@ -549,17 +600,20 @@ def _plot_set_pixel(x: Any, y: Any, r: Any, g: Any, b: Any) -> None:
     rr = max(0, min(255, int(to_number(r))))
     gg = max(0, min(255, int(to_number(g))))
     bb = max(0, min(255, int(to_number(b))))
-
     w = _PLOT_STATE["width"]
     h = _PLOT_STATE["height"]
-    if 0 <= px < w and 0 <= py < h:
-        _PLOT_STATE["pixels"][py][px][0] = rr
-        _PLOT_STATE["pixels"][py][px][1] = gg
-        _PLOT_STATE["pixels"][py][px][2] = bb
+
+    if not (0 <= px < w and 0 <= py < h):
+        return
+
+    if _PLOT_STATE["draw"] is not None:
+        _PLOT_STATE["draw"].point((px, py), fill=(rr, gg, bb))
+    elif _PLOT_STATE["pixels"]:
+        _PLOT_STATE["pixels"][py][px] = [rr, gg, bb]
 
 
 def _plot_draw_axes() -> None:
-    if not _PLOT_STATE["pixels"]:
+    if _PLOT_STATE["image"] is None and not _PLOT_STATE["pixels"]:
         _plot_reset(800, 500, 48)
 
     left = _PLOT_STATE["margin"]
@@ -567,23 +621,27 @@ def _plot_draw_axes() -> None:
     top = _PLOT_STATE["margin"]
     bottom = _PLOT_STATE["height"] - _PLOT_STATE["margin"]
 
-    for x in range(left, right + 1):
-        _plot_set_pixel(x, bottom, 80, 80, 80)
-    for y in range(top, bottom + 1):
-        _plot_set_pixel(left, y, 80, 80, 80)
+    gray = (80, 80, 80)
+    if _PLOT_STATE["draw"] is not None:
+        d = _PLOT_STATE["draw"]
+        d.line([(left, bottom), (right, bottom)], fill=gray)
+        d.line([(left, top), (left, bottom)], fill=gray)
+    else:
+        for x in range(left, right + 1):
+            _plot_set_pixel(x, bottom, 80, 80, 80)
+        for y in range(top, bottom + 1):
+            _plot_set_pixel(left, y, 80, 80, 80)
 
 
 def _plot_guardar(path: Any, title: Any, xlabel: Any, ylabel: Any) -> str:
-    if not _PLOT_STATE["pixels"]:
+    if _PLOT_STATE["image"] is None and not _PLOT_STATE["pixels"]:
         _plot_reset(800, 500, 48)
 
     raw_path = str(path)
     out_path = raw_path
-    if raw_path.lower().endswith(".png"):
-        out_path = raw_path[:-4] + ".ppm"
+    if raw_path.lower().endswith(".ppm"):
+        out_path = raw_path[:-4] + ".png"
 
-    # Keep generated images organized under a dedicated folder
-    # when the user provides only a filename.
     if os.path.dirname(out_path) == "":
         out_path = os.path.join("graficos", out_path)
 
@@ -591,43 +649,213 @@ def _plot_guardar(path: Any, title: Any, xlabel: Any, ylabel: Any) -> str:
     if folder:
         os.makedirs(folder, exist_ok=True)
 
-    with open(out_path, "w", encoding="utf-8") as f:
-        f.write("P3\n")
-        f.write(f"# {str(title)} | x:{str(xlabel)} y:{str(ylabel)}\n")
-        f.write(f"{_PLOT_STATE['width']} {_PLOT_STATE['height']}\n255\n")
-        for row in _PLOT_STATE["pixels"]:
-            line = []
-            for rr, gg, bb in row:
-                line.append(f"{rr} {gg} {bb}")
-            f.write(" ".join(line) + "\n")
+    page_saved = False
 
-    png_path = os.path.splitext(out_path)[0] + ".png"
-    png_written = False
+    # ─── Backend PIL: salva PNG directo ───────────────────────────────
+    if _PLOT_STATE["image"] is not None:
+        img = _PLOT_STATE["image"]
+        try:
+            PilFont = _pil_font()
+            if title and PilFont is not None:
+                ft = None
+                for fp in [
+                    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                    "/usr/share/fonts/TTF/DejaVuSans.ttf",
+                    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+                    "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
+                ]:
+                    if os.path.isfile(fp):
+                        ft = PilFont.truetype(fp, 14)
+                        break
+                PilDraw = _pil_draw()
+                if PilDraw is not None:
+                    d = PilDraw.Draw(img)
+                    tw = d.textbbox((0, 0), str(title), font=ft)[2]
+                    d.text(
+                        ((_PLOT_STATE["width"] - tw) // 2, 4),
+                        str(title),
+                        fill=(40, 40, 40),
+                        font=ft,
+                    )
+                    if xlabel:
+                        d.text(
+                            (_PLOT_STATE["width"] // 2 - 20, _PLOT_STATE["height"] - 16),
+                            str(xlabel),
+                            fill=(60, 60, 60),
+                            font=ft,
+                        )
+                    if ylabel:
+                        d.text(
+                            (6, _PLOT_STATE["height"] // 2 - 10),
+                            str(ylabel),
+                            fill=(60, 60, 60),
+                            font=ft,
+                        )
+            img.save(out_path)
+            page_saved = True
+        except Exception:
+            pass
+
+    # ─── Backend PPM (fallback) ────────────────────────────────────────
+    if not page_saved and _PLOT_STATE["pixels"]:
+        ppm_path = os.path.splitext(out_path)[0] + ".ppm"
+        with open(ppm_path, "w", encoding="utf-8") as f:
+            f.write("P3\n")
+            f.write(f"# {str(title)} | x:{str(xlabel)} y:{str(ylabel)}\n")
+            f.write(f"{_PLOT_STATE['width']} {_PLOT_STATE['height']}\n255\n")
+            for row in _PLOT_STATE["pixels"]:
+                line = []
+                for rr, gg, bb in row:
+                    line.append(f"{rr} {gg} {bb}")
+                f.write(" ".join(line) + "\n")
+        # Intentar convertir a PNG via PIL o ImageMagick
+        png_path = os.path.splitext(ppm_path)[0] + ".png"
+        try:
+            from PIL import Image
+            img = Image.new("RGB", (_PLOT_STATE["width"], _PLOT_STATE["height"]))
+            pixels = [tuple(pixel) for row in _PLOT_STATE["pixels"] for pixel in row]
+            img.putdata(pixels)
+            img.save(png_path)
+            page_saved = True
+        except Exception:
+            png_writer = shutil.which("magick") or shutil.which("convert")
+            if png_writer is not None:
+                try:
+                    subprocess.run(
+                        [png_writer, ppm_path, png_path],
+                        check=True,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                    )
+                except Exception:
+                    pass
+
+    _PLOT_STATE["last_path"] = out_path if page_saved else ppm_path
+    return str(_PLOT_STATE["last_path"])
+
+
+# ─── Primitivas de dibujo de alto nivel (requieren PIL) ──────────────
+
+def _plot_linea(x1: Any, y1: Any, x2: Any, y2: Any,
+                r: Any, g: Any, b: Any, grosor: Any = 1) -> None:
+    if _PLOT_STATE["draw"] is None:
+        # Sin PIL: dibujar pixel por pixel
+        _plot_set_pixel(x1, y1, r, g, b)
+        _plot_set_pixel(x2, y2, r, g, b)
+        return
+    rr = max(0, min(255, int(to_number(r))))
+    gg = max(0, min(255, int(to_number(g))))
+    bb = max(0, min(255, int(to_number(b))))
+    th = max(1, int(to_number(grosor)))
+    _PLOT_STATE["draw"].line(
+        [(int(to_number(x1)), int(to_number(y1))),
+         (int(to_number(x2)), int(to_number(y2)))],
+        fill=(rr, gg, bb),
+        width=th,
+    )
+
+
+def _plot_rectangulo(x: Any, y: Any, w: Any, h: Any,
+                     r: Any, g: Any, b: Any, relleno: Any = True) -> None:
+    if _PLOT_STATE["draw"] is None:
+        return
+    rr = max(0, min(255, int(to_number(r))))
+    gg = max(0, min(255, int(to_number(g))))
+    bb = max(0, min(255, int(to_number(b))))
+    fill = bool(relleno)
+    x0 = int(to_number(x))
+    y0 = int(to_number(y))
+    x1 = x0 + int(to_number(w))
+    y1 = y0 + int(to_number(h))
+    if fill:
+        _PLOT_STATE["draw"].rectangle([(x0, y0), (x1, y1)], fill=(rr, gg, bb))
+    else:
+        _PLOT_STATE["draw"].rectangle([(x0, y0), (x1, y1)], outline=(rr, gg, bb))
+
+
+def _plot_circulo(xc: Any, yc: Any, radio: Any,
+                  r: Any, g: Any, b: Any, relleno: Any = False) -> None:
+    if _PLOT_STATE["draw"] is None:
+        return
+    rr = max(0, min(255, int(to_number(r))))
+    gg = max(0, min(255, int(to_number(g))))
+    bb = max(0, min(255, int(to_number(b))))
+    fill = bool(relleno)
+    cx = int(to_number(xc))
+    cy = int(to_number(yc))
+    rd = max(1, int(to_number(radio)))
+    bbox = [(cx - rd, cy - rd), (cx + rd, cy + rd)]
+    if fill:
+        _PLOT_STATE["draw"].ellipse(bbox, fill=(rr, gg, bb))
+    else:
+        _PLOT_STATE["draw"].ellipse(bbox, outline=(rr, gg, bb))
+
+
+def _plot_texto(x: Any, y: Any, texto: Any,
+                r: Any, g: Any, b: Any, tamano: Any = 12) -> None:
+    if _PLOT_STATE["image"] is None:
+        return
+    rr = max(0, min(255, int(to_number(r))))
+    gg = max(0, min(255, int(to_number(g))))
+    bb = max(0, min(255, int(to_number(b))))
+    sz = max(8, min(72, int(to_number(tamano))))
+    txt = str(texto)
     try:
-        from PIL import Image
-
-        img = Image.new("RGB", (_PLOT_STATE["width"], _PLOT_STATE["height"]))
-        pixels = [tuple(pixel) for row in _PLOT_STATE["pixels"] for pixel in row]
-        img.putdata(pixels)
-        img.save(png_path)
-        png_written = True
+        ft = None
+        PilFont = _pil_font()
+        if PilFont is not None and sz >= 8:
+            for fp in [
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                "/usr/share/fonts/TTF/DejaVuSans.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+                "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
+            ]:
+                if os.path.isfile(fp):
+                    ft = PilFont.truetype(fp, sz)
+                    break
+        _PLOT_STATE["draw"].text(
+            (int(to_number(x)), int(to_number(y))),
+            txt,
+            fill=(rr, gg, bb),
+            font=ft,
+        )
     except Exception:
-        png_writer = shutil.which("magick") or shutil.which("convert")
-        if png_writer is not None:
-            try:
-                command = [png_writer, out_path, png_path]
-                subprocess.run(
-                    command,
-                    check=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                )
-                png_written = True
-            except Exception:
-                png_written = False
+        pass
 
-    _PLOT_STATE["last_path"] = out_path
-    return out_path
+
+def _plot_poligono(puntos: Any, r: Any, g: Any, b: Any, relleno: Any = True) -> None:
+    if _PLOT_STATE["draw"] is None:
+        return
+    rr = max(0, min(255, int(to_number(r))))
+    gg = max(0, min(255, int(to_number(g))))
+    bb = max(0, min(255, int(to_number(b))))
+    fill = bool(relleno)
+    pts = []
+    for p in puntos:
+        if isinstance(p, (list, tuple)) and len(p) >= 2:
+            pts.append((int(to_number(p[0])), int(to_number(p[1]))))
+    if len(pts) < 3:
+        return
+    if fill:
+        _PLOT_STATE["draw"].polygon(pts, fill=(rr, gg, bb))
+    else:
+        _PLOT_STATE["draw"].polygon(pts, outline=(rr, gg, bb))
+
+
+def _plot_limpiar(r: Any, g: Any, b: Any) -> None:
+    rr = max(0, min(255, int(to_number(r))))
+    gg = max(0, min(255, int(to_number(g))))
+    bb = max(0, min(255, int(to_number(b))))
+    if _PLOT_STATE["image"] is not None:
+        _PLOT_STATE["draw"].rectangle(
+            [(0, 0), (_PLOT_STATE["width"] - 1, _PLOT_STATE["height"] - 1)],
+            fill=(rr, gg, bb),
+        )
+    elif _PLOT_STATE["pixels"]:
+        for y in range(_PLOT_STATE["height"]):
+            for x in range(_PLOT_STATE["width"]):
+                _PLOT_STATE["pixels"][y][x] = [rr, gg, bb]
+
 
 
 def _plot_last_path() -> str | None:
@@ -1948,6 +2176,12 @@ def make_builtins() -> dict[str, Any]:
         "__grafico_guardar": _plot_guardar,
         "__grafico_last_path": _plot_last_path,
         "__grafico_mostrar": _plot_mostrar,
+        "__grafico_linea": _plot_linea,
+        "__grafico_rectangulo": _plot_rectangulo,
+        "__grafico_circulo": _plot_circulo,
+        "__grafico_texto": _plot_texto,
+        "__grafico_poligono": _plot_poligono,
+        "__grafico_limpiar": _plot_limpiar,
         "__gui_alert": _gui_alert,
         "__gui_confirm": _gui_confirm,
         "__gui_input": _gui_input,
