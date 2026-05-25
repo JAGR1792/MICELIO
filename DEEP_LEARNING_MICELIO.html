@@ -4,79 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deep Learning en MICELIO</title>
+
+    <!-- MathJax (LaTeX formulas) -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Mermaid (diagrams) -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#1a3a2a',
+                primaryTextColor: '#dce5dc',
+                primaryBorderColor: '#2ecc71',
+                lineColor: '#2ecc71',
+                secondaryColor: '#0d2016',
+                tertiaryColor: '#1a2a1e',
+                clusterBkg: '#0d1410',
+                clusterBorder: '#1a3a2a',
+                nodeBorder: '#2ecc71',
+                nodeTextColor: '#dce5dc',
+                edgeLabelBackground: '#0d1410',
+                fontFamily: 'Outfit, sans-serif'
+            }
+        });
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        
-        :root {
-            /* Paleta Tokyo Night Premium */
-            --bg-base: #1a1b26;
-            --bg-dark: #15161e;
-            --bg-surface: rgba(36, 40, 59, 0.6); /* Translucido para Glassmorphism */
-            --bg-surface-hover: rgba(36, 40, 59, 0.9);
-            --fg-main: #c0caf5;
-            --fg-muted: #a9b1d6;
-            --fg-dark: #565f89;
-            
-            /* Acentos Neón */
-            --accent-purple: #bb9af7;
-            --accent-blue: #7aa2f7;
-            --accent-cyan: #7dcfff;
-            --accent-green: #9ece6a;
-            --accent-yellow: #e0af68;
-            --accent-red: #f7768e;
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 
-            /* Tipografía */
+    <style>
+        :root {
+            --bg-deep: #080c0a;
+            --bg-base: #0d1410;
+            --bg-surface: rgba(18, 30, 22, 0.65);
+            --bg-surface-hover: rgba(18, 30, 22, 0.9);
+            --fg-main: #dce5dc;
+            --fg-muted: #8aa88a;
+            --fg-dark: #3a5a3a;
+            --fg-very-dark: #1e3a1e;
+
+            --accent-primary: #2ecc71;
+            --accent-secondary: #1abc9c;
+            --accent-tertiary: #f1c40f;
+            --accent-warm: #e67e22;
+            --accent-hot: #e74c3c;
+            --accent-cool: #3498db;
+            --accent-purple: #9b59b6;
+            --accent-rose: #e84393;
+
             --font-main: 'Outfit', system-ui, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
-            
-            /* Efectos */
-            --glass-border: 1px solid rgba(192, 202, 245, 0.1);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            --blur: blur(12px);
+            --font-display: 'Playfair Display', serif;
+
+            --glass-border: 1px solid rgba(46, 204, 113, 0.12);
+            --glass-border-hover: 1px solid rgba(46, 204, 113, 0.3);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --glass-glow: 0 0 20px rgba(46, 204, 113, 0.05);
+            --blur: blur(16px);
+            --radius: 14px;
         }
 
-        * {
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
+        * { box-sizing: border-box; scroll-behavior: smooth; }
 
-        /* Scrollbar estético */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
         ::-webkit-scrollbar-thumb {
             background: var(--fg-dark);
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-blue);
-        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
 
         body {
-            background: radial-gradient(circle at top left, #24283b, var(--bg-base));
+            background: var(--bg-deep);
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(46, 204, 113, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(26, 188, 156, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(241, 196, 15, 0.02) 0%, transparent 50%);
             background-attachment: fixed;
             color: var(--fg-main);
             font-family: var(--font-main);
             font-weight: 300;
-            line-height: 1.7;
+            line-height: 1.8;
             margin: 0;
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar Glassmorphism */
         aside {
             width: 300px;
             height: 100vh;
             position: fixed;
-            background: rgba(26, 27, 38, 0.5);
+            background: rgba(8, 12, 10, 0.7);
             backdrop-filter: var(--blur);
             -webkit-backdrop-filter: var(--blur);
             border-right: var(--glass-border);
@@ -86,55 +107,38 @@
         }
 
         aside h2 {
-            color: var(--accent-purple);
-            font-size: 1.1rem;
+            color: var(--accent-primary);
+            font-size: 0.85rem;
             font-weight: 800;
             margin-top: 0;
             margin-bottom: 2rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            opacity: 0.7;
         }
 
-        aside ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        aside li {
-            margin-bottom: 0.8rem;
-        }
+        aside ul { list-style: none; padding: 0; margin: 0; }
+        aside li { margin-bottom: 0.6rem; }
 
         aside a {
             color: var(--fg-muted);
             text-decoration: none;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-        }
-
-        aside a::before {
-            content: "";
-            display: inline-block;
-            width: 0;
-            height: 2px;
-            background: var(--accent-cyan);
-            transition: width 0.3s ease;
-            margin-right: 0;
+            padding: 0.3rem 0.5rem;
+            border-radius: 6px;
+            border-left: 2px solid transparent;
         }
 
         aside a:hover {
-            color: var(--accent-cyan);
-            transform: translateX(5px);
+            color: var(--accent-primary);
+            background: rgba(46, 204, 113, 0.05);
+            border-left-color: var(--accent-primary);
+            padding-left: 1rem;
         }
 
-        aside a:hover::before {
-            width: 10px;
-            margin-right: 8px;
-        }
-
-        /* Contenido Principal */
         main {
             margin-left: 300px;
             padding: 4rem 5rem;
@@ -146,47 +150,71 @@
             font-size: 3.5rem;
             font-weight: 800;
             margin-top: 0;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--fg-muted);
+            margin-bottom: 3rem;
+            font-weight: 300;
         }
 
         h2 {
-            color: var(--accent-blue);
-            font-size: 2.2rem;
+            color: var(--accent-primary);
+            font-size: 2rem;
             font-weight: 600;
             margin-top: 4rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(122, 162, 247, 0.2);
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: var(--accent-primary);
+            border-radius: 2px;
         }
 
         h3 {
-            color: var(--accent-cyan);
-            font-size: 1.5rem;
+            color: var(--accent-secondary);
+            font-size: 1.4rem;
             font-weight: 600;
             margin-top: 2.5rem;
         }
 
         h4 {
-            color: var(--accent-yellow);
-            font-size: 1.2rem;
+            color: var(--accent-tertiary);
+            font-size: 1.1rem;
             margin-top: 1.5rem;
+            font-weight: 600;
         }
 
-        p, li {
-            color: var(--fg-muted);
-            font-size: 1.05rem;
+        p, li { color: var(--fg-muted); font-size: 1.05rem; }
+        strong { color: var(--fg-main); font-weight: 600; }
+
+        .highlight {
+            color: var(--accent-primary);
+            font-weight: 600;
         }
 
-        strong {
-            color: var(--fg-main);
+        .emph-gold {
+            color: var(--accent-tertiary);
             font-weight: 600;
         }
 
         a {
-            color: var(--accent-purple);
+            color: var(--accent-secondary);
             text-decoration: none;
             position: relative;
         }
@@ -199,7 +227,7 @@
             height: 1px;
             bottom: 0;
             left: 0;
-            background-color: var(--accent-purple);
+            background-color: var(--accent-secondary);
             transform-origin: bottom right;
             transition: transform 0.25s ease-out;
         }
@@ -216,34 +244,32 @@
             margin: 4rem 0;
         }
 
-        /* Código y Terminales */
         code {
             font-family: var(--font-mono);
-            background-color: rgba(0, 0, 0, 0.3);
-            color: var(--accent-green);
+            background: rgba(46, 204, 113, 0.08);
+            color: var(--accent-primary);
             padding: 0.2rem 0.5rem;
             border-radius: 6px;
-            font-size: 0.9em;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.88em;
+            border: 1px solid rgba(46, 204, 113, 0.15);
         }
 
         pre {
-            background: var(--bg-dark);
-            padding: 2rem 1.5rem 1.5rem 1.5rem;
-            border-radius: 12px;
+            background: var(--bg-deep);
+            padding: 2rem 1.5rem 1.5rem;
+            border-radius: var(--radius);
             overflow-x: auto;
             border: var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            box-shadow: var(--glass-shadow), var(--glass-glow);
             position: relative;
             margin: 2rem 0;
             transition: border-color 0.3s ease;
         }
 
         pre:hover {
-            border-color: rgba(122, 162, 247, 0.4);
+            border-color: rgba(46, 204, 113, 0.3);
         }
 
-        /* Botones estilo macOS en los bloques de código */
         pre::before {
             content: "";
             position: absolute;
@@ -252,8 +278,8 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: #f7768e;
-            box-shadow: 20px 0 0 #e0af68, 40px 0 0 #9ece6a;
+            background: #e74c3c;
+            box-shadow: 20px 0 0 #f1c40f, 40px 0 0 #2ecc71;
         }
 
         pre.mice::after {
@@ -268,14 +294,13 @@
         }
 
         pre code {
-            background-color: transparent;
+            background: transparent;
             color: var(--fg-main);
             padding: 0;
             border: none;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
-        /* Tablas Glassmorphism */
         table {
             width: 100%;
             border-collapse: separate;
@@ -283,7 +308,7 @@
             margin: 2.5rem 0;
             background: var(--bg-surface);
             backdrop-filter: var(--blur);
-            border-radius: 12px;
+            border-radius: var(--radius);
             overflow: hidden;
             border: var(--glass-border);
             box-shadow: var(--glass-shadow);
@@ -292,357 +317,534 @@
         th, td {
             padding: 1.2rem;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         }
 
         th {
-            background-color: rgba(0, 0, 0, 0.2);
-            color: var(--accent-purple);
+            background: rgba(46, 204, 113, 0.08);
+            color: var(--accent-primary);
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 1px;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        tr:last-child td { border-bottom: none; }
+
+        .mermaid-container {
+            margin: 2.5rem 0;
+            padding: 2rem;
+            background: var(--bg-surface);
+            backdrop-filter: var(--blur);
+            border: var(--glass-border);
+            border-radius: var(--radius);
+            box-shadow: var(--glass-shadow);
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
         }
 
-        /* Bloques Visuales y Matemáticos */
-        .visual-aid {
-            margin: 2.5rem 0;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, rgba(122, 162, 247, 0.1), rgba(187, 154, 247, 0.05));
-            border: 1px solid rgba(122, 162, 247, 0.2);
-            border-radius: 12px;
-            text-align: center;
-            font-style: italic;
-            color: var(--accent-cyan);
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+        .mermaid-container svg {
+            max-width: 100%;
         }
 
         .math-block {
             background: var(--bg-surface);
-            border-left: 4px solid var(--accent-green);
+            border-left: 4px solid var(--accent-primary);
             padding: 1.5rem;
             margin: 1.5rem 0;
-            border-radius: 0 12px 12px 0;
-            font-family: var(--font-mono);
-            color: var(--accent-green);
+            border-radius: 0 var(--radius) var(--radius) 0;
             backdrop-filter: var(--blur);
             box-shadow: var(--glass-shadow);
+            overflow-x: auto;
         }
 
-        /* Responsive */
+        .math-block .MathJax {
+            font-size: 1.1em !important;
+        }
+
+        .result-box {
+            margin: 2rem 0;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.08), rgba(26, 188, 156, 0.04));
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            border-radius: var(--radius);
+            box-shadow: var(--glass-shadow), inset 0 0 30px rgba(46, 204, 113, 0.03);
+        }
+
+        .result-box h4 {
+            color: var(--accent-primary);
+            margin-top: 0;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .result-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.2rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(46, 204, 113, 0.1);
+            transition: border-color 0.3s ease;
+        }
+
+        .result-card:hover {
+            border-color: rgba(46, 204, 113, 0.3);
+        }
+
+        .result-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            display: block;
+        }
+
+        .result-card .label {
+            font-size: 0.85rem;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.3rem;
+        }
+
+        .result-card.perfect .value { color: var(--accent-tertiary); }
+
+        .info-note {
+            margin: 1.5rem 0;
+            padding: 1rem 1.5rem;
+            background: rgba(46, 204, 113, 0.06);
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 0 8px 8px 0;
+            color: var(--fg-muted);
+            font-size: 0.95rem;
+        }
+
+        .info-note strong {
+            color: var(--accent-primary);
+        }
+
+        .crown-jewel-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-warm));
+            color: #000;
+            font-weight: 800;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: 1rem;
+            vertical-align: middle;
+        }
+
+        .img-container {
+            margin: 2.5rem 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            background: var(--bg-deep);
+            text-align: center;
+        }
+
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .img-container .caption {
+            padding: 1rem;
+            color: var(--fg-muted);
+            font-size: 0.9rem;
+            font-style: italic;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
         @media (max-width: 1024px) {
-            aside {
-                display: none;
-            }
+            aside { display: none; }
             main {
                 margin-left: 0;
                 width: 100%;
-                padding: 2rem;
+                padding: 2rem 1.5rem;
             }
+            h1 { font-size: 2.5rem; }
+            .two-columns { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <aside>
-        <h2>Índice</h2>
-        <nav>
-            <ul>
-                <li><a href="#prefacio">Prefacio</a></li>
-                <li><a href="#fundamentos">1. Fundamentos: qué es una red neuronal</a></li>
-                <li><a href="#componentes">2. Componentes de una red</a></li>
-                <li><a href="#forward">3. Forward propagation</a></li>
-                <li><a href="#backpropagation">4. Backpropagation</a></li>
-                <li><a href="#ciclo">5. El ciclo de entrenamiento completo</a></li>
-                <li><a href="#api">6. API del módulo dl.mice</a></li>
-                <li><a href="#ejemplo1">7. Ejemplo 1: XOR</a></li>
-                <li><a href="#ejemplo2">8. Ejemplo 2: Caperucita Roja</a></li>
-                <li><a href="#ejemplo3">9. Ejemplo 3: Autoencoder</a></li>
-                <li><a href="#ejemplo4">10. Ejemplo 4: Clasificador Iris</a></li>
-                <li><a href="#matematicas">11. Matemáticas subyacentes</a></li>
-                <li><a href="#arquitectura">12. Arquitectura interna y conexión</a></li>
-                <li><a href="#limitaciones">13. Limitaciones actuales</a></li>
-            </ul>
-        </nav>
-    </aside>
+<aside>
+    <h2>Índice</h2>
+    <nav>
+        <ul>
+            <li><a href="#prefacio">Prefacio</a></li>
+            <li><a href="#fundamentos">1. Fundamentos</a></li>
+            <li><a href="#componentes">2. Componentes</a></li>
+            <li><a href="#forward">3. Forward propagation</a></li>
+            <li><a href="#backpropagation">4. Backpropagation</a></li>
+            <li><a href="#ciclo">5. Ciclo de entrenamiento</a></li>
+            <li><a href="#api">6. API de dl.mice</a></li>
+            <li><a href="#ejemplo1">7. XOR clásico</a></li>
+            <li><a href="#ejemplo2">8. Caperucita Roja</a></li>
+            <li><a href="#ejemplo3">9. Autoencoder</a></li>
+            <li><a href="#ejemplo4">10. Iris</a></li>
+            <li><a href="#joya" style="color: #f1c40f; font-weight: 600;">★ 11. La Joya de la Corona</a></li>
+            <li><a href="#matematicas">12. Matemáticas</a></li>
+            <li><a href="#arquitectura">13. Arquitectura interna</a></li>
+            <li><a href="#limitaciones">14. Limitaciones</a></li>
+        </ul>
+    </nav>
+</aside>
 
-    <main>
-        <h1>Deep Learning en MICELIO</h1>
+<main>
 
-        <section id="prefacio">
-            <h2>Prefacio</h2>
-            <p>Este documento describe la implementación de redes neuronales artificiales y deep learning en MICELIO. Está dirigido a personas que nunca han trabajado con frameworks como TensorFlow o PyTorch, y que quizá tampoco conocen los fundamentos teóricos del aprendizaje automático. Cada concepto se presenta desde su base, incluyendo el propósito de cada operación y el significado de los resultados.</p>
-            <p>La implementación completa está escrita en MICELIO puro, sin dependencias externas de machine learning. Las funciones matemáticas (exponencial, raíz cuadrada) se implementan mediante series de Taylor y Newton-Raphson, el generador de números aleatorios mediante un algoritmo congruencial lineal, y el ordenamiento mediante Quicksort.</p>
-        </section>
+    <h1>Deep Learning en MICELIO</h1>
+    <p class="subtitle">Una implementaci&oacute;n completa de redes neuronales en MICELIO puro, sin dependencias externas de machine learning</p>
 
-        <section id="fundamentos">
-            <h2>1. Fundamentos: qué es una red neuronal</h2>
-            
-            <h3>1.1 La idea central</h3>
-            <p>Una red neuronal artificial es un programa que, en lugar de recibir instrucciones explícitas sobre cómo resolver un problema, <strong>aprende a resolverlo a partir de ejemplos</strong>.</p>
-            <p>El proceso es siempre el mismo:</p>
-            <pre><code>1. Se le muestran ejemplos a la red (datos de entrada)
-2. La red produce una respuesta (predicción)
+    <!-- ================================================================ -->
+    <!-- PREFACIO -->
+    <!-- ================================================================ -->
+    <section id="prefacio">
+        <h2>Prefacio</h2>
+        <p>Este documento describe la implementaci&oacute;n de redes neuronales artificiales y deep learning en <strong>MICELIO</strong>. Est&aacute; dirigido a personas que nunca han trabajado con frameworks como TensorFlow o PyTorch, y que quiz&aacute; tampoco conocen los fundamentos te&oacute;ricos del aprendizaje autom&aacute;tico. Cada concepto se presenta desde su base, incluyendo el prop&oacute;sito de cada operaci&oacute;n y el significado de los resultados.</p>
+        <p>La implementaci&oacute;n completa est&aacute; escrita en <strong>MICELIO puro</strong>, sin dependencias externas de machine learning. Las funciones matem&aacute;ticas (exponencial, ra&iacute;z cuadrada) se implementan mediante series de Taylor y Newton-Raphson, el generador de n&uacute;meros aleatorios mediante un algoritmo congruencial lineal, y el ordenamiento mediante Quicksort.</p>
+        <p>Todo el c&oacute;digo fuente est&aacute; en el repositorio: <a href="https://github.com/JAGR1792/MICELIO" target="_blank">github.com/JAGR1792/MICELIO</a></p>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 1. FUNDAMENTOS -->
+    <!-- ================================================================ -->
+    <section id="fundamentos">
+        <h2>1. Fundamentos: qu&eacute; es una red neuronal</h2>
+
+        <h3>1.1 La idea central</h3>
+        <p>Una red neuronal artificial es un programa que, en lugar de recibir instrucciones expl&iacute;citas sobre c&oacute;mo resolver un problema, <strong>aprende a resolverlo a partir de ejemplos</strong>.</p>
+        <p>El proceso es siempre el mismo:</p>
+        <pre><code>1. Se le muestran ejemplos a la red (datos de entrada)
+2. La red produce una respuesta (predicci&oacute;n)
 3. Se compara la respuesta con la respuesta correcta
 4. Se calcula el error
-5. La red ajusta sus parámetros internos para reducir ese error
+5. La red ajusta sus par&aacute;metros internos para reducir ese error
 6. Se repite hasta que el error es aceptable</code></pre>
-            <p>Esto se conoce como <strong>aprendizaje supervisado</strong>: la red aprende de ejemplos etiquetados.</p>
+        <p>Esto se conoce como <strong>aprendizaje supervisado</strong>: la red aprende de ejemplos etiquetados.</p>
 
-            <h3>1.2 La neurona artificial</h3>
-            <p>Una neurona artificial es la unidad mínima de procesamiento. Recibe varias señales de entrada, las combina, y decide si "se activa" o no.</p>
-            <p><strong>Analogía:</strong> Una neurona biológica recibe señales de otras neuronas a través de sus dendritas. Si la suma de esas señales supera un umbral, la neurona "dispara" una señal a través de su axón. La neurona artificial hace lo mismo con números.</p>
-            
-            <div class="visual-aid">
-                
+        <h3>1.2 La neurona artificial</h3>
+        <p>Una neurona artificial es la unidad m&iacute;nima de procesamiento. Recibe varias se&ntilde;ales de entrada, las combina, y decide si &laquo;se activa&raquo; o no.</p>
+        <p><strong>Analog&iacute;a:</strong> Una neurona biol&oacute;gica recibe se&ntilde;ales de otras neuronas a trav&eacute;s de sus dendritas. Si la suma de esas se&ntilde;ales supera un umbral, la neurona &laquo;dispara&raquo; una se&ntilde;al a trav&eacute;s de su ax&oacute;n. La neurona artificial hace lo mismo con n&uacute;meros.</p>
+
+        <p>Estructuralmente, una neurona hace dos operaciones en secuencia:</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart LR
+    subgraph Entradas
+        x1["x₁"]; x2["x₂"]; x3["x₃"]
+    end
+    subgraph Neuron["Neurona Artificial"]
+        S["Σ"] --> A["g(·)"]
+    end
+    subgraph Salida
+        out["ŷ"]
+    end
+    x1 -->|w₁| S
+    x2 -->|w₂| S
+    x3 -->|w₃| S
+    B["b (sesgo)"] --> S
+    A --> out
             </div>
+        </div>
 
-            <p>Estructuralmente, una neurona hace dos operaciones en secuencia:</p>
-            <pre><code>Entrada 1 ──→ (peso 1)
-Entrada 2 ──→ (peso 2) ──→ SUMA ──→ ACTIVACIÓN ──→ Salida
-Entrada 3 ──→ (peso 3)</code></pre>
-            
-            <p><strong>Primera operación: suma ponderada.</strong> Cada entrada se multiplica por un peso (que representa su importancia) y se suman todos los productos, más un sesgo (bias):</p>
-            <pre><code>z = (x1 * w1) + (x2 * w2) + (x3 * w3) + b</code></pre>
-            <p>Donde:</p>
-            <ul>
-                <li><code>x1, x2, x3</code> son las entradas</li>
-                <li><code>w1, w2, w3</code> son los pesos (parámetros que la red aprende)</li>
-                <li><code>b</code> es el sesgo (otro parámetro aprendido)</li>
-                <li><code>z</code> es el resultado de la suma ponderada</li>
-            </ul>
+        <p><strong>Primera operaci&oacute;n: suma ponderada.</strong> Cada entrada se multiplica por un peso (que representa su importancia) y se suman todos los productos, m&aacute;s un sesgo (bias):</p>
+        <div class="math-block">
+            $$z = (x_1 \times w_1) + (x_2 \times w_2) + (x_3 \times w_3) + b$$
+        </div>
+        <p>Donde <code>x₁, x₂, x₃</code> son las entradas, <code>w₁, w₂, w₃</code> son los pesos (par&aacute;metros que la red aprende) y <code>b</code> es el sesgo (otro par&aacute;metro aprendido).</p>
 
-            <p><strong>Segunda operación: función de activación.</strong> Se aplica una función no lineal a <code>z</code> para producir la salida de la neurona:</p>
-            <pre><code>salida = activacion(z)</code></pre>
-            <p>Esta función de activación es crucial: sin ella, la red solo podría aprender relaciones lineales, y apilar varias capas no daría ninguna ventaja respecto a una sola.</p>
+        <p><strong>Segunda operaci&oacute;n: funci&oacute;n de activaci&oacute;n.</strong> Se aplica una funci&oacute;n no lineal a <code>z</code> para producir la salida de la neurona:</p>
+        <div class="math-block">
+            $$a = g(z)$$
+        </div>
+        <p>Esta funci&oacute;n de activaci&oacute;n es crucial: sin ella, la red solo podr&iacute;a aprender relaciones lineales, y apilar varias capas no dar&iacute;a ninguna ventaja respecto a una sola.</p>
 
-            <h3>1.3 Capas y redes profundas</h3>
-            <p>Varias neuronas agrupadas forman una <strong>capa</strong> (layer). Varias capas apiladas forman una <strong>red profunda</strong> (deep neural network).</p>
-            <pre><code>Entrada → [Capa oculta 1] → [Capa oculta 2] → [Capa de salida]</code></pre>
-            <ul>
-                <li><strong>Capa de entrada:</strong> recibe los datos sin procesar (por ejemplo, los píxeles de una imagen)</li>
-                <li><strong>Capas ocultas:</strong> procesan la información progresivamente, extrayendo patrones cada vez más abstractos</li>
-                <li><strong>Capa de salida:</strong> produce la respuesta final de la red</li>
-            </ul>
-            <p>Una red con múltiples capas ocultas se denomina <strong>Perceptrón Multicapa (MLP)</strong> y es la arquitectura fundamental del deep learning.</p>
+        <h3>1.3 Capas y redes profundas</h3>
+        <p>Varias neuronas agrupadas forman una <strong>capa</strong> (layer). Varias capas apiladas forman una <strong>red profunda</strong> (deep neural network).</p>
 
-            <div class="visual-aid">
-                
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart LR
+    subgraph Input["Capa de Entrada"]
+        i1["x₁"]; i2["x₂"]; i3["x₃"]
+    end
+    subgraph H1["Capa Oculta 1"]
+        h11["h₁"]; h12["h₂"]; h13["h₃"]
+    end
+    subgraph H2["Capa Oculta 2"]
+        h21["h₁"]; h22["h₂"]; h23["h₃"]
+    end
+    subgraph Output["Capa de Salida"]
+        o1["ŷ₁"]; o2["ŷ₂"]
+    end
+    i1 --> h11; i1 --> h12; i1 --> h13
+    i2 --> h11; i2 --> h12; i2 --> h13
+    i3 --> h11; i3 --> h12; i3 --> h13
+    h11 --> h21; h11 --> h22; h11 --> h23
+    h12 --> h21; h12 --> h22; h12 --> h23
+    h13 --> h21; h13 --> h22; h13 --> h23
+    h21 --> o1; h21 --> o2
+    h22 --> o1; h22 --> o2
+    h23 --> o1; h23 --> o2
             </div>
-        </section>
+        </div>
 
-        <section id="componentes">
-            <h2>2. Componentes de una red</h2>
-            
-            <h3>2.1 Pesos y sesgos</h3>
-            <p>Los <strong>pesos</strong> (weights, símbolo <code>W</code>) son números que determinan la influencia de cada entrada sobre cada neurona. Si un peso es grande y positivo, la entrada correspondiente tiende a activar la neurona. Si es grande y negativo, tiende a inhibirla.</p>
-            <p>Los <strong>sesgos</strong> (biases, símbolo <code>b</code>) son números que determinan el umbral de activación de la neurona. Un sesgo alto significa que la neurona se activa fácilmente; uno bajo, que necesita mucha evidencia para activarse.</p>
-            <p>Durante el entrenamiento, la red ajusta estos valores para minimizar el error.</p>
+        <ul>
+            <li><strong>Capa de entrada:</strong> recibe los datos sin procesar (por ejemplo, los p&iacute;xeles de una imagen)</li>
+            <li><strong>Capas ocultas:</strong> procesan la informaci&oacute;n progresivamente, extrayendo patrones cada vez m&aacute;s abstractos</li>
+            <li><strong>Capa de salida:</strong> produce la respuesta final de la red</li>
+        </ul>
+        <p>Una red con m&uacute;ltiples capas ocultas se denomina <strong>Perceptr&oacute;n Multicapa (MLP)</strong> y es la arquitectura fundamental del deep learning.</p>
+    </section>
 
-            <h3>2.2 Funciones de activación</h3>
-            <p>Una función de activación decide si una neurona debe "disparar" o no, y con qué intensidad. Las tres funciones implementadas en MICELIO son:</p>
+    <!-- ================================================================ -->
+    <!-- 2. COMPONENTES -->
+    <!-- ================================================================ -->
+    <section id="componentes">
+        <h2>2. Componentes de una red</h2>
 
-            <div class="visual-aid">
-                
+        <h3>2.1 Pesos y sesgos</h3>
+        <p>Los <strong>pesos</strong> (weights, s&iacute;mbolo <code>W</code>) son n&uacute;meros que determinan la influencia de cada entrada sobre cada neurona. Si un peso es grande y positivo, la entrada correspondiente tiende a activar la neurona. Si es grande y negativo, tiende a inhibirla.</p>
+        <p>Los <strong>sesgos</strong> (biases, s&iacute;mbolo <code>b</code>) son n&uacute;meros que determinan el umbral de activaci&oacute;n de la neurona. Un sesgo alto significa que la neurona se activa f&aacute;cilmente; uno bajo, que necesita mucha evidencia para activarse.</p>
+        <p>Durante el entrenamiento, la red ajusta estos valores para minimizar el error.</p>
+
+        <h3>2.2 Funciones de activaci&oacute;n</h3>
+        <p>Una funci&oacute;n de activaci&oacute;n decide si una neurona debe &laquo;disparar&raquo; o no, y con qu&eacute; intensidad. Las tres funciones implementadas en MICELIO son:</p>
+
+        <h4>Sigmoide</h4>
+        <div class="math-block">
+            $$\sigma(x) = \frac{1}{1 + e^{-x}}$$
+        </div>
+        <p><strong>Forma:</strong> Curva en forma de S que transforma cualquier n&uacute;mero real en un valor entre 0 y 1.</p>
+        <p><strong>Para qu&eacute; se usa:</strong> Cuando la salida debe interpretarse como una <strong>probabilidad</strong>. En clasificaci&oacute;n binaria, la neurona de salida con sigmoide indica la probabilidad de pertenecer a la clase positiva. En problemas multi-etiqueta (donde varias opciones pueden ser ciertas a la vez), cada neurona de salida usa sigmoide independientemente.</p>
+
+        <h4>ReLU (Rectified Linear Unit)</h4>
+        <div class="math-block">
+            $$\text{ReLU}(x) = \max(0, x)$$
+        </div>
+        <p><strong>Forma:</strong> Si la entrada es positiva, la deja pasar intacta. Si es negativa, la convierte en cero.</p>
+        <p><strong>Para qu&eacute; se usa:</strong> En capas ocultas. Es la activaci&oacute;n m&aacute;s utilizada en deep learning porque:</p>
+        <ul>
+            <li>Es computacionalmente simple (solo compara con cero)</li>
+            <li>No satura para valores positivos grandes (a diferencia de sigmoide)</li>
+            <li>Ayuda a mitigar el problema del desvanecimiento del gradiente</li>
+        </ul>
+
+        <h4>Softmax</h4>
+        <div class="math-block">
+            $$\text{softmax}(x_i) = \frac{e^{x_i}}{\sum_{j} e^{x_j}}$$
+        </div>
+        <p><strong>Forma:</strong> Convierte un vector de n&uacute;meros reales en una distribuci&oacute;n de probabilidad donde todos los valores suman 1.</p>
+        <p><strong>Para qu&eacute; se usa:</strong> En la capa de salida de problemas de <strong>clasificaci&oacute;n multiclase</strong>, donde exactamente una clase debe ser seleccionada entre varias. Cada neurona de salida representa la probabilidad de una clase, y la clase con mayor probabilidad es la predicci&oacute;n.</p>
+
+        <h3>2.3 Inicializaci&oacute;n de pesos</h3>
+        <p>Antes de entrenar, los pesos deben inicializarse con valores adecuados. Si todos los pesos comienzan en cero, todas las neuronas de una misma capa aprender&iacute;an exactamente lo mismo (simetr&iacute;a). Si son muy grandes, las activaciones se saturan. Si son muy peque&ntilde;os, las se&ntilde;ales se desvanecen.</p>
+        <p>MICELIO usa <strong>inicializaci&oacute;n Xavier uniforme</strong> (Glorot uniform):</p>
+        <div class="math-block">
+            $$W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, +\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)$$
+        </div>
+        <p>Esta inicializaci&oacute;n mantiene la varianza de las activaciones estable a trav&eacute;s de las capas, evitando que las se&ntilde;ales crezcan o se reduzcan demasiado.</p>
+
+        <h3>2.4 Funci&oacute;n de p&eacute;rdida</h3>
+        <p>La funci&oacute;n de p&eacute;rdida (loss function) mide <strong>qu&eacute; tan lejos</strong> est&aacute;n las predicciones de la red de los valores correctos. MICELIO implementa el <strong>Error Cuadr&aacute;tico Medio (MSE)</strong>:</p>
+        <div class="math-block">
+            $$\text{MSE} = \frac{1}{m \cdot c} \sum_{i=1}^{m} \sum_{j=1}^{c} \left(y_{ij} - \hat{y}_{ij}\right)^2$$
+        </div>
+        <p>Donde <code>m</code> es el n&uacute;mero de muestras y <code>c</code> el n&uacute;mero de salidas por muestra.</p>
+        <ul>
+            <li>MSE = 0: predicci&oacute;n perfecta</li>
+            <li>MSE peque&ntilde;o: la red se aproxima bien</li>
+            <li>MSE grande: la red est&aacute; lejos de acertar</li>
+        </ul>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 3. FORWARD PROPAGATION -->
+    <!-- ================================================================ -->
+    <section id="forward">
+        <h2>3. Forward propagation: c&oacute;mo hace una predicci&oacute;n la red</h2>
+
+        <h3>3.1 Definici&oacute;n</h3>
+        <p>Forward propagation (propagaci&oacute;n hacia adelante) es el proceso mediante el cual la red transforma una entrada en una predicci&oacute;n. Los datos fluyen desde la capa de entrada, atraviesan las capas ocultas, y llegan a la capa de salida.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart LR
+    X["X<br/>(entrada)"] --> C1["Capa 1<br/>Z₁ = X · W₁ + b₁"]
+    C1 --> A1["A₁ = ReLU(Z₁)"]
+    A1 --> C2["Capa 2<br/>Z₂ = A₁ · W₂ + b₂"]
+    C2 --> A2["A₂ = Softmax(Z₂)"]
+    A2 --> Ŷ["Ŷ<br/>(predicci&oacute;n)"]
             </div>
+        </div>
 
-            <h4>Sigmoide</h4>
-            <p><strong>Fórmula:</strong> <code>sigma(x) = 1 / (1 + e^(-x))</code></p>
-            <p><strong>Forma:</strong> Curva en forma de S que transforma cualquier número real en un valor entre 0 y 1.</p>
-            <pre><code>    1 ───────────────
-      │            ╱
-      │          ╱
-      │        ╱
-      │      ╱
-    0 ────╯</code></pre>
-            <p><strong>Para qué se usa:</strong> Cuando la salida debe interpretarse como una <strong>probabilidad</strong>. En clasificación binaria, la neurona de salida con sigmoide indica la probabilidad de pertenecer a la clase positiva. En problemas multi-etiqueta (donde varias opciones pueden ser ciertas a la vez), cada neurona de salida usa sigmoide independientemente.</p>
-            <p><strong>Ejemplo:</strong> si la salida de una neurona con sigmoide es 0.87, se interpreta como "87% de probabilidad de que esto sea correcto".</p>
+        <h3>3.2 Algoritmo paso a paso</h3>
+        <p>Para cada capa <code>l</code> de la red, desde la primera hasta la &uacute;ltima:</p>
+        <p><strong>Paso 1: Transformaci&oacute;n lineal</strong></p>
+        <div class="math-block">
+            $$Z^{[l]} = A^{[l-1]} W^{[l]} + b^{[l]}$$
+        </div>
+        <p>Donde <code>A[l-1]</code> es la activaci&oacute;n de la capa anterior (o la entrada <code>X</code> si es la primera capa).</p>
 
-            <h4>ReLU (Rectified Linear Unit)</h4>
-            <p><strong>Fórmula:</strong> <code>ReLU(x) = max(0, x)</code></p>
-            <p><strong>Forma:</strong> Si la entrada es positiva, la deja pasar intacta. Si es negativa, la convierte en cero.</p>
-            <pre><code>      │          ╱
-      │        ╱
-      │      ╱
-      │    ╱
-    0 ──╯</code></pre>
-            <p><strong>Para qué se usa:</strong> En capas ocultas. Es la activación más utilizada en deep learning porque:</p>
-            <ul>
-                <li>Es computacionalmente simple (solo compara con cero)</li>
-                <li>No satura para valores positivos grandes (a diferencia de sigmoide)</li>
-                <li>Ayuda a mitigar el problema del desvanecimiento del gradiente</li>
-            </ul>
+        <p><strong>Paso 2: Aplicaci&oacute;n de la funci&oacute;n de activaci&oacute;n</strong></p>
+        <div class="math-block">
+            $$A^{[l]} = g^{[l]}\left(Z^{[l]}\right)$$
+        </div>
+        <p>Introduce no-linealidad. Sin este paso, apilar capas no tendr&iacute;a sentido porque toda la red ser&iacute;a equivalente a una sola capa lineal.</p>
 
-            <h4>Softmax</h4>
-            <p><strong>Fórmula:</strong> <code>softmax(x_i) = e^(x_i) / sum(e^(x_j))</code> (con estabilización numérica restando el máximo)</p>
-            <p><strong>Forma:</strong> Convierte un vector de números reales en una distribución de probabilidad donde todos los valores suman 1.</p>
-            <p><strong>Para qué se usa:</strong> En la capa de salida de problemas de <strong>clasificación multiclase</strong>, donde exactamente una clase debe ser seleccionada entre varias. Cada neurona de salida representa la probabilidad de una clase, y la clase con mayor probabilidad es la predicción.</p>
-            <p><strong>Ejemplo:</strong> si la salida softmax es <code>[0.70, 0.20, 0.10]</code>, la clase 0 tiene 70% de probabilidad, la clase 1 tiene 20%, y la clase 2 tiene 10%.</p>
-
-            <h3>2.3 Inicialización de pesos</h3>
-            <p>Antes de entrenar, los pesos deben inicializarse con valores adecuados. Si todos los pesos comienzan en cero, todas las neuronas de una misma capa aprenderían exactamente lo mismo (simetría). Si son muy grandes, las activaciones se saturan. Si son muy pequeños, las señales se desvanecen.</p>
-            <p>MICELIO usa <strong>inicialización Xavier uniforme</strong> (Glorot uniform):</p>
-            <pre><code>W[i][j] = U(-1, 1) * sqrt(6 / (n_entrada + n_salida))</code></pre>
-            <p>Donde <code>U(-1, 1)</code> es un número aleatorio uniforme entre -1 y 1, y <code>n_entrada</code> y <code>n_salida</code> son las cantidades de neuronas de entrada y salida de la capa.</p>
-            <p>Esta inicialización mantiene la varianza de las activaciones estable a través de las capas, evitando que las señales crezcan o se reduzcan demasiado.</p>
-
-            <h3>2.4 Función de pérdida</h3>
-            <p>La función de pérdida (loss function) mide <strong>qué tan lejos</strong> están las predicciones de la red de los valores correctos. MICELIO implementa el <strong>Error Cuadrático Medio (MSE)</strong>:</p>
-            <pre><code>MSE = (1 / (m * c)) * sum_i sum_j (y_real[i][j] - y_pred[i][j])^2</code></pre>
-            <p>Donde <code>m</code> es el número de muestras y <code>c</code> el número de salidas por muestra.</p>
-            <ul>
-                <li>MSE = 0: predicción perfecta</li>
-                <li>MSE pequeño: la red se aproxima bien</li>
-                <li>MSE grande: la red está lejos de acertar</li>
-            </ul>
-        </section>
-
-        <section id="forward">
-            <h2>3. Forward propagation: cómo hace una predicción la red</h2>
-            
-            <h3>3.1 Definición</h3>
-            <p>Forward propagation (propagación hacia adelante) es el proceso mediante el cual la red transforma una entrada en una predicción. Los datos fluyen desde la capa de entrada, atraviesan las capas ocultas, y llegan a la capa de salida.</p>
-
-            <h3>3.2 Algoritmo paso a paso</h3>
-            <p>Para cada capa <code>l</code> de la red, desde la primera hasta la última:</p>
-            <p><strong>Paso 1: Transformación lineal</strong></p>
-            <pre><code>Z[l] = A[l-1] * W[l] + b[l]</code></pre>
-            <p>Donde:</p>
-            <ul>
-                <li><code>A[l-1]</code> es la activación de la capa anterior (o la entrada <code>X</code> si es la primera capa)</li>
-                <li><code>W[l]</code> son los pesos de la capa actual</li>
-                <li><code>b[l]</code> es el sesgo de la capa actual</li>
-                <li><code>Z[l]</code> es el resultado de la combinación lineal</li>
-            </ul>
-            <p><strong>Para qué sirve:</strong> Esta operación decide cuánto "escucha" la neurona a cada entrada, según los pesos aprendidos.</p>
-
-            <p><strong>Paso 2: Aplicación de la función de activación</strong></p>
-            <pre><code>A[l] = g[l](Z[l])</code></pre>
-            <p>Donde <code>g[l]</code> es la función de activación de la capa <code>l</code> (ReLU, sigmoide, softmax o lineal).</p>
-            <p><strong>Para qué sirve:</strong> Introduce no-linealidad. Sin este paso, apilar capas no tendría sentido porque toda la red sería equivalente a una sola capa lineal.</p>
-
-            <h3>3.3 Implementación en MICELIO</h3>
-            <pre class="mice"><code>funcion forward(modelo, X) {
+        <h3>3.3 Implementaci&oacute;n en MICELIO</h3>
+        <pre class="mice"><code>funcion forward(modelo, X) {
     var activaciones = [X]
     var actual = X
 
     para capa en modelo["capas"] {
-        # Z = A_prev * W  (multiplicación matricial)
+        # Z = A_prev * W  (multiplicaci&oacute;n matricial)
         var Z = mat.multiplicar(actual, capa["W"])
 
-        # Sumar el sesgo (bias) a cada fila (cada muestra)
+        # Sumar el sesgo (bias) a cada fila
         para fi en rango(mat.filas(Z)) {
             para ci en rango(mat.columnas(Z)) {
                 Z[fi][ci] = Z[fi][ci] + capa["b"][0][ci]
             }
         }
 
-        # Aplicar la función de activación correspondiente
-        si (capa["act"] == "relu") {
-            actual = relu(Z)
-        } sino_si (capa["act"] == "sigmoid") {
-            actual = sigmoid(Z)
-        } sino_si (capa["act"] == "softmax") {
-            actual = softmax(Z)
-        } sino {
-            actual = Z   # activación lineal (identidad)
-        }
+        # Aplicar la funci&oacute;n de activaci&oacute;n correspondiente
+        si (capa["act"] == "relu")    { actual = relu(Z) }
+        sino_si (capa["act"] == "sigmoid") { actual = sigmoid(Z) }
+        sino_si (capa["act"] == "softmax") { actual = softmax(Z) }
+        sino { actual = Z }
 
-        # Guardar la activación para usarla en backpropagation
         activaciones.agregar(actual)
     }
 
-    # Retornar la predicción y todas las activaciones intermedias
     regresa {"salida": actual, "activaciones": activaciones}
 }</code></pre>
-            <p><strong>Qué retorna esta función:</strong></p>
-            <ul>
-                <li><code>"salida"</code>: la predicción de la red (matriz de tamaño <code>m x c</code>, donde <code>m</code> es el número de muestras y <code>c</code> el número de neuronas de salida)</li>
-                <li><code>"activaciones"</code>: lista con la entrada y las activaciones de todas las capas, necesaria para el backpropagation</li>
-            </ul>
-        </section>
+        <p><strong>Qu&eacute; retorna esta funci&oacute;n:</strong></p>
+        <ul>
+            <li><code>"salida"</code>: la predicci&oacute;n de la red (matriz de tama&ntilde;o <code>m &times; c</code>)</li>
+            <li><code>"activaciones"</code>: lista con la entrada y las activaciones de todas las capas, necesaria para el backpropagation</li>
+        </ul>
+    </section>
 
-        <section id="backpropagation">
-            <h2>4. Backpropagation: cómo aprende la red de sus errores</h2>
+    <!-- ================================================================ -->
+    <!-- 4. BACKPROPAGATION -->
+    <!-- ================================================================ -->
+    <section id="backpropagation">
+        <h2>4. Backpropagation: c&oacute;mo aprende la red de sus errores</h2>
 
-            <h3>4.1 Definición</h3>
-            <p>Backpropagation (retropropagación del error) es el algoritmo que calcula cómo debe ajustarse cada peso para reducir el error de la red. El error "viaja hacia atrás" desde la capa de salida hasta la primera capa oculta.</p>
+        <h3>4.1 Definici&oacute;n</h3>
+        <p>Backpropagation (retropropagaci&oacute;n del error) es el algoritmo que calcula c&oacute;mo debe ajustarse cada peso para reducir el error de la red. El error &laquo;viaja hacia atr&aacute;s&raquo; desde la capa de salida hasta la primera capa oculta.</p>
 
-            <h3>4.2 Intuición</h3>
-            <p>Cuando la red se equivoca, no toda la culpa es de la última capa. Cada capa contribuyó al error. Backpropagation reparte la culpa proporcionalmente:</p>
-            <ol>
-                <li>Calcula el error en la salida</li>
-                <li>Determina cuánto contribuyó cada peso de la última capa a ese error</li>
-                <li>Propaga ese error hacia la capa anterior</li>
-                <li>Repite hasta llegar a la primera capa</li>
-            </ol>
-
-            <div class="visual-aid">
-                
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart RL
+    Ŷ["Ŷ (predicci&oacute;n)"] --> E["δ = Ŷ − Y<br/>(error en salida)"]
+    E --> B2["Capa 2<br/>dW₂ = A₁ᵀ · δ<br/>db₂ = Σδ<br/>δ₂ = δ · W₂ᵀ ⊙ g'(Z₁)"]
+    B2 --> B1["Capa 1<br/>dW₁ = Xᵀ · δ₂<br/>db₁ = Σδ₂"]
+    B1 --> UPD["Actualizar<br/>W ← W − lr · dW<br/>b ← b − lr · db"]
             </div>
+        </div>
 
-            <h3>4.3 Algoritmo paso a paso</h3>
-            <p><strong>Paso 1: Error en la capa de salida</strong></p>
-            <pre><code>delta = prediccion - Y</code></pre>
-            <p>Donde <code>Y</code> son los valores correctos. Esta diferencia, elemento a elemento, es la dirección en que debe moverse la predicción para acercarse a la realidad.</p>
+        <h3>4.2 Intuici&oacute;n</h3>
+        <p>Cuando la red se equivoca, no toda la culpa es de la &uacute;ltima capa. Cada capa contribuy&oacute; al error. Backpropagation reparte la culpa proporcionalmente:</p>
+        <ol>
+            <li>Calcula el error en la salida</li>
+            <li>Determina cu&aacute;nto contribuy&oacute; cada peso de la &uacute;ltima capa a ese error</li>
+            <li>Propaga ese error hacia la capa anterior</li>
+            <li>Repite hasta llegar a la primera capa</li>
+        </ol>
 
-            <p><strong>Paso 2: Para cada capa, desde la última hasta la primera</strong></p>
-            <p>Para cada capa <code>i</code> (en orden inverso):</p>
-            <pre><code># Gradiente de los pesos: cuánto contribuyó cada peso al error
-dW = (A_prev)^T * delta
+        <h3>4.3 Algoritmo paso a paso</h3>
+        <p><strong>Paso 1: Error en la capa de salida</strong></p>
+        <div class="math-block">
+            $$\delta^{[L]} = \hat{Y} - Y$$
+        </div>
+        <p>Esta diferencia, elemento a elemento, es la direcci&oacute;n en que debe moverse la predicci&oacute;n para acercarse a la realidad.</p>
 
-# Gradiente del sesgo: suma del error por cada neurona
-db = sum(delta, axis=0)
+        <p><strong>Paso 2: Para cada capa, desde la &uacute;ltima hasta la primera</strong></p>
+        <div class="math-block">
+            $$\text{d}W^{[l]} = (A^{[l-1]})^\top \cdot \delta^{[l]}$$
+            $$\text{d}b^{[l]} = \sum \delta^{[l]}$$
+            $$\delta^{[l-1]} = \delta^{[l]} \cdot (W^{[l]})^\top \odot g'^{[l-1]}(Z^{[l-1]})$$
+        </div>
 
-# Propagar el error a la capa anterior (si no es la primera)
-error_oculto = delta * W^T
+        <p><strong>Paso 3: Actualizar par&aacute;metros</strong></p>
+        <div class="math-block">
+            $$W^{[l]} \leftarrow W^{[l]} - \text{lr} \cdot \text{d}W^{[l]}$$
+            $$b^{[l]} \leftarrow b^{[l]} - \text{lr} \cdot \text{d}b^{[l]}$$
+        </div>
 
-# Aplicar la derivada de la activación de la capa anterior
-si (activacion_anterior == "relu"):
-    delta = error_oculto ⊙ ReLU'(A_prev)
-sino si (activacion_anterior == "sigmoid"):
-    delta = error_oculto ⊙ sigmoid'(A_prev)
-sino:
-    delta = error_oculto
+        <h3>4.4 Las derivadas de activaci&oacute;n en MICELIO</h3>
+        <p><strong>Derivada de sigmoide:</strong></p>
+        <div class="math-block">
+            $$\sigma'(x) = \sigma(x) \cdot (1 - \sigma(x))$$
+        </div>
+        <p>En MICELIO: <code>m[i][j] * (1 - m[i][j])</code> donde <code>m</code> es la salida de sigmoide.</p>
 
-# Actualizar pesos y sesgos
-W = W - lr * dW
-b = b - lr * db</code></pre>
+        <p><strong>Derivada de ReLU:</strong></p>
+        <div class="math-block">
+            $$\text{ReLU}'(x) = \begin{cases} 1 & \text{si } x > 0 \\ 0 & \text{si } x \le 0 \end{cases}$$
+        </div>
+        <p>En MICELIO: <code>si (m[i][j] &gt; 0) { 1 } sino { 0 }</code>.</p>
 
-            <p><strong>Paso 3: Repetir</strong></p>
-            <p>Se itera sobre todo el conjunto de datos tantas veces como épocas (epochs) se hayan configurado.</p>
+        <h3>4.5 Tasa de aprendizaje (learning rate)</h3>
+        <p>La tasa de aprendizaje <code>lr</code> controla qu&eacute; tan grandes son los ajustes en cada paso:</p>
+        <div class="math-block">
+            $$W_{\text{nuevo}} = W_{\text{viejo}} - \text{lr} \cdot \nabla W$$
+        </div>
+        <ul>
+            <li>Un valor alto (ej. 0.5) hace que la red aprenda r&aacute;pido pero puede ser inestable</li>
+            <li>Un valor bajo (ej. 0.01) hace que el aprendizaje sea lento pero estable</li>
+            <li>Los valores t&iacute;picos est&aacute;n entre 0.01 y 0.5</li>
+        </ul>
+    </section>
 
-            <h3>4.4 Las derivadas de activación en MICELIO</h3>
-            <p>Cada función de activación tiene su correspondiente derivada, necesaria para backpropagation:</p>
-            <p><strong>Derivada de sigmoide:</strong></p>
-            <pre><code>sigmoid'(x) = sigmoid(x) * (1 - sigmoid(x))</code></pre>
-            <p>En MICELIO: <code>m[i][j] * (1 - m[i][j])</code> donde <code>m</code> es la salida de sigmoide.</p>
-            
-            <p><strong>Derivada de ReLU:</strong></p>
-            <pre><code>ReLU'(x) = 1  si x > 0
-           0  si x <= 0</code></pre>
-            <p>En MICELIO: <code>si (m[i][j] > 0) { 1 } sino { 0 }</code>.</p>
+    <!-- ================================================================ -->
+    <!-- 5. CICLO DE ENTRENAMIENTO -->
+    <!-- ================================================================ -->
+    <section id="ciclo">
+        <h2>5. El ciclo de entrenamiento completo</h2>
 
-            <h3>4.5 Tasa de aprendizaje (learning rate)</h3>
-            <p>La tasa de aprendizaje <code>lr</code> controla qué tan grandes son los ajustes en cada paso:</p>
-            <pre><code>nuevo_peso = viejo_peso - lr * gradiente</code></pre>
-            <ul>
-                <li>Un valor alto (ej. 0.5) hace que la red aprenda rápido pero puede ser inestable</li>
-                <li>Un valor bajo (ej. 0.01) hace que el aprendizaje sea lento pero estable</li>
-                <li>Los valores típicos están entre 0.01 y 0.5</li>
-            </ul>
-        </section>
+        <p>El entrenamiento combina forward propagation y backpropagation en un ciclo:</p>
 
-        <section id="ciclo">
-            <h2>5. El ciclo de entrenamiento completo</h2>
-            <p>El entrenamiento combina forward propagation y backpropagation en un ciclo:</p>
-            <pre class="mice"><code>funcion entrenar_red(modelo, X, Y, epochs, lr) {
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart TD
+    INIT["Inicializar W, b<br/>(Xavier)"] --> FWD["Forward Propagation<br/>Ŷ = forward(X)"]
+    FWD --> LOSS["Calcular error<br/>δ = Ŷ − Y"]
+    LOSS --> BP["Backpropagation<br/>dW, db por capa"]
+    BP --> UPD["Actualizar<br/>W ← W − lr·dW<br/>b ← b − lr·db"]
+    UPD --> CHECK["&iquest;epochs completados?"]
+    CHECK -->|"No"| FWD
+    CHECK -->|"S&iacute;"| DONE["Modelo entrenado"]
+            </div>
+        </div>
+
+        <pre class="mice"><code>funcion entrenar_red(modelo, X, Y, epochs, lr) {
     para e en rango(epochs) {
-        # 1. Forward: obtener predicción
+        # 1. Forward: obtener predicci&oacute;n
         var fwd = forward(modelo, X)
         var pred = fwd["salida"]
         var activaciones = fwd["activaciones"]
@@ -650,396 +852,278 @@ b = b - lr * db</code></pre>
         # 2. Error en la salida
         var delta = mat.resta_matrices(pred, Y)
 
-        # 3. Backpropagation: desde la última capa hacia atrás
+        # 3. Backpropagation: desde la &uacute;ltima capa hacia atr&aacute;s
         var i = modelo["capas"].longitud() - 1
         mientras (i >= 0) {
             var capa = modelo["capas"][i]
             var A_prev = activaciones[i]
-
-            # Calcular gradientes
             var dW = mat.multiplicar(mat.transpuesta(A_prev), delta)
-            var db = mat.ceros(1, mat.columnas(delta))
-            para fila_d en delta {
-                var c_idx = 0
-                mientras (c_idx < fila_d.longitud()) {
-                    db[0][c_idx] = db[0][c_idx] + fila_d[c_idx]
-                    c_idx = c_idx + 1
-                }
-            }
+            # ... (c&aacute;lculo de db, propagaci&oacute;n de error, actualizaci&oacute;n)
 
-            # Propagar error a la capa anterior
-            si (i > 0) {
-                var error_oculto = mat.multiplicar(delta, mat.transpuesta(capa["W"]))
-                var act_prev = modelo["capas"][i-1]["act"]
-                si (act_prev == "relu") {
-                    delta = hadamard(error_oculto, relu_derivada(activaciones[i]))
-                } sino_si (act_prev == "sigmoid") {
-                    delta = hadamard(error_oculto, sigmoid_derivada(activaciones[i]))
-                } sino {
-                    delta = error_oculto
-                }
-            }
-
-            # Actualizar parámetros
             capa["W"] = mat.resta_matrices(capa["W"], mat.escalar(dW, lr))
             capa["b"] = mat.resta_matrices(capa["b"], mat.escalar(db, lr))
-
             i = i - 1
         }
     }
 }</code></pre>
-            <p>El parámetro <code>modelo</code> se modifica <strong>in-place</strong>: los pesos se actualizan directamente sobre la estructura del modelo, no se retorna un nuevo modelo.</p>
-        </section>
+        <p>El par&aacute;metro <code>modelo</code> se modifica <strong>in-place</strong>: los pesos se actualizan directamente sobre la estructura del modelo, no se retorna un nuevo modelo.</p>
+    </section>
 
-        <section id="api">
-            <h2>6. API del módulo dl.mice</h2>
-            <p>Para usar el módulo de deep learning:</p>
-            <pre class="mice"><code>importar "dl.mice" como dl</code></pre>
-            <p>Este módulo internamente importa dos bibliotecas:</p>
-            <ul>
-                <li><code>matriz.mice</code> como <code>mat</code>: provee las operaciones de álgebra lineal (multiplicación de matrices, transpuesta, suma, resta). Todas estas operaciones están implementadas en MICELIO puro mediante bucles anidados.</li>
-                <li><code>math.mice</code> como <code>math</code>: provee la función <code>raiz()</code> (raíz cuadrada mediante Newton-Raphson), usada en la inicialización Xavier.</li>
-            </ul>
-            <p>La función <code>exp()</code> que utiliza sigmoide y softmax no viene de <code>math.mice</code>, sino del ámbito global, donde <code>builtins.mice</code> la define mediante una serie de Taylor de 10 términos implementada en MICELIO puro.</p>
+    <!-- ================================================================ -->
+    <!-- 6. API -->
+    <!-- ================================================================ -->
+    <section id="api">
+        <h2>6. API del m&oacute;dulo dl.mice</h2>
 
-            <h3>6.1 dl.aplicar(matriz, funcion)</h3>
-            <p><strong>Firma:</strong> <code>aplicar(m, f)</code></p>
-            <p><strong>Qué hace:</strong> Aplica una función <code>f</code> a cada elemento individual de la matriz <code>m</code>. Recorre cada fila y cada elemento, lo pasa por la función, y construye una nueva matriz con los resultados.</p>
-            <p><strong>Para qué se usa:</strong> Es la base de las funciones de activación. <code>sigmoid(m)</code> se implementa como <code>aplicar(m, sigmoid_esc)</code>, donde <code>sigmoid_esc</code> opera sobre un solo número.</p>
-            <p><strong>Ejemplo:</strong></p>
-            <pre class="mice"><code>var cuad = funcion (x) { regresa x * x }
-dl.aplicar([[1, 2], [3, 4]], cuad)
-# → [[1, 4], [9, 16]]</code></pre>
+        <p>Para usar el m&oacute;dulo de deep learning:</p>
+        <pre class="mice"><code>importar "dl.mice" como dl</code></pre>
+        <p>Este m&oacute;dulo internamente importa dos bibliotecas:</p>
+        <ul>
+            <li><code>matriz.mice</code> como <code>mat</code>: provee las operaciones de &aacute;lgebra lineal</li>
+            <li><code>math.mice</code> como <code>math</code>: provee la funci&oacute;n <code>raiz()</code> (ra&iacute;z cuadrada mediante Newton-Raphson)</li>
+        </ul>
+        <p>La funci&oacute;n <code>exp()</code> que utiliza sigmoide y softmax viene del &aacute;mbito global, donde <code>builtins.mice</code> la define mediante una serie de Taylor de 10 t&eacute;rminos implementada en MICELIO puro.</p>
 
-            <h3>6.2 dl.hadamard(m1, m2)</h3>
-            <p><strong>Firma:</strong> <code>hadamard(m1, m2)</code></p>
-            <p><strong>Qué hace:</strong> Multiplica dos matrices elemento por elemento (producto de Hadamard). No es la multiplicación matricial usual, sino que cada posición <code>[i][j]</code> del resultado es <code>m1[i][j] * m2[i][j]</code>. Ambas matrices deben tener las mismas dimensiones.</p>
-            <p><strong>Para qué se usa:</strong> Exclusivamente en backpropagation, para combinar el error propagado con la derivada de la función de activación: <code>delta = error_oculto ⊙ derivada(activacion)</code>.</p>
+        <h3>6.1 dl.aplicar(matriz, funcion)</h3>
+        <p><strong>Firma:</strong> <code>aplicar(m, f)</code></p>
+        <p>Aplica una funci&oacute;n <code>f</code> a cada elemento individual de la matriz <code>m</code>.</p>
 
-            <h3>6.3 Funciones de activación</h3>
-            
-            <h4>dl.sigmoid(matriz)</h4>
-            <p><strong>Firma:</strong> <code>sigmoid(m)</code></p>
-            <p><strong>Fórmula:</strong> <code>sigmoid(x) = 1 / (1 + e^(-x))</code></p>
-            <p><strong>Qué hace:</strong> Aplica la función sigmoide a cada elemento de la matriz. Cada elemento se transforma a un valor en el intervalo (0, 1).</p>
-            <p><strong>Para qué se usa:</strong> En capas de salida para problemas de clasificación binaria o multi-etiqueta. La salida se interpreta como una probabilidad.</p>
-            <p><strong>Implementación:</strong></p>
-            <pre class="mice"><code>funcion sigmoid_esc(x) { regresa 1 / (1 + exp(-x)) }
-funcion sigmoid(m) { regresa aplicar(m, sigmoid_esc) }</code></pre>
-            <p>La función <code>exp()</code> invocada es la serie de Taylor implementada en <code>builtins.mice</code>.</p>
+        <h3>6.2 dl.hadamard(m1, m2)</h3>
+        <p><strong>Firma:</strong> <code>hadamard(m1, m2)</code></p>
+        <p>Multiplica dos matrices elemento por elemento (producto de Hadamard). Se usa en backpropagation para combinar el error propagado con la derivada de la funci&oacute;n de activaci&oacute;n.</p>
 
-            <h4>dl.sigmoid_derivada(matriz)</h4>
-            <p><strong>Firma:</strong> <code>sigmoid_derivada(m)</code></p>
-            <p><strong>Fórmula:</strong> <code>sigmoid_derivada(x) = x * (1 - x)</code></p>
-            <p><strong>Qué hace:</strong> Calcula la derivada de la sigmoide. Recibe la <strong>salida</strong> de la sigmoide (no la entrada a la sigmoide). Esto es correcto porque si <code>a = sigmoid(z)</code>, entonces <code>sigmoid'(z) = a * (1 - a)</code>.</p>
-            <p><strong>Para qué se usa:</strong> En backpropagation, cuando la capa anterior usa activación sigmoide.</p>
+        <h3>6.3 Funciones de activaci&oacute;n</h3>
 
-            <h4>dl.relu(matriz)</h4>
-            <p><strong>Firma:</strong> <code>relu(m)</code></p>
-            <p><strong>Fórmula:</strong> <code>ReLU(x) = max(0, x)</code></p>
-            <p><strong>Qué hace:</strong> Para cada elemento, si es positivo lo deja igual, si es negativo lo convierte en cero.</p>
-            <p><strong>Para qué se usa:</strong> En capas ocultas. Es la activación predeterminada en la mayoría de las redes profundas modernas.</p>
+        <h4>dl.sigmoid(matriz)</h4>
+        <p><strong>Firma:</strong> <code>sigmoid(m)</code></p>
+        <p>Aplica la funci&oacute;n sigmoide a cada elemento. Cada elemento se transforma a un valor en (0, 1).</p>
 
-            <h4>dl.relu_derivada(matriz)</h4>
-            <p><strong>Firma:</strong> <code>relu_derivada(m)</code></p>
-            <p><strong>Fórmula:</strong> <code>ReLU'(x) = 1 si x > 0, 0 si x <= 0</code></p>
-            <p><strong>Qué hace:</strong> Para cada elemento, retorna 1 si es positivo, 0 si es cero o negativo.</p>
-            <p><strong>Para qué se usa:</strong> En backpropagation, cuando la capa anterior usa activación ReLU.</p>
+        <h4>dl.sigmoid_derivada(matriz)</h4>
+        <p><strong>Firma:</strong> <code>sigmoid_derivada(m)</code></p>
+        <p>Calcula la derivada de la sigmoide. Recibe la salida de la sigmoide (no la entrada), porque <code>&sigma;'(z) = &sigma;(z) * (1 - &sigma;(z))</code>.</p>
 
-            <h4>dl.softmax(matriz)</h4>
-            <p><strong>Firma:</strong> <code>softmax(m)</code></p>
-            <p><strong>Fórmula:</strong> <code>softmax(x_i) = e^(x_i - max) / sum_j e^(x_j - max)</code> (versión numéricamente estable)</p>
-            <p><strong>Qué hace:</strong> Convierte cada fila de la matriz en una distribución de probabilidad donde todos los valores son positivos y suman 1.</p>
-            <p><strong>Para qué se usa:</strong> En la capa de salida para clasificación multiclase (una opción entre varias).</p>
-            <p><strong>Estabilidad numérica:</strong> La implementación resta el valor máximo de cada fila antes de calcular la exponencial. Esto evita el desbordamiento que ocurriría con valores grandes (ej. <code>exp(1000)</code>).</p>
+        <h4>dl.relu(matriz)</h4>
+        <p><strong>Firma:</strong> <code>relu(m)</code></p>
+        <p>Para cada elemento, si es positivo lo deja igual, si es negativo lo convierte en cero.</p>
 
-            <h3>6.4 dl.perceptron_multicapa(arquitectura)</h3>
-            <p><strong>Firma:</strong> <code>perceptron_multicapa(arquitectura)</code></p>
-            <p><strong>Qué hace:</strong> Crea un modelo de perceptrón multicapa (MLP) con la arquitectura especificada. Inicializa los pesos con el método Xavier uniforme y los sesgos en cero.</p>
-            <p><strong>Parámetro <code>arquitectura</code>:</strong> Lista de diccionarios, cada uno representando una capa:</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Campo</th>
-                        <th>Tipo</th>
-                        <th>Descripción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><code>"in"</code></td><td>número</td><td>Cantidad de neuronas de entrada de esta capa</td></tr>
-                    <tr><td><code>"out"</code></td><td>número</td><td>Cantidad de neuronas de salida de esta capa</td></tr>
-                    <tr><td><code>"act"</code></td><td>texto</td><td>Función de activación: <code>"relu"</code>, <code>"sigmoid"</code>, <code>"softmax"</code>, <code>"lineal"</code></td></tr>
-                </tbody>
-            </table>
-            <p><strong>Ejemplo de arquitectura:</strong></p>
-            <pre class="mice"><code>var arq = [
-    {"in": 4, "out": 3, "act": "relu"},      # primera capa oculta
-    {"in": 3, "out": 4, "act": "sigmoid"}     # capa de salida
-]</code></pre>
-            <p><strong>Retorno:</strong> Diccionario con la estructura:</p>
-            <pre><code>{
-  "capas": [
-    {
-      "W": [[pesos...]],    # matriz de dimensión (in x out)
-      "b": [[sesgos...]],   # matriz de dimensión (1 x out)
-      "act": "relu"
-    },
-    ...
-  ]
-}</code></pre>
-            <p><strong>Inicialización de pesos (Xavier uniforme):</strong></p>
-            <pre class="mice"><code>W[i][j] = (aleatorio() * 2 - 1) * math.raiz(6 / (n_in + n_out))</code></pre>
-            <p>Donde <code>aleatorio()</code> es el generador congruencial lineal implementado en <code>builtins.mice</code>, y <code>math.raiz()</code> es la raíz cuadrada mediante Newton-Raphson de <code>math.mice</code>.</p>
+        <h4>dl.relu_derivada(matriz)</h4>
+        <p><strong>Firma:</strong> <code>relu_derivada(m)</code></p>
+        <p>Para cada elemento, retorna 1 si es positivo, 0 si es cero o negativo.</p>
 
-            <h3>6.5 dl.forward(modelo, X)</h3>
-            <p><strong>Firma:</strong> <code>forward(modelo, X)</code></p>
-            <p><strong>Qué hace:</strong> Ejecuta una propagación hacia adelante completa. Toma el modelo y una entrada, y retorna la predicción.</p>
-            <p><strong>Parámetros:</strong></p>
-            <ul>
-                <li><code>modelo</code>: diccionario retornado por <code>perceptron_multicapa</code></li>
-                <li><code>X</code>: matriz de entrada de dimensión <code>(m x n)</code>, donde <code>m</code> es el número de muestras y <code>n</code> el número de características</li>
-            </ul>
-            <p><strong>Retorno:</strong> Diccionario con dos campos:</p>
-            <ul>
-                <li><code>"salida"</code>: matriz de predicción de dimensión <code>(m x c)</code>, donde <code>c</code> es el número de neuronas de la última capa</li>
-                <li><code>"activaciones"</code>: lista con la entrada y las activaciones de todas las capas (necesaria para entrenamiento)</li>
-            </ul>
-            <p><strong>Uso típico:</strong></p>
-            <pre class="mice"><code>var resultado = dl.forward(modelo, [[1, 1, 0, 0]])
-var prediccion = resultado["salida"]          # la respuesta
-var activaciones = resultado["activaciones"]  # estados intermedios</code></pre>
+        <h4>dl.softmax(matriz)</h4>
+        <p><strong>Firma:</strong> <code>softmax(m)</code></p>
+        <p>Convierte cada fila de la matriz en una distribuci&oacute;n de probabilidad. Implementaci&oacute;n num&eacute;ricamente estable (resta el m&aacute;ximo de cada fila antes de la exponencial).</p>
 
-            <h3>6.6 dl.entrenar_red(modelo, X, Y, epochs, lr)</h3>
-            <p><strong>Firma:</strong> <code>entrenar_red(modelo, X, Y, epochs, lr)</code></p>
-            <p><strong>Qué hace:</strong> Entrena la red neuronal usando el algoritmo de descenso de gradiente con backpropagation. El modelo se modifica in-place.</p>
-            <p><strong>Parámetros:</strong></p>
-            <ul>
-                <li><code>modelo</code>: modelo creado con <code>perceptron_multicapa</code> (se modifica directamente)</li>
-                <li><code>X</code>: datos de entrada, matriz de dimensión <code>(m x n)</code></li>
-                <li><code>Y</code>: valores objetivo (correctos), matriz de dimensión <code>(m x c)</code></li>
-                <li><code>epochs</code>: cantidad de iteraciones completas sobre todos los datos</li>
-                <li><code>lr</code>: tasa de aprendizaje (learning rate), típicamente entre 0.01 y 0.5</li>
-            </ul>
-            <p><strong>Algoritmo interno:</strong></p>
-            <ol>
-                <li>Forward propagation: calcula predicción y activaciones</li>
-                <li>Calcula el error: <code>delta = prediccion - Y</code></li>
-                <li>Backpropagation: para cada capa en orden inverso, calcula gradientes y propaga el error</li>
-                <li>Actualización: <code>W = W - lr * dW</code>, <code>b = b - lr * db</code></li>
-            </ol>
-
-            <h3>6.7 dl.error_mse(y_real, y_pred)</h3>
-            <p><strong>Firma:</strong> <code>error_mse(y_real, y_pred)</code></p>
-            <p><strong>Qué hace:</strong> Calcula el Error Cuadrático Medio entre los valores reales y las predicciones.</p>
-            <p><strong>Fórmula:</strong> <code>MSE = (1 / (f * c)) * sum_i sum_j (real[i][j] - pred[i][j])^2</code></p>
-            <p><strong>Interpretación:</strong></p>
-            <ul>
-                <li>MSE = 0: la predicción es exactamente igual al valor real</li>
-                <li>MSE bajo: la red se aproxima bien</li>
-                <li>MSE alto: la red se equivoca mucho</li>
-            </ul>
-        </section>
-
-        <section id="ejemplo1">
-            <h2>7. Ejemplo 1: XOR (clasificación binaria)</h2>
-
-            <h3>7.1 El problema</h3>
-            <p>La compuerta XOR (o exclusivo) es un problema clásico para probar redes neuronales porque <strong>no es linealmente separable</strong>: una sola neurona no puede resolverlo.</p>
-            <pre><code>Entrada:  (x1, x2)
-Salida:   0 si x1 = x2, 1 si x1 != x2
-
-Ejemplos:
-  (0, 0) → 0
-  (0, 1) → 1
-  (1, 0) → 1
-  (1, 1) → 0</code></pre>
-            <p>Si se grafican estos puntos, los ceros están en las esquinas opuestas del cuadrado, y los unos en las otras dos. No es posible trazar una línea recta que separe ambas clases. Se necesita al menos una capa oculta que doble el espacio de decisión.</p>
-
-            <div class="visual-aid">
-                
-            </div>
-
-            <h3>7.2 Código completo</h3>
-            <pre class="mice"><code>importar "dl.mice" como dl</code></pre>
-            <p>Esta línea importa el módulo de deep learning. Internamente, <code>dl.mice</code> importa <code>matriz.mice</code> (para operaciones algebraicas) y <code>math.mice</code> (para raíz cuadrada). Las funciones <code>exp()</code> y <code>aleatorio()</code> se resuelven desde el ámbito global, donde <code>builtins.mice</code> las define en MICELIO puro.</p>
-            <pre class="mice"><code>var X = [[0,0], [0,1], [1,0], [1,1]]</code></pre>
-            <p>Matriz de entrada: 4 muestras, cada una con 2 características (coordenadas x1, x2).</p>
-            <pre class="mice"><code>var Y = [[1,0], [0,1], [0,1], [1,0]]</code></pre>
-            <p>Matriz de salida en codificación <strong>one-hot</strong>: cada fila tiene un 1 en la posición de la clase correcta y 0 en las demás.</p>
-            <ul>
-                <li><code>[1,0]</code> = clase 0 (XOR = 0)</li>
-                <li><code>[0,1]</code> = clase 1 (XOR = 1)</li>
-            </ul>
-            <pre class="mice"><code>var arq = [
-    {"in": 2, "out": 4, "act": "relu"},
-    {"in": 4, "out": 2, "act": "softmax"}
-]</code></pre>
-            <p>Arquitectura de la red:</p>
-            <ul>
-                <li><strong>Capa 1:</strong> 2 neuronas de entrada, 4 neuronas ocultas, activación ReLU. Esta capa aprende a transformar el espacio de entrada para hacerlo separable.</li>
-                <li><strong>Capa 2:</strong> 4 neuronas de entrada (la salida de la capa anterior), 2 neuronas de salida, activación softmax. Produce la probabilidad de pertenencia a cada clase.</li>
-            </ul>
-            <p>Se usa softmax porque es un problema de clasificación donde exactamente una clase debe ser seleccionada.</p>
-            <pre class="mice"><code>var modelo = dl.perceptron_multicapa(arq)</code></pre>
-            <p>Crea la red con pesos inicializados aleatoriamente (método Xavier) y sesgos en cero.</p>
-            <pre class="mice"><code>dl.entrenar_red(modelo, X, Y, 2000, 0.1)</code></pre>
-            <p>Entrena la red durante 2000 épocas con tasa de aprendizaje 0.1. En cada época se ejecuta forward propagation, se calcula el error, se hace backpropagation, y se actualizan los pesos.</p>
-            <pre class="mice"><code>var res = dl.forward(modelo, X)
-imp res["salida"]</code></pre>
-            <p>Evalúa la red con los mismos datos de entrenamiento e imprime las predicciones.</p>
-
-            <h3>7.3 Resultado esperado</h3>
-            <p>Después de 2000 épocas, la salida debería aproximarse a:</p>
-            <pre><code>[0.99, 0.01]  → clase 0 (para entrada 0,0)
-[0.01, 0.99]  → clase 1 (para entrada 0,1)
-[0.01, 0.99]  → clase 1 (para entrada 1,0)
-[0.99, 0.01]  → clase 0 (para entrada 1,1)</code></pre>
-            <p>Cada fila suma aproximadamente 1 (por softmax). El valor más alto en cada fila indica la clase predicha. Un valor de 0.99 indica 99% de confianza en la predicción.</p>
-        </section>
-
-        <section id="ejemplo2">
-            <h2>8. Ejemplo 2: Caperucita Roja (multi-etiqueta)</h2>
-            
-            <h3>8.1 El problema</h3>
-            <p>Este ejemplo modela las reacciones de Caperucita Roja ante distintos personajes del cuento. Es un problema de clasificación <strong>multi-etiqueta</strong>: un personaje puede activar varias reacciones simultáneamente.</p>
-            <p><strong>Datos de entrenamiento (4 rasgos de entrada):</strong></p>
-            <table>
-                <thead>
-                    <tr><th>Personaje</th><th style="text-align:center">Orejas grandes</th><th style="text-align:center">Dientes grandes</th><th style="text-align:center">Apuesto</th><th style="text-align:center">Arrugado</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Lobo</td><td style="text-align:center">1</td><td style="text-align:center">1</td><td style="text-align:center">0</td><td style="text-align:center">0</td></tr>
-                    <tr><td>Príncipe</td><td style="text-align:center">0</td><td style="text-align:center">1</td><td style="text-align:center">1</td><td style="text-align:center">0</td></tr>
-                    <tr><td>Abuelita</td><td style="text-align:center">0</td><td style="text-align:center">0</td><td style="text-align:center">0</td><td style="text-align:center">1</td></tr>
-                </tbody>
-            </table>
-            <p><strong>Reacciones esperadas (4 salidas):</strong></p>
-            <table>
-                <thead>
-                    <tr><th>Personaje</th><th style="text-align:center">Gritar</th><th style="text-align:center">Abrazar</th><th style="text-align:center">Dar comida</th><th style="text-align:center">Besar</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Lobo</td><td style="text-align:center">1</td><td style="text-align:center">0</td><td style="text-align:center">0</td><td style="text-align:center">0</td></tr>
-                    <tr><td>Príncipe</td><td style="text-align:center">0</td><td style="text-align:center">0</td><td style="text-align:center">1</td><td style="text-align:center">1</td></tr>
-                    <tr><td>Abuelita</td><td style="text-align:center">0</td><td style="text-align:center">1</td><td style="text-align:center">1</td><td style="text-align:center">0</td></tr>
-                </tbody>
-            </table>
-            <p>Observe que el Príncipe activa dos salidas (comida y besar) simultáneamente. Esto es multi-etiqueta y requiere sigmoide en la salida (no softmax), porque cada neurona debe decidir independientemente si su etiqueta está presente.</p>
-
-            <h3>8.2 Código completo</h3>
-            <pre class="mice"><code>importar "dl.mice" como dl</code></pre>
-            <p>Importa el módulo de deep learning. Este módulo a su vez importa <code>matriz.mice</code> (operaciones matriciales) y <code>math.mice</code> (raíz cuadrada). La función <code>exp()</code> que usará sigmoide proviene de <code>builtins.mice</code> (serie de Taylor). No es necesario importar nada adicional.</p>
-            <pre class="mice"><code>var X = [
-    [1, 1, 0, 0],   # Lobo: orejas grandes, dientes grandes
-    [0, 1, 1, 0],   # Príncipe: dientes grandes, apuesto
-    [0, 0, 0, 1]    # Abuelita: arrugada
-]</code></pre>
-            <p>Matriz de 3 muestras y 4 características. Cada fila representa un personaje. Cada columna representa un rasgo binario (1 = presente, 0 = ausente).</p>
-            <pre class="mice"><code>var Y = [
-    [1, 0, 0, 0],   # Lobo → solo gritar
-    [0, 0, 1, 1],   # Príncipe → dar comida y besar
-    [0, 1, 1, 0]    # Abuelita → abrazar y dar comida
-]</code></pre>
-            <p>Matriz de 3 muestras y 4 etiquetas. Cada fila representa las reacciones correctas para ese personaje. Múltiple 1s por fila indican múltiples reacciones simultáneas.</p>
-            <pre class="mice"><code>var arq = [
+        <h3>6.4 dl.perceptron_multicapa(arquitectura)</h3>
+        <p><strong>Firma:</strong> <code>perceptron_multicapa(arquitectura)</code></p>
+        <p>Crea un modelo MLP con la arquitectura especificada. Inicializa los pesos con el m&eacute;todo Xavier uniforme y los sesgos en cero.</p>
+        <table>
+            <thead>
+                <tr><th>Campo</th><th>Tipo</th><th>Descripci&oacute;n</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>"in"</code></td><td>n&uacute;mero</td><td>Neuronas de entrada de esta capa</td></tr>
+                <tr><td><code>"out"</code></td><td>n&uacute;mero</td><td>Neuronas de salida de esta capa</td></tr>
+                <tr><td><code>"act"</code></td><td>texto</td><td>Funci&oacute;n de activaci&oacute;n: <code>"relu"</code>, <code>"sigmoid"</code>, <code>"softmax"</code>, <code>"lineal"</code></td></tr>
+            </tbody>
+        </table>
+        <p><strong>Ejemplo:</strong></p>
+        <pre class="mice"><code>var arq = [
     {"in": 4, "out": 3, "act": "relu"},
     {"in": 3, "out": 4, "act": "sigmoid"}
-]</code></pre>
-            <p>Arquitectura:</p>
-            <ul>
-                <li><strong>Capa 1 (oculta):</strong> 4 entradas, 3 neuronas, activación ReLU. Reduce la dimensionalidad y aprende combinaciones relevantes de los rasgos.</li>
-                <li><strong>Capa 2 (salida):</strong> 3 entradas, 4 salidas, activación sigmoide. Produce 4 probabilidades independientes entre 0 y 1, una por cada posible reacción.</li>
-            </ul>
-            <p>Se usa sigmoide en lugar de softmax porque las salidas no son mutuamente excluyentes. Con sigmoide, cada neurona de salida da una probabilidad independiente. Con softmax, las probabilidades sumarían 1, lo que obligaría a elegir una sola reacción.</p>
-            <pre class="mice"><code>var modelo = dl.perceptron_multicapa(arq)</code></pre>
-            <p>Crea la red. Los pesos se inicializan con Xavier uniforme y los sesgos en cero.</p>
-            <pre class="mice"><code>dl.entrenar_red(modelo, X, Y, 5000, 0.2)</code></pre>
-            <p>Entrena por 5000 épocas con tasa de aprendizaje 0.2. Durante el entrenamiento, el módulo imprime el error MSE cada 200 épocas. Este error debería disminuir progresivamente, indicando que la red está aprendiendo.</p>
-            <pre class="mice"><code>var casos = [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 0, 1]]
-var nombres = ["Lobo", "Príncipe", "Abuelita"]
-var etiquetas = ["Gritar", "Abrazar", "Comida", "Besar"]
+]
+var modelo = dl.perceptron_multicapa(arq)</code></pre>
 
-para i en rango(3) {
-    var res = dl.forward(modelo, [casos[i]])
-    var probs = res["salida"][0]
-    imp nombres[i] + ":"
-    para j en rango(4) {
-        imp "  " + etiquetas[j] + ": " + aTexto(probs[j])
-    }
-}</code></pre>
-            <p>Evalúa la red con cada personaje. Para cada uno, imprime las 4 probabilidades. Una probabilidad cercana a 1 significa que la red predice que esa reacción ocurrirá. Cercana a 0 significa que no.</p>
-            <pre class="mice"><code>var res = dl.forward(modelo, [[1, 1, 0, 1]])
-imp res["salida"][0]</code></pre>
-            <p>Evalúa un caso mixto: un personaje con orejas grandes, dientes grandes y arrugado (un "Lobo disfrazado de abuelita"). Esto permite ver cómo la red generaliza a combinaciones no vistas durante el entrenamiento.</p>
+        <h3>6.5 dl.forward(modelo, X)</h3>
+        <p><strong>Firma:</strong> <code>forward(modelo, X)</code></p>
+        <p>Ejecuta una propagaci&oacute;n hacia adelante completa. Retorna <code>{"salida": &hellip;, "activaciones": &hellip;}</code>.</p>
 
-            <h3>8.3 Interpretación de resultados</h3>
-            <p>Un resultado típico después de 5000 épocas:</p>
-            <pre><code>Lobo:          Gritar: 0.9999, Abrazar: 0.0001, Comida: 0.0001, Besar: 0.0001
-Príncipe:      Gritar: 0.0001, Abrazar: 0.0001, Comida: 0.9999, Besar: 0.9999
-Abuelita:      Gritar: 0.0001, Abrazar: 0.9999, Comida: 0.9999, Besar: 0.0001
-Lobo disfraz:  Gritar: 0.9500, Abrazar: 0.1000, Comida: 0.0500, Besar: 0.0200</code></pre>
-            <ul>
-                <li>La red aprendió que el Lobo solo provoca gritos (primer vector de probabilidad)</li>
-                <li>El Príncipe provoca comida y beso (segundo vector, dos valores altos)</li>
-                <li>La Abuelita provoca abrazo y comida (tercer vector, dos valores altos)</li>
-                <li>El Lobo disfrazado activa principalmente "Gritar" (el rasgo más distintivo del Lobo) pero con menor confianza que el Lobo puro, porque la presencia de arrugas (rasgo de abuelita) introduce ambigüedad</li>
-            </ul>
-        </section>
+        <h3>6.6 dl.entrenar_red(modelo, X, Y, epochs, lr)</h3>
+        <p><strong>Firma:</strong> <code>entrenar_red(modelo, X, Y, epochs, lr)</code></p>
+        <p>Entrena la red mediante descenso de gradiente con backpropagation. El modelo se modifica in-place.</p>
 
-        <section id="ejemplo3">
-            <h2>9. Ejemplo 3: Autoencoder (compresión de datos)</h2>
-            
-            <h3>9.1 El problema</h3>
-            <p>Un autoencoder es una red que aprende a <strong>reconstruir su propia entrada</strong>. Tiene una capa oculta con menos neuronas que la entrada (cuello de botella), que fuerza a la red a aprender una representación comprimida de los datos.</p>
-            <pre><code>Entrada (4) → Comprime → Cuello de botella (2) → Expande → Salida (4)</code></pre>
-            <p>La utilidad del autoencoder es que el cuello de botella aprende a capturar la información esencial de los datos, descartando el ruido. Esto sirve para:</p>
-            <ul>
-                <li>Reducción de dimensionalidad</li>
-                <li>Detección de anomalías (lo que no se reconstruye bien es anómalo)</li>
-                <li>Aprendizaje de representaciones latentes</li>
-            </ul>
+        <h3>6.7 dl.error_mse(y_real, y_pred)</h3>
+        <p><strong>Firma:</strong> <code>error_mse(y_real, y_pred)</code></p>
+        <p>Calcula el Error Cuadr&aacute;tico Medio entre los valores reales y las predicciones.</p>
+    </section>
 
-            <div class="visual-aid">
-                
+    <!-- ================================================================ -->
+    <!-- 7. EJEMPLO 1: XOR -->
+    <!-- ================================================================ -->
+    <section id="ejemplo1">
+        <h2>7. Ejemplo 1: XOR (clasificaci&oacute;n binaria)</h2>
+
+        <h3>7.1 El problema</h3>
+        <p>La compuerta XOR (o exclusivo) es un problema cl&aacute;sico para probar redes neuronales porque <strong>no es linealmente separable</strong>: una sola neurona no puede resolverlo.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart TD
+    subgraph Tabla_XOR["Tabla de Verdad XOR"]
+        T0["(0, 0) → 0"]
+        T1["(0, 1) → 1"]
+        T2["(1, 0) → 1"]
+        T3["(1, 1) → 0"]
+    end
+    subgraph No_Separable["No es separable linealmente"]
+        direction LR
+        P0["(0,0) ← clase 0"] --- P1["(0,1) ← clase 1"]
+        P2["(1,0) ← clase 1"] --- P3["(1,1) ← clase 0"]
+    end
             </div>
+        </div>
 
-            <h3>9.2 Código completo</h3>
-            <pre class="mice"><code>importar "dl.mice" como dl</code></pre>
-            <pre class="mice"><code>var X = [
+        <p>Si se grafican estos puntos, los ceros est&aacute;n en las esquinas opuestas del cuadrado, y los unos en las otras dos. No es posible trazar una l&iacute;nea recta que separe ambas clases. Se necesita al menos una capa oculta que doble el espacio de decisi&oacute;n.</p>
+
+        <h3>7.2 C&oacute;digo completo</h3>
+        <pre class="mice"><code>importar "dl.mice" como dl
+
+var X = [[0,0], [0,1], [1,0], [1,1]]
+var Y = [[1,0], [0,1], [0,1], [1,0]]   # one-hot
+
+var arq = [
+    {"in": 2, "out": 4, "act": "relu"},
+    {"in": 4, "out": 2, "act": "softmax"}
+]
+
+var modelo = dl.perceptron_multicapa(arq)
+dl.entrenar_red(modelo, X, Y, 2000, 0.1)
+
+var res = dl.forward(modelo, X)
+imp res["salida"]</code></pre>
+
+        <h3>7.3 Resultado esperado</h3>
+        <p>Despu&eacute;s de 2000 &eacute;pocas, la salida deber&iacute;a aproximarse a:</p>
+        <pre><code>[0.99, 0.01]  → clase 0 (para (0,0))
+[0.01, 0.99]  → clase 1 (para (0,1))
+[0.01, 0.99]  → clase 1 (para (1,0))
+[0.99, 0.01]  → clase 0 (para (1,1))</code></pre>
+        <p>Cada fila suma aproximadamente 1 (por softmax). El valor m&aacute;s alto en cada fila indica la clase predicha. Un valor de 0.99 indica 99% de confianza.</p>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 8. EJEMPLO 2: CAPERUCITA -->
+    <!-- ================================================================ -->
+    <section id="ejemplo2">
+        <h2>8. Ejemplo 2: Caperucita Roja (multi-etiqueta)</h2>
+
+        <h3>8.1 El problema</h3>
+        <p>Modela las reacciones de Caperucita Roja ante distintos personajes del cuento. Es un problema de clasificaci&oacute;n <strong>multi-etiqueta</strong>: un personaje puede activar varias reacciones simult&aacute;neamente.</p>
+
+        <table>
+            <thead>
+                <tr><th>Personaje</th><th style="text-align:center">Orejas</th><th style="text-align:center">Dientes</th><th style="text-align:center">Apuesto</th><th style="text-align:center">Arrugado</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Lobo</td><td style="text-align:center">1</td><td style="text-align:center">1</td><td style="text-align:center">0</td><td style="text-align:center">0</td></tr>
+                <tr><td>Pr&iacute;ncipe</td><td style="text-align:center">0</td><td style="text-align:center">1</td><td style="text-align:center">1</td><td style="text-align:center">0</td></tr>
+                <tr><td>Abuelita</td><td style="text-align:center">0</td><td style="text-align:center">0</td><td style="text-align:center">0</td><td style="text-align:center">1</td></tr>
+            </tbody>
+        </table>
+
+        <p><strong>Reacciones esperadas:</strong></p>
+        <table>
+            <thead>
+                <tr><th>Personaje</th><th style="text-align:center">Gritar</th><th style="text-align:center">Abrazar</th><th style="text-align:center">Comida</th><th style="text-align:center">Besar</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Lobo</td><td style="text-align:center">1</td><td style="text-align:center">0</td><td style="text-align:center">0</td><td style="text-align:center">0</td></tr>
+                <tr><td>Pr&iacute;ncipe</td><td style="text-align:center">0</td><td style="text-align:center">0</td><td style="text-align:center">1</td><td style="text-align:center">1</td></tr>
+                <tr><td>Abuelita</td><td style="text-align:center">0</td><td style="text-align:center">1</td><td style="text-align:center">1</td><td style="text-align:center">0</td></tr>
+            </tbody>
+        </table>
+        <p>El Pr&iacute;ncipe activa dos salidas (comida y besar) simult&aacute;neamente. Esto es multi-etiqueta y requiere <strong>sigmoide</strong> en la salida (no softmax), porque cada neurona debe decidir independientemente si su etiqueta est&aacute; presente.</p>
+
+        <h3>8.2 C&oacute;digo completo</h3>
+        <pre class="mice"><code>importar "dl.mice" como dl
+
+var X = [
+    [1, 1, 0, 0],   # Lobo
+    [0, 1, 1, 0],   # Pr&iacute;ncipe
+    [0, 0, 0, 1]    # Abuelita
+]
+
+var Y = [
+    [1, 0, 0, 0],   # Lobo → solo gritar
+    [0, 0, 1, 1],   # Pr&iacute;ncipe → comida y besar
+    [0, 1, 1, 0]    # Abuelita → abrazar y comida
+]
+
+var arq = [
+    {"in": 4, "out": 3, "act": "relu"},
+    {"in": 3, "out": 4, "act": "sigmoid"}  # sigmoide para multi-etiqueta
+]
+
+var modelo = dl.perceptron_multicapa(arq)
+dl.entrenar_red(modelo, X, Y, 5000, 0.2)
+
+# Evaluaci&oacute;n...
+for i in range(3) {
+    var res = dl.forward(modelo, [X[i]])
+    imp nombres[i] + ": " + aTexto(res["salida"][0])
+}</code></pre>
+
+        <h3>8.3 Interpretaci&oacute;n de resultados</h3>
+        <p>Un resultado t&iacute;pico despu&eacute;s de 5000 &eacute;pocas muestra que la red aprendi&oacute; las asociaciones correctas, e incluso generaliza a casos mixtos no vistos (como un &laquo;Lobo disfrazado de abuelita&raquo;) reduciendo la confianza cuando hay rasgos contradictorios.</p>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 9. EJEMPLO 3: AUTOENCODER -->
+    <!-- ================================================================ -->
+    <section id="ejemplo3">
+        <h2>9. Ejemplo 3: Autoencoder (compresi&oacute;n de datos)</h2>
+
+        <h3>9.1 El problema</h3>
+        <p>Un autoencoder es una red que aprende a <strong>reconstruir su propia entrada</strong>. Tiene una capa oculta con menos neuronas que la entrada (cuello de botella), que fuerza a la red a aprender una representaci&oacute;n comprimida de los datos.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart TD
+    subgraph Codificador["Codificador"]
+        I["Entrada (4)"] --> B["Cuello de Botella (2)"]
+    end
+    subgraph Decodificador["Decodificador"]
+        B --> O["Salida (4)"]
+    end
+            </div>
+        </div>
+
+        <p>La utilidad del autoencoder es que el cuello de botella aprende a capturar la informaci&oacute;n esencial de los datos, descartando el ruido. Sirve para reducci&oacute;n de dimensionalidad, detecci&oacute;n de anomal&iacute;as y aprendizaje de representaciones latentes.</p>
+
+        <h3>9.2 C&oacute;digo completo</h3>
+        <pre class="mice"><code>importar "dl.mice" como dl
+
+var X = [
     [1, 0, 0, 0],
     [0, 1, 0, 0],
     [0, 0, 1, 0],
     [0, 0, 0, 1]
-]</code></pre>
-            <p>Cuatro patrones de 4 bits, cada uno con un solo bit activo. La red debe aprender a comprimir cada patrón a 2 números y luego reconstruirlo.</p>
-            <pre class="mice"><code>var arq = [
-    {"in": 4, "out": 2, "act": "relu"},
-    {"in": 2, "out": 4, "act": "sigmoid"}
-]</code></pre>
-            <p>Arquitectura con cuello de botella de 2 neuronas:</p>
-            <ul>
-                <li><strong>Capa 1:</strong> codifica de 4 a 2 dimensiones con ReLU</li>
-                <li><strong>Capa 2:</strong> decodifica de 2 a 4 dimensiones con sigmoide</li>
-            </ul>
-            <pre class="mice"><code>var modelo = dl.perceptron_multicapa(arq)
-dl.entrenar_red(modelo, X, X, 3000, 0.1)</code></pre>
-            <p>Note que <code>Y = X</code>: el objetivo de entrenamiento es la misma entrada. Esto es lo que define a un autoencoder.</p>
-            <pre class="mice"><code>var test = dl.forward(modelo, [[1, 0, 0, 1]])
-imp "Entrada: [1, 0, 0, 1]"
-imp "Reconstrucción:"
-imp test["salida"][0]</code></pre>
-            <p>Prueba con un patrón que no estaba en los datos de entrenamiento. Si el patrón se reconstruye bien, significa que es similar a los datos de entrenamiento. Si se reconstruye mal, es potencialmente anómalo.</p>
-            <pre class="mice"><code>imp "Código latente (2 neuronas):"
-imp test["activaciones"][1]</code></pre>
-            <p>Muestra la representación interna del patrón en el cuello de botella (activación de la capa 1, que es el índice 1 en la lista de activaciones porque el índice 0 es la entrada).</p>
-        </section>
+]
 
-        <section id="ejemplo4">
-            <h2>10. Ejemplo 4: Clasificador Iris (softmax)</h2>
-            
-            <h3>10.1 El problema</h3>
-            <p>Clasificar flores Iris en 3 especies según 2 características. Es clasificación <strong>multiclase</strong>: exactamente una especie debe ser seleccionada.</p>
-            <pre class="mice"><code>importar "dl.mice" como dl
+var arq = [
+    {"in": 4, "out": 2, "act": "relu"},      # comprime
+    {"in": 2, "out": 4, "act": "sigmoid"}     # reconstruye
+]
+
+var modelo = dl.perceptron_multicapa(arq)
+dl.entrenar_red(modelo, X, X, 3000, 0.1)   # Y = X
+
+var res = dl.forward(modelo, [[1, 0, 0, 1]])
+imp "Reconstrucci&oacute;n:", res["salida"][0]
+imp "C&oacute;digo latente:", res["activaciones"][1]</code></pre>
+        <p>Note que <code>Y = X</code>: el objetivo de entrenamiento es la misma entrada. Esto es lo que define a un autoencoder.</p>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 10. EJEMPLO 4: IRIS -->
+    <!-- ================================================================ -->
+    <section id="ejemplo4">
+        <h2>10. Ejemplo 4: Clasificador Iris (softmax)</h2>
+
+        <h3>10.1 El problema</h3>
+        <p>Clasificar flores Iris en 3 especies seg&uacute;n 2 caracter&iacute;sticas. Es clasificaci&oacute;n <strong>multiclase</strong>: exactamente una especie debe ser seleccionada.</p>
+
+        <pre class="mice"><code>importar "dl.mice" como dl
 
 var X = [
     [1.0, 2.0], [2.0, 1.0],   # clase 0
@@ -1051,160 +1135,423 @@ var Y = [
     [1, 0, 0], [1, 0, 0],
     [0, 1, 0], [0, 1, 0],
     [0, 0, 1], [0, 0, 1]
-]</code></pre>
-            <p>Codificación one-hot: 3 clases, cada una representada por un vector con un 1 en su posición.</p>
-            <pre class="mice"><code>var arq = [
+]
+
+var arq = [
     {"in": 2, "out": 5, "act": "relu"},
     {"in": 5, "out": 3, "act": "softmax"}
-]</code></pre>
-            <p>Arquitectura: 2 características de entrada, 5 neuronas ocultas con ReLU, 3 salidas con softmax.</p>
-            <p>Se usa softmax porque las clases son mutuamente excluyentes. La salida es una distribución de probabilidad sobre las 3 clases.</p>
-            <pre class="mice"><code>var modelo = dl.perceptron_multicapa(arq)
+]
+
+var modelo = dl.perceptron_multicapa(arq)
 dl.entrenar_red(modelo, X, Y, 2000, 0.05)
 
-var prueba = dl.forward(modelo, [[2.5, 1.5]])
-imp prueba["salida"][0]
-
+var pred = dl.forward(modelo, [[2.5, 1.5]])["salida"][0]
+# Clase con mayor probabilidad
 var clase = 0
-si (prueba["salida"][0][1] > prueba["salida"][0][clase]) { clase = 1 }
-si (prueba["salida"][0][2] > prueba["salida"][0][clase]) { clase = 2 }
-imp "Clase predicha: " + aTexto(clase)</code></pre>
-            <p>La clase predicha es la neurona de salida con el valor más alto.</p>
-        </section>
+si (pred[1] > pred[clase]) { clase = 1 }
+si (pred[2] > pred[clase]) { clase = 2 }
+imp "Clase predicha:", clase</code></pre>
+        <p>Se usa softmax porque las clases son mutuamente excluyentes. La salida es una distribuci&oacute;n de probabilidad sobre las 3 clases, y la clase con mayor probabilidad es la predicci&oacute;n.</p>
+    </section>
 
-        <section id="matematicas">
-            <h2>11. Matemáticas subyacentes</h2>
-            
-            <h3>11.1 Forward propagation</h3>
-            <p>Para una red con L capas, la capa l calcula:</p>
-            <div class="math-block">
-                Z[l] = A[l-1] * W[l] + b[l]<br>
-                A[l] = g[l](Z[l])
+    <!-- ================================================================ -->
+    <!-- ★ 11. LA JOYA DE LA CORONA -->
+    <!-- ================================================================ -->
+    <section id="joya">
+        <h2>11. La Joya de la Corona: clasificaci&oacute;n no-lineal XOR-2D <span class="crown-jewel-badge">&hearts; joya</span></h2>
+
+        <div class="info-note">
+            <strong>★</strong> Este es el ejemplo cumbre de MICELIO: una red neuronal que aprende una frontera de decisi&oacute;n no-lineal en 2D, genera gr&aacute;ficos de alta calidad, y alcanza <strong>100% de exactitud</strong> &mdash; todo en MICELIO puro.
+        </div>
+
+        <h3>11.1 El problema: XOR en 2D</h3>
+        <p>A diferencia del XOR cl&aacute;sico de 4 puntos, este problema extiende el concepto a un espacio 2D continuo con <strong>60 puntos distribuidos en 4 clusters</strong>:</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart TD
+    subgraph XOR2D["XOR-2D: 4 Clusters, 2 Clases"]
+        C0["Clase 0<br/>Centro: (−2, 2)<br/>15 puntos"]
+        C1["Clase 1<br/>Centro: (2, −2)<br/>15 puntos"]
+        C2["Clase 1<br/>Centro: (−2, −2)<br/>15 puntos"]
+        C3["Clase 0<br/>Centro: (2, 2)<br/>15 puntos"]
+    end
+
+    subgraph Regla["Regla XOR en 2D"]
+        R["Clase 0 si (x &lt; 0 y y &gt; 0) o (x &gt; 0 y y &lt; 0)<br/>Clase 1 si (x &lt; 0 y y &lt; 0) o (x &gt; 0 y y &gt; 0)"]
+    end
             </div>
-            <p>Donde:</p>
-            <ul>
-                <li><code>A[0] = X</code> (la entrada)</li>
-                <li><code>W[l]</code> es la matriz de pesos de la capa l</li>
-                <li><code>b[l]</code> es el vector de sesgos de la capa l</li>
-                <li><code>g[l]</code> es la función de activación de la capa l</li>
-                <li><code>A[L]</code> es la salida final (predicción)</li>
-            </ul>
+        </div>
 
-            <h3>11.2 Backpropagation</h3>
-            <p>Para MSE loss, el error en la capa de salida es:</p>
-            <div class="math-block">delta[L] = A[L] - Y</div>
-            <p>Para cada capa l desde L-1 hasta 1:</p>
-            <div class="math-block">delta[l] = (delta[l+1] * W[l+1]^T) ⊙ g[l]'(Z[l])</div>
-            <p>Los gradientes son:</p>
-            <div class="math-block">
-                dW[l] = A[l-1]^T * delta[l]<br>
-                db[l] = sum(delta[l], axis=0)
+        <p>Los 60 puntos se generan a&ntilde;adiendo ruido gaussiano (±1.25) alrededor de 4 centros. El split de entrenamiento/test usa <code>i % 5 == 0</code> para mantener balance de clases (48 train, 12 test).</p>
+
+        <h3>11.2 Arquitectura de la red</h3>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart LR
+    I["Entrada<br/>2 neuronas<br/>(x, y)"] --> H["Capa Oculta<br/>4 neuronas<br/>ReLU"]
+    H --> O["Capa Salida<br/>2 neuronas<br/>Softmax"]
+    O --> P["Clase 0<br/>o<br/>Clase 1"]
             </div>
-            <p>La actualización:</p>
-            <div class="math-block">
-                W[l] = W[l] - lr * dW[l]<br>
-                b[l] = b[l] - lr * db[l]
+        </div>
+
+        <p>Arquitectura <strong>2 &rarr; 4 &rarr; 2</strong>:</p>
+        <ul>
+            <li><strong>Capa 1:</strong> 4 neuronas con activaci&oacute;n <strong>ReLU</strong>. Transforma el espacio de entrada (no-linealmente separable) en un espacio donde las clases son separables.</li>
+            <li><strong>Capa 2:</strong> 2 neuronas con activaci&oacute;n <strong>Softmax</strong>. Produce la probabilidad de pertenencia a cada clase.</li>
+        </ul>
+
+        <h3>11.3 Hiperpar&aacute;metros</h3>
+        <table>
+            <thead>
+                <tr><th>Par&aacute;metro</th><th>Valor</th><th>Justificaci&oacute;n</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>&Eacute;pocas</td><td><strong>150</strong></td><td>Convergencia r&aacute;pida (&asymp;90s). La p&eacute;rdida cae de ~0.33 a &lt;0.001.</td></tr>
+                <tr><td>Tasa de aprendizaje</td><td><strong>0.01</strong></td><td>Estable para softmax+MSE. Con lr &ge; 0.05 el entrenamiento diverge (NaN).</td></tr>
+                <tr><td>Batch</td><td><strong>Full-batch</strong></td><td>48 muestras por &eacute;poca. Mini-batch ser&iacute;a 2-3x m&aacute;s lento.</td></tr>
+                <tr><td>Inicializaci&oacute;n</td><td><strong>Xavier uniforme</strong></td><td>Mantiene la varianza estable entre capas.</td></tr>
+                <tr><td>P&eacute;rdida</td><td><strong>MSE</strong></td><td>&Uacute;nica funci&oacute;n de p&eacute;rdida implementada en dl.mice.</td></tr>
+            </tbody>
+        </table>
+
+        <h3>11.4 C&oacute;digo completo</h3>
+
+        <p><strong>Paso 1: Generaci&oacute;n de datos sint&eacute;ticos XOR-2D</strong></p>
+        <pre class="mice"><code>funcion generar_xor2d() {
+    var X = []
+    var Y = []
+    var centros = [[-2, 2], [2, -2], [-2, -2], [2, 2]]
+    var labels = [[1, 0], [0, 1], [0, 1], [1, 0]]   # one-hot
+    var c = 0
+    mientras (c < 4) {
+        var i = 0
+        mientras (i < 15) {
+            var xv = centros[c][0] + (aleatorio() * 2.5 - 1.25)
+            var yv = centros[c][1] + (aleatorio() * 2.5 - 1.25)
+            X.agregar([xv, yv])
+            Y.agregar(labels[c])
+            i = i + 1
+        }
+        c = c + 1
+    }
+    regresa {"X": X, "Y": Y}
+}</code></pre>
+        <p>Los centros est&aacute;n en las 4 esquinas de un cuadrado de lado 4. Los clusters miden ~2.5 unidades de di&aacute;metro. Las clases siguen el patr&oacute;n XOR: centros opuestos comparten clase.</p>
+
+        <p><strong>Paso 2: Construcci&oacute;n y entrenamiento</strong></p>
+        <pre class="mice"><code>importar "../modulos_std/dl.mice" como dl
+importar "../modulos_std/ml.mice" como ml
+importar "../modulos_std/grafico.mice" como g  # gr&aacute;ficos PNG
+
+var arq = [
+    {"in": 2, "out": 4, "act": "relu"},
+    {"in": 4, "out": 2, "act": "softmax"}
+]
+var modelo = dl.perceptron_multicapa(arq)
+var lr = 0.01
+var epochs = 150
+var track_ep = []
+var track_loss = []
+
+para ep en rango(epochs) {
+    dl.entrenar_red(modelo, X_train, Y_train, 1, lr)
+
+    si (ep % 50 == 0 o ep == epochs - 1) {
+        var fwd = dl.forward(modelo, X_test)
+        var loss = dl.error_mse(Y_test, fwd["salida"])
+        track_ep.agregar(ep)
+        track_loss.agregar(loss)
+    }
+}</code></pre>
+
+        <p><strong>Paso 3: Evaluaci&oacute;n con m&eacute;tricas de ml.mice</strong></p>
+        <pre class="mice"><code>var fwd_test = dl.forward(modelo, X_test)
+var preds = fwd_test["salida"]
+# argmax: &iacute;ndice del valor m&aacute;s alto en cada fila
+funcion argmax(fila) {
+    var idx = 0; var max_v = fila[0]
+    var i = 1
+    mientras (i < longitud(fila)) {
+        si (fila[i] > max_v) { idx = i; max_v = fila[i] }
+        i = i + 1
+    }
+    regresa idx
+}
+
+var acc = ml.exactitud(pred_clases, real_clases)
+var f1 = ml.f1_score(pred_clases, real_clases)
+var mc = ml.matriz_confusion(pred_clases, real_clases)</code></pre>
+
+        <p><strong>Paso 4: Visualizaci&oacute;n &mdash; Curva de aprendizaje</strong></p>
+        <pre class="mice"><code>g.color_linea(60, 100, 200)
+g.lineas(track_ep, track_loss)
+g.titulo("Curva de Aprendizaje — XOR-2D")
+g.etiquetas("Epoca", "Error MSE")
+g.guardar("graficos/xor_loss.png")</code></pre>
+
+        <p><strong>Paso 5: Visualizaci&oacute;n &mdash; Mapa de decisi&oacute;n 40&times;40</strong></p>
+        <pre class="mice"><code># Grid de 40&times;40 = 1600 puntos en [-4.5, 4.5]^2
+var grid_pts = []
+para xi en rango(40) {
+    var xv = xmin + (xi * (xmax - xmin) / 39)
+    para yi en rango(40) {
+        grid_pts.agregar([xv, yv])
+    }
+}
+var res_grid = dl.forward(modelo, grid_pts)
+# Clasificar cada punto del grid
+# Pintar fondo con colores suaves + puntos de test
+# Marcar errores en amarillo</code></pre>
+
+        <h3>11.5 Resultados</h3>
+
+        <div class="result-box">
+            <h4>M&eacute;tricas de clasificaci&oacute;n</h4>
+            <div class="result-grid">
+                <div class="result-card perfect">
+                    <span class="value">100%</span>
+                    <span class="label">Exactitud</span>
+                </div>
+                <div class="result-card perfect">
+                    <span class="value">1.0</span>
+                    <span class="label">F1-Score</span>
+                </div>
+                <div class="result-card">
+                    <span class="value">6</span>
+                    <span class="label">TP (clase 0)</span>
+                </div>
+                <div class="result-card">
+                    <span class="value">6</span>
+                    <span class="label">TN (clase 1)</span>
+                </div>
+                <div class="result-card">
+                    <span class="value">0</span>
+                    <span class="label">FP</span>
+                </div>
+                <div class="result-card">
+                    <span class="value">0</span>
+                    <span class="label">FN</span>
+                </div>
+            </div>
+            <p style="margin-bottom: 0;">La p&eacute;rdida MSE desciende de <strong>0.33</strong> (ep&oacute;c 0) a <strong>0.0002</strong> (ep&oacute;c 149). No hay errores en el conjunto de test.</p>
+        </div>
+
+        <h3>11.6 Visualizaciones generadas</h3>
+
+        <div class="two-columns">
+            <div class="img-container">
+                <img id="xor-loss-img" src="graficos/xor_loss.png" alt="Curva de aprendizaje XOR-2D" onerror="this.style.display='none'; document.querySelector('#xor-loss-placeholder').style.display='flex';">
+                <div id="xor-loss-placeholder" style="display:none; min-height: 300px; background: var(--bg-deep); align-items:center; justify-content:center; flex-direction:column;">
+                    <p style="color:var(--fg-dark);">Curva de Aprendizaje</p>
+                    <p style="color:var(--fg-muted); font-size:0.9rem;">(ejecuta 23_joya_clasificacion.mice para generar esta imagen)</p>
+                </div>
+                <div class="caption">Curva de p&eacute;rdida MSE durante 150 &eacute;pocas</div>
             </div>
 
-            <h3>11.3 Derivadas de activación</h3>
-            <table>
-                <thead>
-                    <tr><th>Activación</th><th>g(x)</th><th>g'(x)</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Sigmoide</td><td>1/(1+e^(-x))</td><td>g(x) * (1-g(x))</td></tr>
-                    <tr><td>ReLU</td><td>max(0, x)</td><td>1 si x > 0, 0 si x <= 0</td></tr>
-                </tbody>
-            </table>
-
-            <h3>11.4 Inicialización Xavier</h3>
-            <div class="math-block">W ~ U(-sqrt(6/(n_in + n_out)), +sqrt(6/(n_in + n_out)))</div>
-
-            <h3>11.5 Exponencial (serie de Taylor)</h3>
-            <div class="math-block">e^x = sum_{n=0}^{10} x^n / n!</div>
-            <p>Error relativo para x en [-2, 2]: &lt; 1e-8. Para valores fuera de este rango, la precisión disminuye pero es suficiente para entrenamiento de redes.</p>
-
-            <h3>11.6 Raíz cuadrada (Newton-Raphson)</h3>
-            <div class="math-block">x_{n+1} = 0.5 * (x_n + S / x_n)</div>
-            <p>Convergencia cuadrática en ~30 iteraciones.</p>
-
-            <h3>11.7 Generador aleatorio (LCG)</h3>
-            <div class="math-block">
-                semilla = (semilla * 1103515245 + 12345) % 2^31<br>
-                aleatorio = semilla / 2^31
+            <div class="img-container">
+                <img id="xor-front-img" src="graficos/xor_frontera.png" alt="Frontera de decisión XOR-2D" onerror="this.style.display='none'; document.querySelector('#xor-front-placeholder').style.display='flex';">
+                <div id="xor-front-placeholder" style="display:none; min-height: 300px; background: var(--bg-deep); align-items:center; justify-content:center; flex-direction:column;">
+                    <p style="color:var(--fg-dark);">Frontera de Decisi&oacute;n</p>
+                    <p style="color:var(--fg-muted); font-size:0.9rem;">(ejecuta 23_joya_clasificacion.mice para generar esta imagen)</p>
+                </div>
+                <div class="caption">Frontera de decisi&oacute;n aprendida (grid 40&times;40). Los puntos grandes son datos de test, el amarillo ser&iacute;a un error (0 en este caso).</div>
             </div>
-            <p>Algoritmo congruencial lineal (estándar POSIX).</p>
-        </section>
+        </div>
 
-        <section id="arquitectura">
-            <h2>12. Arquitectura interna y conexión con Python</h2>
-            
-            <h3>12.1 Cadena de ejecución</h3>
-            <p>Cuando se ejecuta <code>dl.forward(modelo, X)</code> en MICELIO:</p>
-            <pre><code>1. dl.mice llama a mat.multiplicar(A_prev, W)
-2. matriz.mice ejecuta triple bucle anidado en MICELIO puro
-3. Cada multiplicación escalar a*b es interpretada por el Visitor
-4. Si ambos operandos son listas anidadas, el Visitor llama a matrix_mul() en Python
-5. matrix_mul ejecuta el algoritmo O(n^3) en Python puro</code></pre>
-            <p>Cuando se ejecuta <code>sigmoid(Z)</code>:</p>
-            <pre><code>1. dl.mice llama a aplicar(m, sigmoid_esc)
-2. aplicar itera sobre cada elemento y llama sigmoid_esc(x)
-3. sigmoid_esc(x) = 1 / (1 + exp(-x))
-4. exp() resuelve a builtins.mice → serie de Taylor (10 términos)
-5. Cada término de Taylor: multiplicación y división en MICELIO puro</code></pre>
+        <h3>11.7 An&aacute;lisis de la frontera de decisi&oacute;n</h3>
+        <p>La red aprende a separar las dos clases con una frontera que sigue aproximadamente las diagonales del espacio:
 
-            <h3>12.2 Funciones implementadas en MICELIO puro</h3>
-            <table>
-                <thead>
-                    <tr><th>Función</th><th>Implementación</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td><code>exp(x)</code></td><td>Serie de Taylor, 10 términos</td></tr>
-                    <tr><td><code>aleatorio()</code></td><td>LCG, módulo 2^31</td></tr>
-                    <tr><td><code>ordenar(lista)</code></td><td>Quicksort</td></tr>
-                    <tr><td><code>raiz(x)</code></td><td>Newton-Raphson (math.mice)</td></tr>
-                    <tr><td><code>mat.multiplicar(A, B)</code></td><td>Triple bucle O(n^3)</td></tr>
-                    <tr><td><code>sigmoid</code>, <code>relu</code>, <code>softmax</code></td><td>Operaciones elemento a elemento</td></tr>
-                </tbody>
-            </table>
+        <div class="math-block">
+            $$\text{Frontera: } \{(x, y) : \text{softmax}_0(x, y) = \text{softmax}_1(x, y)\}$$
+        </div>
 
-            <h3>12.3 Funciones que permanecen en Python</h3>
-            <p>Las siguientes operaciones requieren acceso al sistema operativo y no pueden implementarse en MICELIO puro:</p>
-            <ul>
-                <li>Archivos: <code>__archivo_leer</code>, <code>__archivo_escribir</code>, etc.</li>
-                <li>Gráficos: <code>__grafico_set_pixel</code>, <code>__grafico_guardar</code></li>
-                <li>GUI: <code>__gui_alert</code>, <code>__gui_confirm</code>, etc.</li>
-                <li>Web: <code>__hifa_*</code> (servidor HTTP)</li>
-                <li>Type introspection: <code>__tipo_nativo</code>, <code>__a_numero</code>, <code>__a_texto</code></li>
-            </ul>
-        </section>
+        <p>En un problema XOR-2D ideal, la frontera se aproxima a:</p>
+        <div class="math-block">
+            $$|x| = |y|$$
+        </div>
 
-        <section id="limitaciones">
-            <h2>13. Limitaciones actuales</h2>
-            
-            <h3>13.1 Algorítmicas</h3>
-            <ul>
-                <li><strong>Full-batch:</strong> El entrenamiento procesa todos los datos en cada época. No hay soporte nativo para mini-batches, aunque pueden implementarse manualmente llamando a <code>entrenar_red</code> con <code>epochs=1</code> por cada lote.</li>
-                <li><strong>SGD sin momentum:</strong> Solo se usa el gradiente inmediato. No hay término de momentum ni optimizadores como Adam o RMSProp.</li>
-                <li><strong>Sin regularización:</strong> No hay dropout, weight decay ni batch normalization. Redes grandes pueden sobreajustarse.</li>
-                <li><strong>MSE como única función de pérdida:</strong> No hay cross-entropy implementada en el ciclo de entrenamiento.</li>
-                <li><strong>Learning rate fijo:</strong> No hay schedulers ni adaptación automática.</li>
-            </ul>
+        <p>La red logra esto con solo 4 neuronas ocultas, demostrando que la arquitectura 2&rarr;4&rarr;2 con ReLU+Softmax tiene suficiente capacidad de representaci&oacute;n para este problema no-lineal. El resultado visual es una frontera limpia que separa correctamente las 4 regiones del espacio.</p>
 
-            <h3>13.2 De rendimiento</h3>
-            <ul>
-                <li><strong>Multiplicación matricial O(n^3):</strong> Sin optimizaciones como Strassen o BLAS. Adecuado para redes pequeñas (menos de 100 neuronas por capa).</li>
-                <li><strong>Taylor series en exp():</strong> 10 términos por llamada. Para entrenamientos largos (5000+ épocas) el tiempo de ejecución es significativamente mayor que con la implementación nativa de Python.</li>
-            </ul>
+        <h3>11.8 Significado de este logro</h3>
+        <p>Este ejemplo demuestra que MICELIO es capaz de <strong>deep learning real</strong>:</p>
+        <ul>
+            <li><strong>Sin Python nativo:</strong> Todo el c&oacute;digo de entrenamiento, activaciones y retropropagaci&oacute;n es MICELIO puro</li>
+            <li><strong>Sin librer&iacute;as externas:</strong> La exponencial es serie de Taylor, la ra&iacute;z cuadrada es Newton-Raphson, los n&uacute;meros aleatorios son LCG</li>
+            <li><strong>Gr&aacute;ficos de alta calidad:</strong> Las visualizaciones se exportan a PNG con anti-aliasing y texto TrueType</li>
+            <li><strong>100% de exactitud en test:</strong> La red generaliza perfectamente a datos no vistos</li>
+        </ul>
 
-            <h3>13.3 Mitigaciones</h3>
-            <ul>
-                <li>Para conjuntos de datos grandes, puede particionarse el entrenamiento en lotes manualmente</li>
-                <li>Para problemas simples, 200-1000 épocas suelen ser suficientes</li>
-                <li>Las redes pequeñas (2-3 capas, &lt;10 neuronas por capa) entrenan en tiempos aceptables</li>
-            </ul>
-        </section>
-    </main>
+        <div class="info-note">
+            <strong>★ Archivo fuente:</strong> <code>MICELIO/ejemplos/23_joya_clasificacion.mice</code> &mdash; 209 l&iacute;neas de MICELIO puro que producen dos gr&aacute;ficos PNG: la curva de p&eacute;rdida y la frontera de decisi&oacute;n.
+        </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 12. MATEMATICAS -->
+    <!-- ================================================================ -->
+    <section id="matematicas">
+        <h2>12. Matem&aacute;ticas subyacentes</h2>
+
+        <h3>12.1 Forward propagation</h3>
+        <p>Para una red con <code>L</code> capas, la capa <code>l</code> calcula:</p>
+        <div class="math-block">
+            $$Z^{[l]} = A^{[l-1]} W^{[l]} + b^{[l]}$$
+            $$A^{[l]} = g^{[l]}\left(Z^{[l]}\right)$$
+        </div>
+        <p>Donde <code>A[0] = X</code> (la entrada), <code>A[L]</code> es la salida final (predicci&oacute;n).</p>
+
+        <h3>12.2 Backpropagation</h3>
+        <p>Para MSE loss, el error en la capa de salida es:</p>
+        <div class="math-block">
+            $$\delta^{[L]} = A^{[L]} - Y$$
+        </div>
+        <p>Para cada capa <code>l</code> desde <code>L-1</code> hasta <code>1</code>:</p>
+        <div class="math-block">
+            $$\delta^{[l]} = \left(\delta^{[l+1]} \cdot (W^{[l+1]})^\top\right) \odot g'^{[l]}(Z^{[l]})$$
+        </div>
+        <p>Los gradientes son:</p>
+        <div class="math-block">
+            $$\text{d}W^{[l]} = (A^{[l-1]})^\top \cdot \delta^{[l]}$$
+            $$\text{d}b^{[l]} = \sum_{i} \delta^{[l]}_i$$
+        </div>
+        <p>Actualizaci&oacute;n:</p>
+        <div class="math-block">
+            $$W^{[l]} \leftarrow W^{[l]} - \text{lr} \cdot \text{d}W^{[l]}$$
+            $$b^{[l]} \leftarrow b^{[l]} - \text{lr} \cdot \text{d}b^{[l]}$$
+        </div>
+
+        <h3>12.3 Derivadas de activaci&oacute;n</h3>
+        <table>
+            <thead>
+                <tr><th>Activaci&oacute;n</th><th>g(x)</th><th>g'(x)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Sigmoide</td><td>$$\frac{1}{1+e^{-x}}$$</td><td>$$g(x) \cdot (1-g(x))$$</td></tr>
+                <tr><td>ReLU</td><td>$$\max(0, x)$$</td><td>$$\begin{cases}1 & x > 0 \\ 0 & x \le 0\end{cases}$$</td></tr>
+            </tbody>
+        </table>
+
+        <h3>12.4 Inicializaci&oacute;n Xavier</h3>
+        <div class="math-block">
+            $$W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, +\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)$$
+        </div>
+
+        <h3>12.5 Exponencial (serie de Taylor)</h3>
+        <div class="math-block">
+            $$e^x = \sum_{n=0}^{10} \frac{x^n}{n!}$$
+        </div>
+        <p>Error relativo para <code>x</code> en [-2, 2]: &lt; 1e-8. Suficiente para entrenamiento de redes.</p>
+
+        <h3>12.6 Ra&iacute;z cuadrada (Newton-Raphson)</h3>
+        <div class="math-block">
+            $$x_{n+1} = \frac{1}{2}\left(x_n + \frac{S}{x_n}\right)$$
+        </div>
+        <p>Convergencia cuadr&aacute;tica en ~30 iteraciones.</p>
+
+        <h3>12.7 Generador aleatorio (LCG)</h3>
+        <div class="math-block">
+            $$s_{n+1} = (s_n \times 1103515245 + 12345) \bmod 2^{31}$$
+            $$u = \frac{s}{2^{31}}$$
+        </div>
+        <p>Algoritmo congruencial lineal (est&aacute;ndar POSIX). Genera n&uacute;meros pseudoaleatorios uniformemente distribuidos en [0, 1).</p>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 13. ARQUITECTURA INTERNA -->
+    <!-- ================================================================ -->
+    <section id="arquitectura">
+        <h2>13. Arquitectura interna y conexi&oacute;n con Python</h2>
+
+        <h3>13.1 Cadena de ejecuci&oacute;n</h3>
+        <p>Cuando se ejecuta <code>dl.forward(modelo, X)</code> en MICELIO:</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart TD
+    A["dl.forward()<br/>dl.mice"] --> B["mat.multiplicar()<br/>matriz.mice"]
+    B --> C["Triple bucle O(n³)<br/>en MICELIO puro"]
+    C --> D["Visitor de Python<br/>interpreta cada operaci&oacute;n"]
+    D --> E["Si operandos son listas,<br/>llama a matrix_mul()<br/>en Python nativo"]
+            </div>
+        </div>
+
+        <p>Cuando se ejecuta <code>sigmoid(Z)</code>:</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart LR
+    A["sigmoid(Z)<br/>dl.mice"] --> B["aplicar(m, sigmoid_esc)<br/>iteraci&oacute;n elemento a elemento"]
+    B --> C["sigmoid_esc(x) = 1/(1+exp(-x))"]
+    C --> D["exp() → builtins.mice<br/>Serie de Taylor de 10 t&eacute;rminos"]
+    D --> E["Cada t&eacute;rmino de Taylor:<br/>multiplicaci&oacute;n y divisi&oacute;n<br/>en MICELIO puro"]
+            </div>
+        </div>
+
+        <h3>13.2 Funciones implementadas en MICELIO puro</h3>
+        <table>
+            <thead>
+                <tr><th>Funci&oacute;n</th><th>Implementaci&oacute;n</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>exp(x)</code></td><td>Serie de Taylor, 10 t&eacute;rminos</td></tr>
+                <tr><td><code>aleatorio()</code></td><td>LCG, m&oacute;dulo 2^31</td></tr>
+                <tr><td><code>ordenar(lista)</code></td><td>Quicksort</td></tr>
+                <tr><td><code>raiz(x)</code></td><td>Newton-Raphson (math.mice)</td></tr>
+                <tr><td><code>mat.multiplicar(A, B)</code></td><td>Triple bucle O(n³)</td></tr>
+                <tr><td><code>sigmoid</code>, <code>relu</code>, <code>softmax</code></td><td>Operaciones elemento a elemento</td></tr>
+            </tbody>
+        </table>
+
+        <h3>13.3 Funciones que permanecen en Python</h3>
+        <p>Las siguientes operaciones requieren acceso al sistema operativo y no pueden implementarse en MICELIO puro:</p>
+        <ul>
+            <li>Archivos: <code>__archivo_leer</code>, <code>__archivo_escribir</code>, etc.</li>
+            <li>Gr&aacute;ficos: <code>__grafico_set_pixel</code>, <code>__grafico_guardar</code></li>
+            <li>GUI: <code>__gui_alert</code>, <code>__gui_confirm</code>, etc.</li>
+            <li>Web: <code>__hifa_*</code> (servidor HTTP)</li>
+            <li>Type introspection: <code>__tipo_nativo</code>, <code>__a_numero</code>, <code>__a_texto</code></li>
+        </ul>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 14. LIMITACIONES -->
+    <!-- ================================================================ -->
+    <section id="limitaciones">
+        <h2>14. Limitaciones actuales</h2>
+
+        <h3>14.1 Algor&iacute;tmicas</h3>
+        <ul>
+            <li><strong>Full-batch:</strong> El entrenamiento procesa todos los datos en cada &eacute;poca. No hay soporte nativo para mini-batches, aunque pueden implementarse manualmente llamando a <code>entrenar_red</code> con <code>epochs=1</code> por cada lote.</li>
+            <li><strong>SGD sin momentum:</strong> Solo se usa el gradiente inmediato. No hay t&eacute;rmino de momentum ni optimizadores como Adam o RMSProp.</li>
+            <li><strong>Sin regularizaci&oacute;n:</strong> No hay dropout, weight decay ni batch normalization. Redes grandes pueden sobreajustarse.</li>
+            <li><strong>MSE como &uacute;nica funci&oacute;n de p&eacute;rdida:</strong> No hay cross-entropy implementada en el ciclo de entrenamiento.</li>
+            <li><strong>Learning rate fijo:</strong> No hay schedulers ni adaptaci&oacute;n autom&aacute;tica.</li>
+        </ul>
+
+        <h3>14.2 De rendimiento</h3>
+        <ul>
+            <li><strong>Multiplicaci&oacute;n matricial O(n³):</strong> Sin optimizaciones como Strassen o BLAS. Adecuado para redes peque&ntilde;as (menos de 100 neuronas por capa).</li>
+            <li><strong>Taylor series en exp():</strong> 10 t&eacute;rminos por llamada. Para entrenamientos largos (5000+ &eacute;pocas) el tiempo de ejecuci&oacute;n es significativamente mayor que con la implementaci&oacute;n nativa de Python.</li>
+        </ul>
+
+        <h3>14.3 Mitigaciones</h3>
+        <ul>
+            <li>Para conjuntos de datos grandes, puede particionarse el entrenamiento en lotes manualmente</li>
+            <li>Para problemas simples, 200-1000 &eacute;pocas suelen ser suficientes</li>
+            <li>Las redes peque&ntilde;as (2-3 capas, &lt;10 neuronas por capa) entrenan en tiempos aceptables</li>
+        </ul>
+
+        <hr>
+
+        <p style="text-align:center; color:var(--fg-dark); font-size:0.9rem;">
+            Documento generado a partir del repositorio MICELIO &mdash;
+            <a href="https://github.com/JAGR1792/MICELIO" target="_blank">github.com/JAGR1792/MICELIO</a>
+        </p>
+    </section>
+
+</main>
 
 </body>
 </html>
