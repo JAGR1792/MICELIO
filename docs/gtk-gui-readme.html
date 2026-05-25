@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>gtk-gui-readme — MICELIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg-page:#f8f1eb;--bg-main:#fffcf8;--bg-surface:#f4ece4;--fg-main:#2c1810;--fg-muted:#7a6658;--accent-terracotta:#c76b4a;--accent-amber:#d4922a;--code-bg:#2c1810;--code-fg:#e8d5c0;--border-light:rgba(199,107,74,0.12);--border-medium:rgba(199,107,74,0.2);--radius:12px;--radius-sm:8px;--font-display:'Playfair Display',serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace}
+[data-theme="dark"]{--bg-page:#1a120e;--bg-main:#241a14;--bg-surface:#2c2018;--fg-main:#e8ddd0;--fg-muted:#b8a89a;--accent-terracotta:#d4835a;--accent-amber:#d4a030;--code-bg:#0d0806;--code-fg:#e8ddd0;--border-light:rgba(212,131,90,0.15);--border-medium:rgba(212,131,90,0.25)}
+*{box-sizing:border-box}
+body{background:var(--bg-page);color:var(--fg-main);font-family:var(--font-body);font-weight:400;line-height:1.7;margin:0;padding:2rem 2rem 4rem;max-width:900px;margin:0 auto}
+h1{font-family:var(--font-display);font-size:2.8rem;font-weight:900;margin:2rem 0 0.3rem;color:var(--accent-terracotta)}
+h2{font-family:var(--font-display);color:var(--fg-main);font-size:1.8rem;font-weight:700;margin-top:3rem;border-bottom:2px solid var(--border-light);padding-bottom:0.5rem}
+h3{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-top:2rem;color:var(--accent-amber)}
+h4{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-top:1.5rem;color:var(--accent-terracotta)}
+a{color:var(--accent-terracotta)}
+code{font-family:var(--font-mono);background:rgba(199,107,74,0.08);color:var(--accent-terracotta);padding:0.15rem 0.5rem;border-radius:5px;font-size:0.85em}
+pre{background:var(--code-bg);color:var(--code-fg);padding:1.5rem;border-radius:var(--radius);overflow-x:auto;font-family:var(--font-mono);font-size:0.9em}
+pre code{background:transparent;color:inherit;padding:0}
+p{margin:0 0 1.2rem}
+strong{color:var(--fg-main)}
+.back{display:inline-block;margin-bottom:2rem;color:var(--fg-muted);text-decoration:none;font-size:0.9rem}
+.back:hover{color:var(--accent-terracotta)}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">&larr; Volver a Deep Learning</a>
+<h1 id="gtk-en-micelio-gui-embebida">GTK En Micelio (GUI Embebida)</h1>
+<h2 id="que-es-gtk">Que es GTK</h2>
+<p>GTK (GIMP Toolkit) es una libreria de interfaz grafica para
+aplicaciones de escritorio. En Linux es una opcion muy comun para
+construir ventanas, botones, dialogos, barras y widgets.</p>
+<p>En Micelio se usa via PyGObject (<code>gi.repository</code>) como
+backend de la capa GUI del runtime.</p>
+<h2 id="por-que-usamos-gtk-aqui">Por que usamos GTK aqui</h2>
+<ul>
+<li><code>tkinter</code> no siempre esta instalado en todos los entornos
+Python.</li>
+<li>Se necesita una ventana tipo app para el graficador, no solo abrir
+archivos sueltos.</li>
+<li>GTK permite embebido real de imagen y controles en la misma
+ventana.</li>
+</ul>
+<h2 id="mini-framework-gui-en-micelio">Mini framework GUI en
+Micelio</h2>
+<p>Ademas de <code>plot</code>, el modulo
+<code>modulos_std/gui.mice</code> ahora funciona como una capa reusable,
+tipo mini toolkit, construida por nosotros en Micelio y montada sobre
+primitivas del runtime.</p>
+<p>Componentes base disponibles:</p>
+<ul>
+<li><code>accion(id, etiqueta, descripcion)</code></li>
+<li><code>crear_menu(titulo, descripcion)</code></li>
+<li><code>menu_agregar(menu, item)</code></li>
+<li><code>menu_seleccionar(menu, valor_defecto)</code></li>
+<li><code>pedir_numero(prompt, valor_defecto)</code></li>
+</ul>
+<p>Con esto puedes crear interfaces por dialogos para cualquier modulo
+(<code>math</code>, <code>matriz</code>, <code>ml</code>, etc.),
+manteniendo el frontend desacoplado de la logica de negocio.</p>
+<h2 id="arquitectura-micelio-runtime">Arquitectura (Micelio +
+runtime)</h2>
+<p>La API publica la consume el usuario desde modulos
+<code>.mice</code>:</p>
+<ul>
+<li><code>modulos_std/grafico.mice</code></li>
+<li><code>modulos_std/gui.mice</code></li>
+</ul>
+<p>El runtime en Python expone primitivas internas
+(<code>__gui_*</code>, <code>__grafico_*</code>) y ejecuta la parte
+nativa de ventana.</p>
+<p>Flujo simplificado:</p>
+<ol type="1">
+<li>El programa Micelio llama <code>plot.mostrar()</code>.</li>
+<li><code>grafico.mice</code> delega a
+<code>__grafico_mostrar(...)</code>.</li>
+<li>El runtime abre una ventana GTK embebida con la imagen del
+grafico.</li>
+<li>El usuario puede hacer zoom, ajustar, guardar y cerrar desde esa
+misma ventana.</li>
+</ol>
+<h2 id="funcionamiento-de-la-ventana-gtk-del-graficador">Funcionamiento
+de la ventana GTK del graficador</h2>
+<p>Implementado en:</p>
+<ul>
+<li><code>MICELIO/runtime.py</code> (funcion
+<code>_gtk_show_image_window</code>)</li>
+</ul>
+<p>Controles incluidos:</p>
+<ul>
+<li><code>+</code>: zoom in</li>
+<li><code>-</code>: zoom out</li>
+<li><code>Ajustar</code>: encaja la imagen al viewport</li>
+<li><code>1:1</code>: escala real</li>
+<li><code>Guardar como...</code>: exporta en ruta elegida por el
+usuario</li>
+<li><code>Cerrar</code></li>
+</ul>
+<p>Barra de estado:</p>
+<ul>
+<li>Resolucion de la imagen</li>
+<li>Porcentaje de zoom</li>
+<li>Eventos simples como guardado</li>
+</ul>
+<h2 id="exportacion-de-imagen">Exportacion de imagen</h2>
+<p>Formato base:</p>
+<ul>
+<li>PPM (<code>P3</code>) generado desde cero por el modulo
+grafico.</li>
+</ul>
+<p>Exportacion PNG:</p>
+<ul>
+<li>Si el usuario guarda como <code>.png</code>, se usa ImageMagick
+(<code>convert</code> o <code>magick</code>) cuando esta
+disponible.</li>
+</ul>
+<h2 id="dependencias-reales">Dependencias reales</h2>
+<p>Minimas para GUI embebida:</p>
+<ul>
+<li>Python con <code>gi</code> (PyGObject)</li>
+<li>GTK 3 (<code>Gtk</code>, <code>GdkPixbuf</code>)</li>
+</ul>
+<p>Opcionales:</p>
+<ul>
+<li><code>zenity</code> (dialogs fallback)</li>
+<li><code>xdg-open</code> (fallback de apertura)</li>
+<li><code>convert</code>/<code>magick</code> (PNG)</li>
+</ul>
+<h2 id="codigo-de-referencia-lineas-clave">Codigo de referencia (lineas
+clave)</h2>
+<ul>
+<li><code>MICELIO/runtime.py</code>:
+<code>_gtk_show_image_window</code></li>
+<li><code>MICELIO/runtime.py</code>: <code>_plot_mostrar</code></li>
+<li><code>MICELIO/runtime.py</code>: <code>_gui_alert</code>,
+<code>_gui_confirm</code>, <code>_gui_input</code>,
+<code>_gui_open_file</code>, <code>_gui_save_file</code>,
+<code>_gui_show_image</code></li>
+<li><code>MICELIO/modulos_std/grafico.mice</code>: API de graficado y
+llamadas a runtime</li>
+<li><code>MICELIO/modulos_std/gui.mice</code>: API GUI de alto
+nivel</li>
+</ul>
+<h2 id="ejemplo-rapido">Ejemplo rapido</h2>
+<pre class="micelio"><code>importar &quot;gui.mice&quot; como gui
+importar &quot;grafico.mice&quot; como plot
+
+plot.estilo(&quot;ocean&quot;)
+plot.titulo(&quot;Demo GTK&quot;)
+plot.etiquetas(&quot;x&quot;, &quot;y&quot;)
+plot.lineas([1,2,3,4], [1,4,9,16])
+
+# Abre ventana embebida con controles y guardado
+plot.mostrar()</code></pre>
+<h2 id="ejemplo-gui-para-modulo-math">Ejemplo GUI para modulo math</h2>
+<pre class="micelio"><code>importar &quot;gui.mice&quot; como gui
+importar &quot;math.mice&quot; como mth
+
+# Abre explorador de operaciones matematicas en GUI
+gui.math(mth)</code></pre>
+<p>El explorador incluye operaciones unarias (seno, coseno, log, raiz,
+etc.), potencia y constantes. La UI pide argumentos y el backend del
+modulo <code>math</code> ejecuta el calculo.</p>
+<h2 id="notas-de-compatibilidad">Notas de compatibilidad</h2>
+<ul>
+<li>Si GTK no esta disponible, el runtime usa fallback
+(<code>zenity</code>, luego visor del sistema).</li>
+<li>La API del lenguaje no cambia: siempre llamas funciones Micelio
+desde los modulos.</li>
+</ul>
+<script>
+(function(){var t=localStorage.getItem('tema');if(t==='dark'||(t===null&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})()
+</script>
+</body>
+</html>

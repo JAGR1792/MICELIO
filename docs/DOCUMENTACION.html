@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DOCUMENTACION — MICELIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg-page:#f8f1eb;--bg-main:#fffcf8;--bg-surface:#f4ece4;--fg-main:#2c1810;--fg-muted:#7a6658;--accent-terracotta:#c76b4a;--accent-amber:#d4922a;--code-bg:#2c1810;--code-fg:#e8d5c0;--border-light:rgba(199,107,74,0.12);--border-medium:rgba(199,107,74,0.2);--radius:12px;--radius-sm:8px;--font-display:'Playfair Display',serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace}
+[data-theme="dark"]{--bg-page:#1a120e;--bg-main:#241a14;--bg-surface:#2c2018;--fg-main:#e8ddd0;--fg-muted:#b8a89a;--accent-terracotta:#d4835a;--accent-amber:#d4a030;--code-bg:#0d0806;--code-fg:#e8ddd0;--border-light:rgba(212,131,90,0.15);--border-medium:rgba(212,131,90,0.25)}
+*{box-sizing:border-box}
+body{background:var(--bg-page);color:var(--fg-main);font-family:var(--font-body);font-weight:400;line-height:1.7;margin:0;padding:2rem 2rem 4rem;max-width:900px;margin:0 auto}
+h1{font-family:var(--font-display);font-size:2.8rem;font-weight:900;margin:2rem 0 0.3rem;color:var(--accent-terracotta)}
+h2{font-family:var(--font-display);color:var(--fg-main);font-size:1.8rem;font-weight:700;margin-top:3rem;border-bottom:2px solid var(--border-light);padding-bottom:0.5rem}
+h3{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-top:2rem;color:var(--accent-amber)}
+h4{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-top:1.5rem;color:var(--accent-terracotta)}
+a{color:var(--accent-terracotta)}
+code{font-family:var(--font-mono);background:rgba(199,107,74,0.08);color:var(--accent-terracotta);padding:0.15rem 0.5rem;border-radius:5px;font-size:0.85em}
+pre{background:var(--code-bg);color:var(--code-fg);padding:1.5rem;border-radius:var(--radius);overflow-x:auto;font-family:var(--font-mono);font-size:0.9em}
+pre code{background:transparent;color:inherit;padding:0}
+p{margin:0 0 1.2rem}
+strong{color:var(--fg-main)}
+.back{display:inline-block;margin-bottom:2rem;color:var(--fg-muted);text-decoration:none;font-size:0.9rem}
+.back:hover{color:var(--accent-terracotta)}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">&larr; Volver a Deep Learning</a>
+<h1 id="documentación-completa-de-micelio">Documentación Completa de
+MICELIO</h1>
+<p><strong>MICELIO</strong> es un lenguaje de programación interpretado
+en español, con paradigma funcional, diseñado para enseñar fundamentos
+de programación y evolucionar hacia ciencia de datos, machine learning y
+deep learning. Construido desde cero usando ANTLR4 y Python (patrón
+Visitor), sin librerías externas de ML/DL.</p>
+<h2 id="filosofía">Filosofía</h2>
+<h3 id="cero-dependencias-externas-de-mldl">Cero dependencias externas
+de ML/DL</h3>
+<p>Todo algoritmo de machine learning y deep learning está escrito en
+MICELIO puro (<code>ml.mice</code>, <code>dl.mice</code>). Las únicas
+dependencias Python son para el intérprete mismo (ANTLR runtime) y para
+funcionalidades accesorias (PIL para gráficos, GTK para GUI).</p>
+<h3 id="reemplazo-de-funciones-nativas-de-python">Reemplazo de funciones
+nativas de Python</h3>
+<p>Todas las operaciones matemáticas que originalmente delegaban a
+Python han sido reescritas como implementaciones MICELIO puras:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función Nativa Python</th>
+<th>Reemplazo MICELIO</th>
+<th>Técnica</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>math.exp</code></td>
+<td><code>exp(x)</code> en <code>builtins.mice</code></td>
+<td>Serie de Taylor (6 términos, desenrollado, potencias
+incrementales)</td>
+</tr>
+<tr>
+<td><code>random.random</code></td>
+<td><code>aleatorio()</code> en <code>builtins.mice</code></td>
+<td>LCG (Linear Congruential Generator)</td>
+</tr>
+<tr>
+<td><code>sorted()</code></td>
+<td><code>ordenar()</code> en <code>builtins.mice</code></td>
+<td>Quicksort (in-place, partición Lomuto)</td>
+</tr>
+</tbody>
+</table>
+<p>Esto garantiza que MICELIO sea autocontenido: el intérprete puede
+ejecutarse con una sola dependencia Python
+(<code>antlr4-python3-runtime</code>) y todo el resto está en MICELIO
+puro.</p>
+<h3 id="optimizaciones-del-intérprete">Optimizaciones del
+intérprete</h3>
+<p>El evaluador (<code>eval_visitor.py</code>) ha sido optimizado para
+rendimiento sin alterar la semántica del lenguaje:</p>
+<ul>
+<li><strong>Tabla de despacho</strong>: reemplaza <code>hasattr()</code>
+por nodo del AST con un <code>dict[type → method]</code> — O(1) por nodo
+visitado</li>
+<li><strong>Búsqueda rápida de variables</strong>:
+<code>visitIdExpr</code> verifica el scope local (<code>self.env</code>)
+primero, cubriendo ~90% de los accesos</li>
+<li><strong>Asignación rápida</strong>: mismo principio, verifica scope
+local antes de recorrer la cadena de entornos</li>
+<li><strong>Operadores nativos en matrices</strong>:
+<code>suma_matrices</code>, <code>resta_matrices</code>,
+<code>multiplicar</code> usan los operadores <code>+</code>,
+<code>-</code>, <code>*</code> de Python (son sintaxis MICELIO, su
+implementación es un detalle interno)</li>
+</ul>
+<h3 id="control-de-versiones">Control de versiones</h3>
+<p>El proyecto se publica en GitHub con releases numeradas
+(<code>0.1.0</code>, <code>0.2.0</code>, <code>0.3.0</code>). Cada
+entrega incluye: 1. El intérprete MICELIO completo 2. La biblioteca
+estándar en MICELIO puro 3. La extensión VS Code empaquetada como
+<code>.vsix</code> 4. Ejemplos ejecutables de cada módulo</p>
+<hr />
+<h2 id="índice">Índice</h2>
+<ol type="1">
+<li><a href="#1-instalación">Instalación</a></li>
+<li><a href="#2-uso-básico">Uso básico</a></li>
+<li><a href="#3-sintaxis-del-lenguaje">Sintaxis del lenguaje</a></li>
+<li><a href="#4-tipos-de-datos">Tipos de datos</a></li>
+<li><a href="#5-biblioteca-estándar">Biblioteca estándar</a></li>
+<li><a href="#6-ejemplos-por-módulo">Ejemplos por módulo</a></li>
+<li><a href="#7-arquitectura">Arquitectura</a></li>
+<li><a href="#8-extensiones-y-herramientas">Extensiones y
+herramientas</a></li>
+<li><a href="#9-desarrollo">Desarrollo</a></li>
+</ol>
+<hr />
+<h2 id="instalación">1. Instalación</h2>
+<h3 id="requisitos">Requisitos</h3>
+<ul>
+<li>Python 3.10+</li>
+<li><code>antlr4-python3-runtime</code> (única dependencia
+obligatoria)</li>
+</ul>
+<h3 id="instalación-rápida">Instalación rápida</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="op">&lt;</span>repo-url<span class="op">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> MICELIO</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Linux/macOS</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> instalación/setup.sh</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Windows</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">instalación/setup.bat</span></span></code></pre></div>
+<h3 id="instalación-manual">Instalación manual</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> MICELIO</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install antlr4-python3-runtime</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> main.py          <span class="co"># REPL</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> main.py archivo.mice  <span class="co"># ejecutar archivo</span></span></code></pre></div>
+<h3
+id="dependencias-opcionales-se-usan-si-están-instaladas">Dependencias
+opcionales (se usan si están instaladas)</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 68%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dependencia</th>
+<th>Función</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pillow (PIL)</td>
+<td>Backend gráfico nativo (PNG, líneas, texto TrueType)</td>
+</tr>
+<tr>
+<td>PyGObject (GTK)</td>
+<td>Ventanas GUI nativas</td>
+</tr>
+<tr>
+<td>Flask</td>
+<td>Servidor web demo (Hifa)</td>
+</tr>
+<tr>
+<td>ImageMagick</td>
+<td>Fallback de conversión de imagen</td>
+</tr>
+<tr>
+<td>zenity</td>
+<td>Diálogos GUI en Linux</td>
+</tr>
+<tr>
+<td>notify-send</td>
+<td>Notificaciones de sistema</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="uso-básico">2. Uso básico</h2>
+<h3 id="ejecutar-un-archivo-.mice">Ejecutar un archivo
+<code>.mice</code></h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> main.py ejemplos/01_basico.mice</span></code></pre></div>
+<h3 id="repl-interactivo">REPL interactivo</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> main.py</span></code></pre></div>
+<h3 id="usando-el-wrapper">Usando el wrapper</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./micelio</span> archivo.mice</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./micelio</span>  <span class="co"># REPL</span></span></code></pre></div>
+<hr />
+<h2 id="sintaxis-del-lenguaje">3. Sintaxis del lenguaje</h2>
+<h3 id="variables-y-constantes">Variables y constantes</h3>
+<pre class="mice"><code>var x = 10
+const PI = 3.1416
+var nombre = &quot;Micelio&quot;
+var lista = [1, 2, 3]
+var dicc = {&quot;clave&quot;: &quot;valor&quot;}</code></pre>
+<h3 id="operaciones-aritméticas">Operaciones aritméticas</h3>
+<pre class="mice"><code>var suma = 5 + 3
+var resta = 10 - 4
+var mult = 6 * 7
+var div = 20 / 4
+var modulo = 10 % 3
+var potencia = 2 ^ 10</code></pre>
+<h3 id="control-de-flujo">Control de flujo</h3>
+<pre class="mice"><code># if / else
+si (x &gt; 0) {
+    imp &quot;positivo&quot;
+} sino {
+    imp &quot;negativo&quot;
+}
+
+# while
+var i = 0
+mientras (i &lt; 5) {
+    imp i
+    i = i + 1
+}
+
+# for (sobre lista)
+para elemento en [1, 2, 3] {
+    imp elemento
+}
+
+# for (rango numérico)
+para i = 1 hasta 5 {
+    imp i                         # 1, 2, 3, 4, 5
+}
+para i = 0 hasta 10 inc 2 {
+    imp i                         # 0, 2, 4, 6, 8, 10
+}
+para i = 5 hasta 1 inc -1 {
+    imp i                         # 5, 4, 3, 2, 1
+}
+
+# switch (sin break automático — efecto fall-through)
+segun (x) {
+    caso 1:
+        imp &quot;uno&quot;
+        romper                    # sale del segun
+    caso 2:
+        imp &quot;dos&quot;
+    caso 3:
+        imp &quot;tres&quot;
+    defecto:
+        imp &quot;otro&quot;
+}
+
+# romper / continuar en bucles
+para i = 1 hasta 10 {
+    si (i == 5) { romper }
+    si (i % 2 == 0) { continuar }
+    imp i                         # 1, 3
+}</code></pre>
+<h3 id="funciones">Funciones</h3>
+<pre class="mice"><code>funcion suma(a, b) {
+    regresa a + b
+}
+
+# Función anónima
+var cuad = funcion (x) { regresa x * x }
+
+# Args variables
+funcion sumar_todos(*args) {
+    var total = 0
+    para n en args {
+        total = total + n
+    }
+    regresa total
+}</code></pre>
+<h3 id="programación-funcional">Programación funcional</h3>
+<pre class="mice"><code># map, filter, reduce
+var datos = [1, 2, 3, 4, 5]
+
+var duplicados = map(funcion (x) { regresa x * 2 }, datos)
+var pares = filter(funcion (x) { regresa x % 2 == 0 }, datos)
+var suma = reduce(funcion (acc, x) { regresa acc + x }, datos, 0)</code></pre>
+<h3 id="recursión">Recursión</h3>
+<pre class="mice"><code>funcion factorial(n) {
+    si (n &lt;= 1) { regresa 1 }
+    sino { regresa n * factorial(n - 1) }
+}
+imp factorial(5)                              # 120</code></pre>
+<h3 id="parámetros-variables-args-y-kwargs">Parámetros variables (*args
+y **kwargs)</h3>
+<pre class="mice"><code># *args: lista de argumentos posicionales variables
+funcion sumar_todos(*numeros) {
+    var total = 0
+    para n en numeros { total = total + n }
+    regresa total
+}
+imp sumar_todos(1, 2, 3, 4)                   # 10
+
+# **kwargs: diccionario de argumentos con nombre
+funcion mostrar_opciones(**opciones) {
+    para clave en opciones.claves() {
+        imp clave + &quot;: &quot; + aTexto(opciones[clave])
+    }
+}
+mostrar_opciones(color=&quot;rojo&quot;, tamano=10)     # color: rojo / tamano: 10
+
+# Combinación
+funcion ejemplo(normal, *args, **kwargs) {
+    imp &quot;normal: &quot; + aTexto(normal)
+    imp &quot;args: &quot; + aTexto(args)
+    imp &quot;kwargs: &quot; + aTexto(kwargs)
+}
+ejemplo(5, 1, 2, 3, x=10, y=20)
+# normal: 5, args: [1,2,3], kwargs: {&quot;x&quot;:10,&quot;y&quot;:20}</code></pre>
+<h3 id="entradasalida">Entrada/Salida</h3>
+<pre class="mice"><code>imp &quot;Hola mundo&quot;
+imp 42
+imp [1, 2, 3]
+
+leer variable
+leer a, b, c  # múltiple en una línea</code></pre>
+<h3 id="importar-módulos">Importar módulos</h3>
+<pre class="mice"><code>importar &quot;math.mice&quot; como math
+imp math.seno(math.PI / 2)</code></pre>
+<h3 id="desempaquetado">Desempaquetado</h3>
+<pre class="mice"><code>var a, b = [10, 20]
+var x, y
+leer x, y
+a, b = [x, y]</code></pre>
+<h3 id="operadores-de-incrementodecremento">Operadores de
+incremento/decremento</h3>
+<pre class="mice"><code>x++   # x = x + 1
+x--   # x = x - 1
+x += 5
+x -= 3</code></pre>
+<h3 id="asignación-múltiple-con-lectura">Asignación múltiple con
+lectura</h3>
+<pre class="mice"><code>leer a, b
+# preprocesado a: __leer_multi(&quot;a,b&quot;)</code></pre>
+<hr />
+<h2 id="tipos-de-datos">4. Tipos de datos</h2>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 40%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tipo</th>
+<th>Ejemplo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Numero</td>
+<td><code>42</code>, <code>3.14</code>, <code>-7</code></td>
+<td>Enteros y flotantes</td>
+</tr>
+<tr>
+<td>Texto</td>
+<td><code>"hola"</code>, <code>'mundo'</code></td>
+<td>Cadenas de caracteres</td>
+</tr>
+<tr>
+<td>Booleano</td>
+<td><code>verdadero</code>, <code>falso</code></td>
+<td>Valores lógicos</td>
+</tr>
+<tr>
+<td>Lista</td>
+<td><code>[1, 2, 3]</code></td>
+<td>Colección ordenada mutable</td>
+</tr>
+<tr>
+<td>Set</td>
+<td><code>#{1, 2, 3}</code></td>
+<td>Conjunto sin duplicados</td>
+</tr>
+<tr>
+<td>Dict</td>
+<td><code>{"a": 1, "b": 2}</code></td>
+<td>Mapa clave-valor</td>
+</tr>
+<tr>
+<td>Nulo</td>
+<td><code>nulo</code></td>
+<td>Ausencia de valor</td>
+</tr>
+<tr>
+<td>Funcion</td>
+<td><code>funcion (x) { regresa x }</code></td>
+<td>Función de primera clase</td>
+</tr>
+</tbody>
+</table>
+<h3 id="conversiones-entre-tipos">Conversiones entre tipos</h3>
+<p>MICELIO <strong>no</strong> realiza conversiones automáticas
+implícitas (tipado fuerte). No se puede sumar un número con un texto; se
+debe convertir explícitamente.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+<th>Ejemplo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>aNumero(valor)</code></td>
+<td>Convierte a número (detecta prefijos 0b, 0o, 0x)</td>
+<td><code>aNumero("FF", 16)</code> → 255</td>
+</tr>
+<tr>
+<td><code>aEntero(valor)</code></td>
+<td>Trunca a entero</td>
+<td><code>aEntero(3.14)</code> → 3</td>
+</tr>
+<tr>
+<td><code>aFlotante(valor)</code></td>
+<td>Convierte a flotante</td>
+<td><code>aFlotante(3)</code> → 3.0</td>
+</tr>
+<tr>
+<td><code>aTexto(valor)</code></td>
+<td>Convierte cualquier valor a texto</td>
+<td><code>aTexto(42)</code> → “42”</td>
+</tr>
+<tr>
+<td><code>aBooleano(valor)</code></td>
+<td>0→falso, vacío→falso, nulo→falso</td>
+<td><code>aBooleano(5)</code> → verdadero</td>
+</tr>
+<tr>
+<td><code>aCaracter(codigo)</code></td>
+<td>Código numérico a carácter</td>
+<td><code>aCaracter(65)</code> → “A”</td>
+</tr>
+<tr>
+<td><code>aCodigo(caracter)</code></td>
+<td>Carácter a código numérico</td>
+<td><code>aCodigo("A")</code> → 65</td>
+</tr>
+<tr>
+<td><code>aBinario(n)</code></td>
+<td>A binario (base 2)</td>
+<td><code>aBinario(10)</code> → “1010”</td>
+</tr>
+<tr>
+<td><code>aOctal(n)</code></td>
+<td>A octal (base 8)</td>
+<td><code>aOctal(64)</code> → “100”</td>
+</tr>
+<tr>
+<td><code>aHexadecimal(n)</code></td>
+<td>A hexadecimal</td>
+<td><code>aHexadecimal(255)</code> → “ff”</td>
+</tr>
+<tr>
+<td><code>aBase(n, base)</code></td>
+<td>A cualquier base 2-36</td>
+<td><code>aBase(100, 5)</code> → “400”</td>
+</tr>
+<tr>
+<td><code>desdeBinario(t)</code></td>
+<td>Desde binario</td>
+<td><code>desdeBinario("1010")</code> → 10</td>
+</tr>
+<tr>
+<td><code>desdeOctal(t)</code></td>
+<td>Desde octal</td>
+<td><code>desdeOctal("12")</code> → 10</td>
+</tr>
+<tr>
+<td><code>desdeHexadecimal(t)</code></td>
+<td>Desde hexadecimal</td>
+<td><code>desdeHexadecimal("A")</code> → 10</td>
+</tr>
+<tr>
+<td><code>desdeBase(t, base)</code></td>
+<td>Desde cualquier base</td>
+<td><code>desdeBase("400", 5)</code> → 100</td>
+</tr>
+<tr>
+<td><code>aBaseComplemento(n, base, bits)</code></td>
+<td>Complemento a dos</td>
+<td><code>aBaseComplemento(-1, 2, 8)</code> → “11111111”</td>
+</tr>
+<tr>
+<td><code>aBaseFraccion(n, base, precision)</code></td>
+<td>Fracción en otra base</td>
+<td><code>aBaseFraccion(0.5, 2)</code> → “0.1”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="métodos-incorporados">Métodos incorporados</h3>
+<p>Todas las colecciones tienen métodos nativos:</p>
+<pre class="mice"><code># Listas
+[1, 2, 3].longitud()     # 3
+[1, 2, 3].agregar(4)     # [1, 2, 3, 4]
+[3, 1, 2].ordenar()      # [1, 2, 3]
+
+# Texto
+&quot;hola&quot;.longitud()         # 4
+&quot;a,b,c&quot;.separar(&quot;,&quot;)      # [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+
+# Dict
+{&quot;a&quot;: 1}.claves()         # [&quot;a&quot;]
+{&quot;a&quot;: 1}.valores()        # [1]
+{&quot;a&quot;: 1}.items()          # [[&quot;a&quot;, 1]]
+
+# Set
+#{1, 2, 3}.longitud()     # 3</code></pre>
+<h3 id="tipos-en-detalle">Tipos en detalle</h3>
+<p><strong>Número</strong>: Representa enteros y flotantes como float de
+doble precisión. No hay distinción explícita; el lenguaje maneja la
+conversión automáticamente.</p>
+<pre class="mice"><code>var entero = 42
+var flotante = 3.14
+var negativo = -7
+var suma = 5 + 3.2    # 8.2</code></pre>
+<p><strong>Booleano</strong>: Valores <code>verdadero</code> y
+<code>falso</code>. Operadores lógicos <code>y</code>, <code>o</code>,
+<code>no</code> con cortocircuito.</p>
+<pre class="mice"><code>si (x &gt; 0 y x &lt; 10) { imp &quot;entre 0 y 10&quot; }
+si (no activo) { imp &quot;inactivo&quot; }</code></pre>
+<p><strong>Texto</strong>: Cadenas entre comillas dobles o simples.
+Acceso por índice, concatenación con <code>+</code>.</p>
+<pre class="mice"><code>var saludo = &quot;Hola&quot;
+var nombre = &#39;Mundo&#39;
+imp saludo + &quot; &quot; + nombre     # &quot;Hola Mundo&quot;
+imp saludo[0]                 # &quot;H&quot;
+imp saludo.longitud()         # 4</code></pre>
+<p><strong>Lista</strong>: Colección ordenada mutable. Cualquier tipo de
+elemento.</p>
+<pre class="mice"><code>var mixta = [1, &quot;dos&quot;, verdadero, [3, 4]]
+mixta.agregar(5)
+mixta[0] = 10
+var primer = primero(mixta)</code></pre>
+<p><strong>Conjunto</strong>: Elementos únicos sin orden. Operaciones:
+unión, intersección, diferencia.</p>
+<pre class="mice"><code>var a = set(1, 2, 3)
+var b = set(3, 4, 5)
+imp 2 in a                  # verdadero
+a.agregar(6)</code></pre>
+<p><strong>Diccionario</strong>: Pares clave-valor. Claves de tipo
+inmutable.</p>
+<pre class="mice"><code>var d = dict(&quot;nombre&quot;, &quot;Ana&quot;, &quot;edad&quot;, 30)
+d[&quot;pais&quot;] = &quot;Peru&quot;
+imp d.claves()              # [&quot;nombre&quot;, &quot;edad&quot;, &quot;pais&quot;]</code></pre>
+<p><strong>Función</strong>: Objetos de primera clase. Asignables,
+pasables y retornables.</p>
+<pre class="mice"><code>var doble = funcion (x) { x * 2 }
+var aplicar = funcion (f, v) { f(v) }
+imp aplicar(doble, 5)       # 10</code></pre>
+<hr />
+<h2 id="biblioteca-estándar">5. Biblioteca estándar</h2>
+<h3 id="builtins.mice-auto-cargado">5.1 builtins.mice
+(auto-cargado)</h3>
+<p>Cargado automáticamente al iniciar. Provee las funciones globales del
+lenguaje.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tipo(valor)</code></td>
+<td>Devuelve el tipo como texto</td>
+</tr>
+<tr>
+<td><code>longitud(coleccion)</code></td>
+<td>Longitud de lista, texto, dict, set</td>
+</tr>
+<tr>
+<td><code>map(func, lista)</code></td>
+<td>Aplica función a cada elemento</td>
+</tr>
+<tr>
+<td><code>filter(pred, lista)</code></td>
+<td>Filtra elementos según predicado</td>
+</tr>
+<tr>
+<td><code>reduce(func, lista, init)</code></td>
+<td>Reduce lista a un valor</td>
+</tr>
+<tr>
+<td><code>todos(pred, lista)</code></td>
+<td>¿Todos cumplen el predicado?</td>
+</tr>
+<tr>
+<td><code>alguno(pred, lista)</code></td>
+<td>¿Alguno cumple el predicado?</td>
+</tr>
+<tr>
+<td><code>ordenar(lista)</code></td>
+<td>Ordena lista (Timsort nativo)</td>
+</tr>
+<tr>
+<td><code>aNumero(valor)</code></td>
+<td>Convierte a número (soporta 0b, 0o, 0x)</td>
+</tr>
+<tr>
+<td><code>aTexto(valor)</code></td>
+<td>Convierte cualquier valor a texto</td>
+</tr>
+<tr>
+<td><code>error(mensaje)</code></td>
+<td>Lanza error con mensaje</td>
+</tr>
+<tr>
+<td><code>rango(fin)</code> / <code>rango(ini, fin)</code></td>
+<td>Genera lista numérica</td>
+</tr>
+<tr>
+<td><code>primero(lista)</code></td>
+<td>Primer elemento</td>
+</tr>
+<tr>
+<td><code>ultimo(lista)</code></td>
+<td>Último elemento</td>
+</tr>
+<tr>
+<td><code>invertir(lista)</code></td>
+<td>Lista invertida</td>
+</tr>
+<tr>
+<td><code>concatenar(l1, l2)</code></td>
+<td>Concatena dos listas</td>
+</tr>
+<tr>
+<td><code>aleatorio()</code></td>
+<td>Número aleatorio entre 0 y 1</td>
+</tr>
+<tr>
+<td><code>abs(x)</code></td>
+<td>Valor absoluto</td>
+</tr>
+<tr>
+<td><code>maximo(a, b)</code></td>
+<td>Máximo de dos números</td>
+</tr>
+<tr>
+<td><code>minimo(a, b)</code></td>
+<td>Mínimo de dos números</td>
+</tr>
+<tr>
+<td><code>exp(x)</code></td>
+<td>Exponencial (e^x) nativo</td>
+</tr>
+<tr>
+<td><code>max_lista(lista)</code></td>
+<td>Máximo valor en lista</td>
+</tr>
+<tr>
+<td><code>min_lista(lista)</code></td>
+<td>Mínimo valor en lista</td>
+</tr>
+<tr>
+<td><code>suma(lista)</code></td>
+<td>Suma de elementos</td>
+</tr>
+<tr>
+<td><code>producto(lista)</code></td>
+<td>Producto de elementos</td>
+</tr>
+<tr>
+<td><code>promedio(lista)</code></td>
+<td>Promedio aritmético</td>
+</tr>
+<tr>
+<td><code>contar(pred, lista)</code></td>
+<td>Cuenta cuántos cumplen predicado</td>
+</tr>
+<tr>
+<td><code>claves(dicc)</code></td>
+<td>Claves de diccionario</td>
+</tr>
+<tr>
+<td><code>valores(dicc)</code></td>
+<td>Valores de diccionario</td>
+</tr>
+<tr>
+<td><code>items(dicc)</code></td>
+<td>Pares [clave, valor]</td>
+</tr>
+</tbody>
+</table>
+<h3 id="math.mice">5.2 math.mice</h3>
+<p>Funciones matemáticas implementadas desde cero. Trigonometría vía
+series de Taylor, raíces con Newton-Raphson.</p>
+<pre class="mice"><code>importar &quot;math.mice&quot; como math</code></pre>
+<table>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>math.PI</code></td>
+<td>Constante π</td>
+</tr>
+<tr>
+<td><code>math.E</code></td>
+<td>Constante e</td>
+</tr>
+<tr>
+<td><code>math.abs(x)</code></td>
+<td>Valor absoluto</td>
+</tr>
+<tr>
+<td><code>math.piso(x)</code></td>
+<td>Piso (floor)</td>
+</tr>
+<tr>
+<td><code>math.techo(x)</code></td>
+<td>Techo (ceil)</td>
+</tr>
+<tr>
+<td><code>math.redondear(x)</code></td>
+<td>Redondeo</td>
+</tr>
+<tr>
+<td><code>math.entero(x)</code></td>
+<td>Parte entera</td>
+</tr>
+<tr>
+<td><code>math.flotante(x)</code></td>
+<td>Conversión a flotante</td>
+</tr>
+<tr>
+<td><code>math.factorial(n)</code></td>
+<td>Factorial (n!)</td>
+</tr>
+<tr>
+<td><code>math.potencia_entera(base, exp)</code></td>
+<td>Potencia entera</td>
+</tr>
+<tr>
+<td><code>math.seno(x)</code></td>
+<td>Seno (serie de Taylor)</td>
+</tr>
+<tr>
+<td><code>math.coseno(x)</code></td>
+<td>Coseno (serie de Taylor)</td>
+</tr>
+<tr>
+<td><code>math.tangente(x)</code></td>
+<td>Tangente (sin/cos)</td>
+</tr>
+<tr>
+<td><code>math.arcotangente(x)</code></td>
+<td>Arco tangente (Taylor)</td>
+</tr>
+<tr>
+<td><code>math.arcoseno(x)</code></td>
+<td>Arco seno (Newton-Raphson)</td>
+</tr>
+<tr>
+<td><code>math.arcocoseno(x)</code></td>
+<td>Arco coseno</td>
+</tr>
+<tr>
+<td><code>math.raiz(x)</code></td>
+<td>Raíz cuadrada (Newton-Raphson)</td>
+</tr>
+<tr>
+<td><code>math.log(x)</code></td>
+<td>Logaritmo natural (atanh)</td>
+</tr>
+<tr>
+<td><code>math.log10(x)</code></td>
+<td>Logaritmo base 10</td>
+</tr>
+<tr>
+<td><code>math.exp(x)</code></td>
+<td>Exponencial (serie Taylor)</td>
+</tr>
+<tr>
+<td><code>math.potencia(base, exp)</code></td>
+<td>Potencia general</td>
+</tr>
+</tbody>
+</table>
+<h3 id="matriz.mice">5.3 matriz.mice</h3>
+<p>Álgebra lineal: ceros, unos, identidad, transpuesta, multiplicación,
+determinante (LU), inversa (Gauss-Jordan).</p>
+<pre class="mice"><code>importar &quot;matriz.mice&quot; como mat</code></pre>
+<table>
+<colgroup>
+<col style="width: 56%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mat.ceros(filas, columnas)</code></td>
+<td>Matriz de ceros</td>
+</tr>
+<tr>
+<td><code>mat.unos(filas, columnas)</code></td>
+<td>Matriz de unos</td>
+</tr>
+<tr>
+<td><code>mat.identidad(n)</code></td>
+<td>Matriz identidad n×n</td>
+</tr>
+<tr>
+<td><code>mat.filas(m)</code></td>
+<td>Número de filas</td>
+</tr>
+<tr>
+<td><code>mat.columnas(m)</code></td>
+<td>Número de columnas</td>
+</tr>
+<tr>
+<td><code>mat.dimensiones(m)</code></td>
+<td>[filas, columnas]</td>
+</tr>
+<tr>
+<td><code>mat.transpuesta(m)</code></td>
+<td>Matriz transpuesta</td>
+</tr>
+<tr>
+<td><code>mat.suma_matrices(a, b)</code></td>
+<td>Suma de matrices</td>
+</tr>
+<tr>
+<td><code>mat.resta_matrices(a, b)</code></td>
+<td>Resta de matrices</td>
+</tr>
+<tr>
+<td><code>mat.multiplicar(a, b)</code></td>
+<td>Multiplicación matricial</td>
+</tr>
+<tr>
+<td><code>mat.escalar(m, k)</code></td>
+<td>Multiplicación por escalar</td>
+</tr>
+<tr>
+<td><code>mat.fila(m, i)</code></td>
+<td>Obtener fila i</td>
+</tr>
+<tr>
+<td><code>mat.columna(m, j)</code></td>
+<td>Obtener columna j</td>
+</tr>
+<tr>
+<td><code>mat.traza(m)</code></td>
+<td>Traza de matriz cuadrada</td>
+</tr>
+<tr>
+<td><code>mat.determinante(m)</code></td>
+<td>Determinante (Sarrus ≤3×3, LU)</td>
+</tr>
+<tr>
+<td><code>mat.inversa(m)</code></td>
+<td>Matriz inversa (Gauss-Jordan)</td>
+</tr>
+<tr>
+<td><code>mat.norma_frobenius(m)</code></td>
+<td>Norma de Frobenius</td>
+</tr>
+<tr>
+<td><code>mat.aplanar(m)</code></td>
+<td>Aplana a lista</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ml.mice">5.4 ml.mice</h3>
+<p>Algoritmos de machine learning: regresión lineal, regresión
+logística, K-Means, métricas.</p>
+<pre class="mice"><code>importar &quot;ml.mice&quot; como ml</code></pre>
+<table>
+<colgroup>
+<col style="width: 57%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ml.dividir_datos(X, Y, proporcion)</code></td>
+<td>Train/test split</td>
+</tr>
+<tr>
+<td><code>ml.media(valores)</code></td>
+<td>Media aritmética</td>
+</tr>
+<tr>
+<td><code>ml.varianza(valores)</code></td>
+<td>Varianza</td>
+</tr>
+<tr>
+<td><code>ml.desviacion_estandar(valores)</code></td>
+<td>Desviación estándar</td>
+</tr>
+<tr>
+<td><code>ml.normalizar(valores)</code></td>
+<td>Normalización z-score</td>
+</tr>
+<tr>
+<td><code>ml.regresion_lineal(X, y)</code></td>
+<td>Regresión lineal (mínimos cuadrados)</td>
+</tr>
+<tr>
+<td><code>ml.predecir_lineal(modelo, X)</code></td>
+<td>Predicción lineal</td>
+</tr>
+<tr>
+<td><code>ml.r_cuadrado(y_real, y_pred)</code></td>
+<td>Coeficiente R²</td>
+</tr>
+<tr>
+<td><code>ml.mse(y_real, y_pred)</code></td>
+<td>Error cuadrático medio</td>
+</tr>
+<tr>
+<td><code>ml.regresion_lineal_descenso(X, y, lr, epochs)</code></td>
+<td>Regresión con descenso de gradiente</td>
+</tr>
+<tr>
+<td><code>ml.regresion_lineal_matricial(X, y)</code></td>
+<td>Regresión matricial</td>
+</tr>
+<tr>
+<td><code>ml.sigmoid(z)</code></td>
+<td>Función sigmoide</td>
+</tr>
+<tr>
+<td><code>ml.sigmoid_derivada(z)</code></td>
+<td>Derivada de sigmoide</td>
+</tr>
+<tr>
+<td><code>ml.regresion_logistica(X, y, lr, epochs)</code></td>
+<td>Regresión logística</td>
+</tr>
+<tr>
+<td><code>ml.predecir_logistica(modelo, X, umbral)</code></td>
+<td>Predicción logística</td>
+</tr>
+<tr>
+<td><code>ml.k_means(X, k, iteraciones)</code></td>
+<td>Algoritmo K-Means</td>
+</tr>
+<tr>
+<td><code>ml.distancia_euclidiana(a, b)</code></td>
+<td>Distancia euclidiana</td>
+</tr>
+<tr>
+<td><code>ml.matriz_confusion(y_real, y_pred)</code></td>
+<td>Matriz de confusión</td>
+</tr>
+<tr>
+<td><code>ml.exactitud(y_real, y_pred)</code></td>
+<td>Accuracy</td>
+</tr>
+<tr>
+<td><code>ml.precision(y_real, y_pred)</code></td>
+<td>Precision</td>
+</tr>
+<tr>
+<td><code>ml.recall(y_real, y_pred)</code></td>
+<td>Recall</td>
+</tr>
+<tr>
+<td><code>ml.f1_score(y_real, y_pred)</code></td>
+<td>F1-Score</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dl.mice">5.5 dl.mice</h3>
+<p>Deep Learning: perceptrón multicapa, forward/backpropagation,
+funciones de activación, entrenamiento.</p>
+<pre class="mice"><code>importar &quot;dl.mice&quot; como dl</code></pre>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dl.aplicar(matriz, funcion)</code></td>
+<td>Aplica función a cada elemento</td>
+</tr>
+<tr>
+<td><code>dl.hadamard(m1, m2)</code></td>
+<td>Producto Hadamard (elemento a elemento)</td>
+</tr>
+<tr>
+<td><code>dl.sigmoid(m)</code></td>
+<td>Sigmoide sobre matriz</td>
+</tr>
+<tr>
+<td><code>dl.sigmoid_derivada(m)</code></td>
+<td>Derivada de sigmoide</td>
+</tr>
+<tr>
+<td><code>dl.relu(m)</code></td>
+<td>ReLU sobre matriz</td>
+</tr>
+<tr>
+<td><code>dl.relu_derivada(m)</code></td>
+<td>Derivada de ReLU</td>
+</tr>
+<tr>
+<td><code>dl.softmax(m)</code></td>
+<td>Softmax</td>
+</tr>
+<tr>
+<td><code>dl.perceptron_multicapa(arquitectura)</code></td>
+<td>Crear MLP con inicialización Xavier</td>
+</tr>
+<tr>
+<td><code>dl.forward(modelo, X)</code></td>
+<td>Propagación hacia adelante</td>
+</tr>
+<tr>
+<td><code>dl.entrenar_red(modelo, X, Y, lr, epochs, verbose)</code></td>
+<td>Entrenamiento completo con backprop</td>
+</tr>
+<tr>
+<td><code>dl.error_mse(y_real, y_pred)</code></td>
+<td>Error MSE</td>
+</tr>
+</tbody>
+</table>
+<h3 id="grafico.mice">5.6 grafico.mice</h3>
+<p>Motor gráfico con backend PIL nativo. Todas las primitivas de dibujo
+(líneas, círculos, texto, rectángulos) se delegan a PIL ImageDraw,
+produciendo PNG con anti-aliasing y texto TrueType. Si PIL no está
+instalado, cae automáticamente a PPM con dibujo pixel por pixel.</p>
+<pre class="mice"><code>importar &quot;grafico.mice&quot; como grafico</code></pre>
+<table>
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grafico.iniciar_grafico(xmin, xmax, ymin, ymax)</code></td>
+<td>Inicializa lienzo con ejes</td>
+</tr>
+<tr>
+<td><code>grafico.titulo(texto)</code></td>
+<td>Define título</td>
+</tr>
+<tr>
+<td><code>grafico.etiquetas(xlabel, ylabel)</code></td>
+<td>Etiquetas de ejes</td>
+</tr>
+<tr>
+<td><code>grafico.lineas(xs, ys)</code></td>
+<td>Gráfico de líneas</td>
+</tr>
+<tr>
+<td><code>grafico.dispersion(xs, ys)</code></td>
+<td>Gráfico de dispersión</td>
+</tr>
+<tr>
+<td><code>grafico.histograma(datos, bins)</code></td>
+<td>Histograma</td>
+</tr>
+<tr>
+<td><code>grafico.guardar(archivo)</code></td>
+<td>Guarda como PNG</td>
+</tr>
+<tr>
+<td><code>grafico.mostrar()</code></td>
+<td>Muestra la imagen</td>
+</tr>
+<tr>
+<td><code>grafico.pintar_mapa(xs, ys, clases, c0, c1)</code></td>
+<td>Mapa de clasificación</td>
+</tr>
+<tr>
+<td><code>grafico.pintar_puntos(xs, ys, r, g, b, tam)</code></td>
+<td>Dibuja puntos como círculos</td>
+</tr>
+<tr>
+<td><code>grafico.color_linea(r, g, b)</code></td>
+<td>Define color de línea</td>
+</tr>
+<tr>
+<td><code>grafico.dibujar_grafo(nodos, aristas, w, h)</code></td>
+<td>Dibuja un grafo (layout circular)</td>
+</tr>
+<tr>
+<td><code>grafico.linea_sobre_grafico(xs, ys)</code></td>
+<td>Línea directa sobre gráfico</td>
+</tr>
+<tr>
+<td><code>grafico.texto(texto, x, y, r, g, b)</code></td>
+<td>Texto TrueType en coordenadas</td>
+</tr>
+<tr>
+<td><code>grafico.estilo(tema)</code></td>
+<td>Tema: claro, oscuro, ocean, retro</td>
+</tr>
+<tr>
+<td><code>grafico.marcadores(activo, tamano)</code></td>
+<td>Configurar marcadores</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Primitivas de dibujo de bajo nivel</strong> (accesibles como
+<code>__grafico_*</code>):</p>
+<table>
+<colgroup>
+<col style="width: 57%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__grafico_reset(ancho, alto, margen)</code></td>
+<td>Crear lienzo</td>
+</tr>
+<tr>
+<td><code>__grafico_set_pixel(x, y, r, g, b)</code></td>
+<td>Pixel individual</td>
+</tr>
+<tr>
+<td><code>__grafico_linea(x1, y1, x2, y2, r, g, b, grosor)</code></td>
+<td>Línea anti-aliased</td>
+</tr>
+<tr>
+<td><code>__grafico_rectangulo(x, y, w, h, r, g, b, fill)</code></td>
+<td>Rectángulo relleno/borde</td>
+</tr>
+<tr>
+<td><code>__grafico_circulo(xc, yc, radio, r, g, b, fill)</code></td>
+<td>Círculo relleno/borde</td>
+</tr>
+<tr>
+<td><code>__grafico_texto(x, y, texto, r, g, b, tamano)</code></td>
+<td>Texto TrueType con tamaño</td>
+</tr>
+<tr>
+<td><code>__grafico_poligono(puntos, r, g, b, fill)</code></td>
+<td>Polígono</td>
+</tr>
+<tr>
+<td><code>__grafico_limpiar(r, g, b)</code></td>
+<td>Limpiar lienzo con color</td>
+</tr>
+<tr>
+<td><code>__grafico_guardar(ruta, título, xlabel, ylabel)</code></td>
+<td>Exportar PNG</td>
+</tr>
+<tr>
+<td><code>__grafico_mostrar(ruta, título, xlabel, ylabel)</code></td>
+<td>Mostrar en ventana GTK</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gui.mice">5.7 gui.mice</h3>
+<p>Interfaz gráfica de usuario usando zenity (Linux) y/o GTK.</p>
+<pre class="mice"><code>importar &quot;gui.mice&quot; como gui</code></pre>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gui.alerta(mensaje)</code></td>
+<td>Mensaje de alerta</td>
+</tr>
+<tr>
+<td><code>gui.confirmar(mensaje)</code></td>
+<td>Diálogo de confirmación</td>
+</tr>
+<tr>
+<td><code>gui.pedir_texto(mensaje)</code></td>
+<td>Entrada de texto</td>
+</tr>
+<tr>
+<td><code>gui.abrir_archivo()</code></td>
+<td>Selector de archivos</td>
+</tr>
+<tr>
+<td><code>gui.guardar_archivo_como()</code></td>
+<td>Guardar archivo</td>
+</tr>
+<tr>
+<td><code>gui.mostrar_imagen(archivo)</code></td>
+<td>Mostrar imagen</td>
+</tr>
+<tr>
+<td><code>gui.calculadora_ux(titulo)</code></td>
+<td>Calculadora interactiva (GTK)</td>
+</tr>
+<tr>
+<td><code>gui.crear_menu(opciones)</code></td>
+<td>Menú de opciones</td>
+</tr>
+<tr>
+<td><code>gui.explorar_math()</code></td>
+<td>Explorador matemático interactivo</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hifa.mice">5.8 hifa.mice</h3>
+<p>Microframework web estilo Flask, implementado en el runtime con
+<code>http.server</code>. Sin dependencias externas.</p>
+<pre class="mice"><code>importar &quot;hifa.mice&quot; como hifa</code></pre>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hifa.crear(nombre)</code></td>
+<td>Crear aplicación web</td>
+</tr>
+<tr>
+<td><code>hifa.estaticos(app, carpeta)</code></td>
+<td>Servir archivos estáticos</td>
+</tr>
+<tr>
+<td><code>hifa.plantillas(app, carpeta)</code></td>
+<td>Carpeta de plantillas</td>
+</tr>
+<tr>
+<td><code>hifa.get_texto(app, ruta, contenido)</code></td>
+<td>Ruta GET (texto/html)</td>
+</tr>
+<tr>
+<td><code>hifa.post_texto(app, ruta, contenido)</code></td>
+<td>Ruta POST (texto/html)</td>
+</tr>
+<tr>
+<td><code>hifa.get_json(app, ruta, datos)</code></td>
+<td>Ruta GET (JSON)</td>
+</tr>
+<tr>
+<td><code>hifa.get_template(app, ruta, archivo, contexto)</code></td>
+<td>Ruta GET con plantilla</td>
+</tr>
+<tr>
+<td><code>hifa.redireccion(app, metodo, ruta, destino)</code></td>
+<td>Redirección HTTP</td>
+</tr>
+<tr>
+<td><code>hifa.rutas(app)</code></td>
+<td>Listar todas las rutas</td>
+</tr>
+<tr>
+<td><code>hifa.iniciar(app, host, puerto)</code></td>
+<td>Iniciar servidor</td>
+</tr>
+<tr>
+<td><code>hifa.iniciar_con_navegador(app, host, puerto)</code></td>
+<td>Iniciar y abrir navegador</td>
+</tr>
+<tr>
+<td><code>hifa.generar_demo(ruta)</code></td>
+<td>Generar proyecto demo</td>
+</tr>
+</tbody>
+</table>
+<h3 id="archivo.mice">5.9 archivo.mice</h3>
+<p>Operaciones de archivos y parseo CSV.</p>
+<pre class="mice"><code>importar &quot;archivo.mice&quot; como archivo</code></pre>
+<table>
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>archivo.leer(ruta)</code></td>
+<td>Leer archivo completo</td>
+</tr>
+<tr>
+<td><code>archivo.escribir(ruta, contenido)</code></td>
+<td>Escribir archivo</td>
+</tr>
+<tr>
+<td><code>archivo.leer_lineas(ruta)</code></td>
+<td>Leer líneas a lista</td>
+</tr>
+<tr>
+<td><code>archivo.escribir_lineas(ruta, lineas)</code></td>
+<td>Escribir lista de líneas</td>
+</tr>
+<tr>
+<td><code>archivo.anexar(ruta, contenido)</code></td>
+<td>Añadir al final del archivo</td>
+</tr>
+<tr>
+<td><code>archivo.existe(ruta)</code></td>
+<td>Verificar si existe</td>
+</tr>
+<tr>
+<td><code>archivo.eliminar(ruta)</code></td>
+<td>Eliminar archivo</td>
+</tr>
+<tr>
+<td><code>archivo.tamano(ruta)</code></td>
+<td>Tamaño del archivo</td>
+</tr>
+<tr>
+<td><code>archivo.leer_csv(ruta)</code></td>
+<td>Parsear CSV a lista de diccionarios</td>
+</tr>
+<tr>
+<td><code>archivo.escribir_csv(ruta, datos)</code></td>
+<td>Escribir datos a CSV</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lista.mice">5.10 lista.mice</h3>
+<p>Utilidades para listas.</p>
+<pre class="mice"><code>importar &quot;lista.mice&quot; como lista</code></pre>
+<table>
+<colgroup>
+<col style="width: 56%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lista.contiene(elemento, lista)</code></td>
+<td>¿Lista contiene elemento?</td>
+</tr>
+<tr>
+<td><code>lista.contar_ocurrencias(elemento, lista)</code></td>
+<td>Contar apariciones</td>
+</tr>
+<tr>
+<td><code>lista.indice_de(elemento, lista)</code></td>
+<td>Índice del elemento</td>
+</tr>
+<tr>
+<td><code>lista.sin_duplicados(lista)</code></td>
+<td>Elimina duplicados</td>
+</tr>
+<tr>
+<td><code>lista.porcion(lista, inicio, fin)</code></td>
+<td>Sublista (slice)</td>
+</tr>
+<tr>
+<td><code>lista.ordenar_asc(lista)</code></td>
+<td>Orden ascendente</td>
+</tr>
+<tr>
+<td><code>lista.ordenar_desc(lista)</code></td>
+<td>Orden descendente</td>
+</tr>
+<tr>
+<td><code>lista.pares(lista)</code></td>
+<td>Elementos en índices pares</td>
+</tr>
+<tr>
+<td><code>lista.impares(lista)</code></td>
+<td>Elementos en índices impares</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dict.mice">5.11 dict.mice</h3>
+<p>Utilidades para diccionarios.</p>
+<pre class="mice"><code>importar &quot;dict.mice&quot; como dict</code></pre>
+<table>
+<colgroup>
+<col style="width: 60%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dict.tiene_clave(dicc, clave)</code></td>
+<td>¿Existe clave?</td>
+</tr>
+<tr>
+<td><code>dict.obtener(dicc, clave, defecto)</code></td>
+<td>Obtener valor con default</td>
+</tr>
+<tr>
+<td><code>dict.combinar(dicc1, dicc2)</code></td>
+<td>Combinar diccionarios</td>
+</tr>
+<tr>
+<td><code>dict.invertir(dicc)</code></td>
+<td>Intercambiar clave↔︎valor</td>
+</tr>
+<tr>
+<td><code>dict.filtrar_claves(dicc, predicado)</code></td>
+<td>Filtrar por clave</td>
+</tr>
+<tr>
+<td><code>dict.mapear_valores(dicc, func)</code></td>
+<td>Transformar valores</td>
+</tr>
+<tr>
+<td><code>dict.de_listas(claves, valores)</code></td>
+<td>Crear desde dos listas</td>
+</tr>
+<tr>
+<td><code>dict.copia_profunda(dicc)</code></td>
+<td>Copia profunda</td>
+</tr>
+</tbody>
+</table>
+<h3 id="set.mice">5.12 set.mice</h3>
+<p>Operaciones de conjuntos.</p>
+<pre class="mice"><code>importar &quot;set.mice&quot; como set</code></pre>
+<table>
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Función</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>set.crear_conjunto(elementos)</code></td>
+<td>Crear conjunto</td>
+</tr>
+<tr>
+<td><code>set.union(a, b)</code></td>
+<td>Unión</td>
+</tr>
+<tr>
+<td><code>set.interseccion(a, b)</code></td>
+<td>Intersección</td>
+</tr>
+<tr>
+<td><code>set.diferencia(a, b)</code></td>
+<td>Diferencia</td>
+</tr>
+<tr>
+<td><code>set.diferencia_simetrica(a, b)</code></td>
+<td>Diferencia simétrica</td>
+</tr>
+<tr>
+<td><code>set.es_subconjunto(a, b)</code></td>
+<td>¿A ⊆ B?</td>
+</tr>
+<tr>
+<td><code>set.producto_cartesiano(a, b)</code></td>
+<td>Producto cartesiano</td>
+</tr>
+<tr>
+<td><code>set.complemento(universo, conjunto)</code></td>
+<td>Complemento</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="ejemplos-por-módulo">6. Ejemplos por módulo</h2>
+<p>Todos los ejemplos están en <code>MICELIO/ejemplos/</code>. Se
+ejecutan con:</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> main.py ejemplos/01_basico.mice</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>01_basico.mice</code></td>
+<td>Variables, aritmética, listas, I/O</td>
+</tr>
+<tr>
+<td><code>02_fibonacci.mice</code></td>
+<td>Fibonacci recursivo</td>
+</tr>
+<tr>
+<td><code>03_matrices.mice</code></td>
+<td>Operaciones con matrices</td>
+</tr>
+<tr>
+<td><code>04_errores.mice</code></td>
+<td>Demostración de errores pedagógicos</td>
+</tr>
+<tr>
+<td><code>05_funcional.mice</code></td>
+<td>map/filter/reduce, pipe, closures</td>
+</tr>
+<tr>
+<td><code>06_caperucita.mice</code></td>
+<td>Procesamiento de texto</td>
+</tr>
+<tr>
+<td><code>07_perceptron_simple.mice</code></td>
+<td>Neurona simple (compuerta AND)</td>
+</tr>
+<tr>
+<td><code>08_regresion.mice</code></td>
+<td>Regresión lineal</td>
+</tr>
+<tr>
+<td><code>09_k_means_visual.mice</code></td>
+<td>K-Means con visualización</td>
+</tr>
+<tr>
+<td><code>10_autoencoder_simple.mice</code></td>
+<td>Autoencoder simple</td>
+</tr>
+<tr>
+<td><code>11_currificacion_avanzada.mice</code></td>
+<td>Currying</td>
+</tr>
+<tr>
+<td><code>12_clasificador_iris_simplificado.mice</code></td>
+<td>Clasificador multiclase softmax</td>
+</tr>
+<tr>
+<td><code>13_series_taylor_custom.mice</code></td>
+<td>Series de Taylor</td>
+</tr>
+<tr>
+<td><code>14_analisis_archivos_csv.mice</code></td>
+<td>Análisis de archivos CSV</td>
+</tr>
+<tr>
+<td><code>15_big_data_regression.mice</code></td>
+<td>Regresión a gran escala</td>
+</tr>
+<tr>
+<td><code>16_stress_test_nn.mice</code></td>
+<td>Prueba de estrés de red neuronal</td>
+</tr>
+<tr>
+<td><code>17_debug_xor.mice</code></td>
+<td>Depuración de red XOR</td>
+</tr>
+<tr>
+<td><code>18_mini_batch_visual.mice</code></td>
+<td>Entrenamiento mini-batch con visualización</td>
+</tr>
+<tr>
+<td><code>18_xor_funcional.mice</code></td>
+<td>XOR en pipeline funcional con <code>|&gt;</code></td>
+</tr>
+<tr>
+<td><code>19_grafico_simple.mice</code></td>
+<td>Grafo simple</td>
+</tr>
+<tr>
+<td><code>20_grafico_seno_coseno.mice</code></td>
+<td>Seno y coseno superpuestos</td>
+</tr>
+<tr>
+<td><code>21_grafico_histograma.mice</code></td>
+<td>Histograma</td>
+</tr>
+<tr>
+<td><code>22_math_didactico.mice</code></td>
+<td>Módulo math didáctico</td>
+</tr>
+<tr>
+<td><code>23_lista_didactica.mice</code></td>
+<td>Utilidades de listas</td>
+</tr>
+<tr>
+<td><code>24_dict_didactico.mice</code></td>
+<td>Diccionarios</td>
+</tr>
+<tr>
+<td><code>25_set_didactico.mice</code></td>
+<td>Conjuntos</td>
+</tr>
+<tr>
+<td><code>26_matriz_didactica.mice</code></td>
+<td>Matrices</td>
+</tr>
+<tr>
+<td><code>27_archivo_didactico.mice</code></td>
+<td>Archivos</td>
+</tr>
+<tr>
+<td><code>28_ml_didactico.mice</code></td>
+<td>Machine learning</td>
+</tr>
+<tr>
+<td><code>29_dl_didactico.mice</code></td>
+<td>Deep learning</td>
+</tr>
+<tr>
+<td><code>30_gui_didactico.mice</code></td>
+<td>GUI</td>
+</tr>
+<tr>
+<td><code>31_hifa_didactico.mice</code></td>
+<td>Hifa web framework</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ejemplo-completo-regresión-lineal">Ejemplo completo: Regresión
+Lineal</h3>
+<pre class="mice"><code>importar &quot;ml.mice&quot; como ml
+
+var X = [[1], [2], [3], [4], [5]]
+var y = [2, 4, 6, 8, 10]
+
+var modelo = ml.regresion_lineal(X, y)
+imp &quot;Modelo entrenado&quot;
+
+var pred = ml.predecir_lineal(modelo, [[6]])
+imp &quot;Prediccion para 6: &quot; + aTexto(pred[0])
+
+var mse_val = ml.mse(y, ml.predecir_lineal(modelo, X))
+imp &quot;MSE: &quot; + aTexto(mse_val)</code></pre>
+<h3 id="ejemplo-completo-perceptrón-multicapa-xor">Ejemplo completo:
+Perceptrón Multicapa (XOR)</h3>
+<pre class="mice"><code>importar &quot;dl.mice&quot; como dl
+
+var X = [[0,0], [0,1], [1,0], [1,1]]
+var Y = [[0], [1], [1], [0]]
+
+var modelo = dl.perceptron_multicapa([2, 4, 1])
+dl.entrenar_red(modelo, X, Y, 0.5, 2000, falso)
+
+var pred = dl.forward(modelo, X)
+imp &quot;Predicciones XOR:&quot;
+imp pred</code></pre>
+<h3 id="ejemplo-completo-servidor-web-con-hifa">Ejemplo completo:
+Servidor Web con Hifa</h3>
+<pre class="mice"><code>importar &quot;hifa.mice&quot; como hifa
+
+var app = hifa.crear(&quot;MiApp&quot;)
+hifa.get_texto(app, &quot;/&quot;, &quot;&lt;h1&gt;Hola Micelio&lt;/h1&gt;&quot;)
+hifa.get_json(app, &quot;/api&quot;, {&quot;mensaje&quot;: &quot;Hola desde Hifa&quot;})
+hifa.iniciar(app, &quot;localhost&quot;, 8080)</code></pre>
+<hr />
+<h2 id="arquitectura">7. Arquitectura</h2>
+<h3 id="pipeline-de-ejecución">Pipeline de ejecución</h3>
+<pre><code>archivo.mice
+     │
+     ▼
+main.py (preprocesador)
+  ├── azúcar sintáctico: leer a,b → __leer_multi(&quot;a,b&quot;)
+  ├── a,b = expr → __asignar_multi(&quot;a,b&quot;, expr)
+  └── x += 1 → x = x + (1)
+     │
+     ▼
+ANTLR4 Lexer (MicelioLexer) → tokens
+     │
+     ▼
+ANTLR4 Parser (MicelioParser) → árbol de parseo
+     │
+     ▼
+EvalVisitor (eval_visitor.py)
+  ├── recorre el árbol ANTLR
+  ├── evalúa expresiones/sentencias
+  ├── resuelve variables (Environment chain)
+  └── delega a runtime functions
+     │
+     ▼
+Runtime (runtime.py)
+  ├── Environment (tabla de símbolos con alcance léxico)
+  ├── FunctionValue (funciones Micelio con clausuras)
+  ├── BoundMethod (métodos nativos en colecciones)
+  ├── make_primitives() → wrappers Python de bajo nivel
+  └── make_builtins() → funciones incorporadas de alto nivel
+     │
+     ▼
+Salida (consola, archivos, imágenes PPM, ventanas GTK, HTTP)</code></pre>
+<h3 id="estructura-del-repositorio">Estructura del repositorio</h3>
+<pre><code>MICELIO/
+├── main.py                    # Entrada CLI/REPL, preprocesador
+├── micelio                    # Wrapper bash
+│
+├── nucleo/
+│   ├── eval_visitor.py        # Visitor de evaluación semántica
+│   └── runtime.py             # Entorno, builtins, gráficos, GUI, Hifa
+│
+├── errores/
+│   └── pedagogicos.py         # Errores pedagógicos con formato glassmorphic
+│
+├── gramatica/
+│   └── Micelio.g4             # Gramática ANTLR4 (163 reglas)
+│
+├── generado/
+│   └── gramatica/             # Lexer/Parser/Visitor generados por ANTLR
+│
+├── modulos_std/               # Biblioteca estándar en Micelio puro
+│   ├── builtins.mice          #   Auto-cargado al inicio
+│   ├── math.mice              #   Matemáticas (Taylor, Newton-Raphson)
+│   ├── matriz.mice            #   Álgebra lineal
+│   ├── ml.mice                #   Machine learning
+│   ├── dl.mice                #   Deep learning
+│   ├── grafico.mice           #   Motor gráfico PPM
+│   ├── gui.mice               #   GUI (zenity/GTK)
+│   ├── hifa.mice              #   Web framework
+│   ├── archivo.mice           #   Archivos y CSV
+│   ├── lista.mice             #   Utilidades de listas
+│   ├── dict.mice              #   Utilidades de diccionarios
+│   └── set.mice               #   Operaciones de conjuntos
+│
+├── ejemplos/                  # 31+ ejemplos ejecutables
+│   ├── 01_basico.mice
+│   ├── ...
+│   └── 31_hifa_didactico.mice
+│
+┤
+├── instalación/               # Scripts de instalación
+│   ├── setup.sh               #   Linux/macOS
+│   ├── setup.bat              #   Windows
+│   └── install-micelio.sh     #   Instalación CLI
+│
+├── micelio-vscode/            # Extensión VS Code
+│   └── extension_unpacked/
+│       └── extension/
+│           ├── package.json
+│           ├── extension.js
+│           ├── language-configuration.json
+│           ├── syntaxes/micelio.tmLanguage.json
+│           └── snippets/micelio.code-snippets
+│
+└── docs/                      # Documentación
+    ├── DOCUMENTACION.md       #   Este documento
+    ├── lenguaje.md            #   Sintaxis del lenguaje
+    ├── runtime.md             #   Arquitectura del runtime
+    ├── estructura-proyecto.md #   Estructura del proyecto
+    └── ...</code></pre>
+<h3 id="componentes-clave">Componentes clave</h3>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 10%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Líneas</th>
+<th>Propósito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>main.py</code></td>
+<td>~200</td>
+<td>Entrada CLI, REPL, preprocesador</td>
+</tr>
+<tr>
+<td><code>eval_visitor.py</code></td>
+<td>~1036</td>
+<td>Evaluación semántica (con tabla de despacho, fast env lookup)</td>
+</tr>
+<tr>
+<td><code>runtime.py</code></td>
+<td>~2282</td>
+<td>Entorno, tipos, builtins, gráficos PIL, GUI, Hifa</td>
+</tr>
+<tr>
+<td><code>pedagogicos.py</code></td>
+<td>~197</td>
+<td>Errores pedagógicos con formato ANSI</td>
+</tr>
+<tr>
+<td><code>Micelio.g4</code></td>
+<td>~163</td>
+<td>Gramática completa del lenguaje</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="extensiones-y-herramientas">8. Extensiones y herramientas</h2>
+<h3 id="extensión-vs-code">Extensión VS Code</h3>
+<p>La extensión <code>micelio-vscode</code> (<code>.vsix</code>) provee
+un entorno de desarrollo completo para archivos <code>.mice</code> y
+<code>.micelio</code>.</p>
+<p><strong>Instalación:</strong></p>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> <span class="at">--install-extension</span> micelio-vscode/extension_unpacked/extension/micelio-syntax-0.3.0.vsix</span></code></pre></div>
+<p>O desde VS Code: Extensiones ⋮ → Install from VSIX.</p>
+<p><strong>Características:</strong></p>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr>
+<th>Característica</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resaltado de sintaxis</td>
+<td>TextMate grammar con keywords, builtins, operadores</td>
+</tr>
+<tr>
+<td>Autocompletado</td>
+<td>Keywords, builtins, símbolos locales, miembros de módulos via
+<code>alias.</code></td>
+</tr>
+<tr>
+<td>Información al hover</td>
+<td>Documentación de cada keyword y función builtin</td>
+</tr>
+<tr>
+<td>Ayuda de firmas</td>
+<td>Parámetros de funciones builtin al escribir <code>(</code></td>
+</tr>
+<tr>
+<td>Esquema de documento</td>
+<td>Outline con funciones y variables del archivo</td>
+</tr>
+<tr>
+<td>Ir a definición</td>
+<td>Salta a definición local o en módulos importados</td>
+</tr>
+<tr>
+<td>Snippets</td>
+<td><code>fun</code>, <code>si</code>, <code>sino</code>,
+<code>para</code>, <code>mientras</code>, <code>var</code>,
+<code>const</code>, <code>regresa</code>, <code>matriz</code>,
+<code>dict</code>, <code>capa</code>, <code>entrenar</code>,
+<code>grafico</code>, <code>leer</code>, <code>test</code>,
+<code>pipe*</code></td>
+</tr>
+<tr>
+<td>Pipe operator</td>
+<td>Enter después de <code>|&gt;</code> inserta automáticamente nuevo
+<code>|&gt;</code></td>
+</tr>
+<tr>
+<td>Auto-cierre</td>
+<td><code>{}</code>, <code>[]</code>, <code>()</code>,
+<code>""</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="desarrollo-mantenimiento">9. Desarrollo (mantenimiento)</h2>
+<h3 id="regenerar-lexerparser-desde-la-gramática">Regenerar lexer/parser
+desde la gramática</h3>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> MICELIO</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="ex">antlr4</span> <span class="at">-Dlanguage</span><span class="op">=</span>Python3 gramatica/Micelio.g4 <span class="at">-o</span> generado/gramatica <span class="at">-no-listener</span> <span class="at">-visitor</span></span></code></pre></div>
+<h3 id="dependencia-única">Dependencia única</h3>
+<pre><code>antlr4-python3-runtime==4.13.1</code></pre>
+<h3 id="rendimiento">Rendimiento</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Operación</th>
+<th>Antes</th>
+<th>Después</th>
+<th>Técnica</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XOR 500 épocas</td>
+<td>~150s (3.3 ep/s)</td>
+<td>~17s (29 ep/s)</td>
+<td>Operadores nativos <code>+</code>, <code>-</code>, <code>*</code>,
+<code>.*</code> en matrices</td>
+</tr>
+<tr>
+<td>Búsqueda de variable</td>
+<td><code>hasattr</code> por nodo + cadena de entornos</td>
+<td>Scope local O(1) + tabla de despacho</td>
+<td>Fast env lookup + dispatch table</td>
+</tr>
+<tr>
+<td>Gráficos (seno/coseno)</td>
+<td>PPM + PIL batch</td>
+<td>PIL nativo directo</td>
+<td>Backend PIL ImageDraw con anti-aliasing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="pruebas">Pruebas</h3>
+<p>Los ejemplos en <code>MICELIO/ejemplos/</code> funcionan como pruebas
+informales:</p>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> main.py ejemplos/01_basico.mice</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> main.py ejemplos/07_perceptron_simple.mice</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> main.py ejemplos/08_regresion.mice</span></code></pre></div>
+<h3 id="limitaciones-conocidas">Limitaciones conocidas</h3>
+<ul>
+<li><strong>Literales dict multilínea</strong> no son soportados por el
+parser: <code>{\n "clave": valor\n}</code> causa error. Usar
+<code>dict("clave", valor)</code> en su lugar.</li>
+<li><strong>Importaciones desde REPL</strong> no funcionan
+correctamente. Ejecutar archivos <code>.mice</code> para usar
+módulos.</li>
+<li><strong>Nuevas líneas dentro de llamadas a función</strong>: el
+parser puede rechazar saltos de línea entre argumentos. Mantener cada
+llamada en una línea.</li>
+</ul>
+<h3 id="alcance-de-variables-scope-dinámico">Alcance de variables (scope
+dinámico)</h3>
+<p>MICELIO usa <strong>scope dinámico</strong>: las variables locales de
+una función llamada pueden sobrescribir variables globales del mismo
+nombre.</p>
+<pre class="mice"><code>var capa = &quot;global&quot;
+
+funcion ejemplo() {
+    var capa = &quot;local&quot;   # Esto SOBRESCRIBE la global &quot;capa&quot;
+    imp capa             # &quot;local&quot;
+}
+
+ejemplo()
+imp capa                 # &quot;local&quot; — la global fue modificada</code></pre>
+<p>Para evitar colisiones, las funciones globales deben tener nombres
+únicos que no sean reutilizados como variables locales (ej:
+<code>crear_capa</code> en lugar de <code>capa</code>).</p>
+<hr />
+<h2 id="gramática-completa-antlr4">9. Gramática completa (ANTLR4)</h2>
+<p>La gramática completa del lenguaje en notación ANTLR. Es el punto de
+partida para generar el lexer y parser.</p>
+<pre><code>grammar Micelio;
+
+program : sep* (statement sep*)* EOF ;
+
+statement
+    : simple_stmt
+    | compound_stmt
+    ;
+
+simple_stmt
+    : var_decl
+    | const_decl
+    | assignment
+    | return_stmt
+    | break_stmt
+    | continue_stmt
+    | import_stmt
+    | leer_stmt
+    | imp_stmt
+    | expr
+    ;
+
+compound_stmt
+    : if_stmt
+    | switch_stmt
+    | while_stmt
+    | for_stmt
+    | func_def
+    | block
+    ;
+
+var_decl : VAR ID (&#39;,&#39; ID)* (&#39;=&#39; expr (&#39;,&#39; expr)*)? ;
+const_decl : CONST ID &#39;=&#39; expr ;
+assignment : assign_target &#39;=&#39; expr ;
+assign_target : ID (&#39;[&#39; expr &#39;]&#39;)* ;
+return_stmt : REGRESA expr? ;
+break_stmt : ROMPER ;
+continue_stmt : CONTINUAR ;
+import_stmt : IMPORTAR STRING (COMO ID)? ;
+leer_stmt : LEER ID ;
+imp_stmt : IMP expr ;
+
+if_stmt : SI &#39;(&#39; expr &#39;)&#39; sep* block (sep* SINO_SI sep* &#39;(&#39; expr &#39;)&#39; sep* block)* (sep* SINO sep* block)? ;
+switch_stmt : SEGUN &#39;(&#39; expr &#39;)&#39; sep* &#39;{&#39; sep* case_block+ &#39;}&#39; ;
+case_block
+    : CASO expr &#39;:&#39; sep* (statement sep*)*
+    | DEFECTO &#39;:&#39; sep* (statement sep*)*
+    ;
+while_stmt : MIENTRAS &#39;(&#39; expr &#39;)&#39; sep* block ;
+for_stmt
+    : PARA ID &#39;=&#39; expr HASTA expr (INC expr)? sep* block
+    | PARA ID EN expr sep* block
+    ;
+
+func_def : FUNCION ID &#39;(&#39; param_list? &#39;)&#39; sep* block ;
+param_list : param_item (&#39;,&#39; param_item)* ;
+param_item : ID | MUL ID | POW ID ;
+block : &#39;{&#39; sep* (statement sep*)* &#39;}&#39; ;
+
+expr
+    : postfixExpr
+    | op=(INC_OP | DEC_OP) expr
+    | expr op=(INC_OP | DEC_OP)
+    | &#39;-&#39; expr
+    | NO expr
+    | expr op=(MUL | DIV | MOD | DOTMUL) expr
+    | expr op=(PLUS | MINUS) expr
+    | expr op=POW expr
+    | expr op=(EQ | NE | LT | LE | GT | GE) expr
+    | expr Y expr
+    | expr O expr
+    | expr IN expr
+    | expr NEWLINE* PIPE NEWLINE* expr
+    ;
+
+primary
+    : literal
+    | ID
+    | &#39;(&#39; expr &#39;)&#39;
+    | &#39;[&#39; sep* (expr (sep* &#39;,&#39; sep* expr)* sep*)? &#39;]&#39;
+    | SET &#39;(&#39; (expr (&#39;,&#39; expr)*)? &#39;)&#39;
+    | DICT &#39;(&#39; (keyValue (&#39;,&#39; keyValue)*)? &#39;)&#39;
+    | &#39;{&#39; (keyValue (&#39;,&#39; keyValue)*)? &#39;}&#39;
+    | FUNCION &#39;(&#39; param_list? &#39;)&#39; block          # función anónima
+    | MATRIZ &#39;(&#39; expr &#39;)&#39;
+    ;
+
+postfixSuffix
+    : &#39;[&#39; expr &#39;]&#39;
+    | &#39;(&#39; exprList? &#39;)&#39;
+    | &#39;.&#39; ID
+    ;
+
+keyValue : expr &#39;:&#39; expr ;
+exprList : expr (&#39;,&#39; expr)* ;
+literal : NUMBER | STRING | BOOL | NULL ;
+sep : &#39;;&#39; | NEWLINE+ ;</code></pre>
+<p>Palabras reservadas: <code>var</code>, <code>const</code>,
+<code>funcion</code>, <code>matriz</code>, <code>regresa</code>,
+<code>si</code>, <code>sino_si</code>, <code>sino</code>,
+<code>segun</code>, <code>caso</code>, <code>defecto</code>,
+<code>para</code>, <code>hasta</code>, <code>inc</code>,
+<code>en</code>, <code>mientras</code>, <code>romper</code>,
+<code>continuar</code>, <code>leer</code>, <code>imp</code>,
+<code>importar</code>, <code>como</code>, <code>set</code>,
+<code>dict</code>, <code>verdadero</code>, <code>falso</code>,
+<code>nulo</code>, <code>y</code>, <code>o</code>, <code>no</code>,
+<code>in</code>.</p>
+<h2 id="implementación-con-patrón-visitor">10. Implementación con patrón
+Visitor</h2>
+<p>La evaluación se realiza mediante un visitor que recorre el AST
+generado por ANTLR. El flujo completo:</p>
+<pre><code>archivo.mice
+     │
+     ▼
+main.py (preprocesador)
+  ├── azúcar sintáctico: leer a,b → __leer_multi(&quot;a,b&quot;)
+  ├── a,b = expr → __asignar_multi(&quot;a,b&quot;, expr)
+  └── x += 1 → x = x + (1)
+     │
+     ▼
+ANTLR4 Lexer → tokens
+     │
+     ▼
+ANTLR4 Parser → árbol de parseo
+     │
+     ▼
+EvalVisitor (eval_visitor.py)
+  ├── tabla de despacho: O(1) por nodo del AST
+  ├── fast env lookup: scope local primero
+  ├── evalúa expresiones y sentencias
+  └── delega a runtime functions
+     │
+     ▼
+Runtime (runtime.py)
+  ├── Environment: tabla de símbolos con alcance dinámico
+  ├── FunctionValue: funciones MICELIO con clausuras
+  ├── BoundMethod: métodos nativos en colecciones
+  └── make_builtins(): funciones incorporadas
+     │
+     ▼
+Salida (consola, archivos, imágenes PNG, ventanas GTK, HTTP)</code></pre>
+<h3 id="pipeline-de-optimizaciones">Pipeline de optimizaciones</h3>
+<ol type="1">
+<li><strong>Preprocesador</strong> (<code>main.py</code>): transforma
+azúcar sintáctico antes del parseo</li>
+<li><strong>Parseo</strong> (ANTLR4): genera AST con reglas semánticas
+de la gramática</li>
+<li><strong>Evaluación</strong> (<code>EvalVisitor</code>):
+<ul>
+<li>Tabla de despacho: <code>dict[type → method]</code> — evita
+<code>hasattr()</code> por nodo</li>
+<li>Búsqueda rápida de variables: verifica <code>self.env</code> primero
+(cubre ~90%)</li>
+<li>Asignación rápida: mismo principio</li>
+</ul></li>
+<li><strong>Runtime</strong> (<code>runtime.py</code>):
+<ul>
+<li>Funciones builtin en Python para operaciones críticas</li>
+<li>Operadores nativos para matrices (<code>+</code>, <code>-</code>,
+<code>*</code>)</li>
+<li>Backend PIL nativo para gráficos</li>
+</ul></li>
+</ol>
+<hr />
+<h3 id="errores-pedagógicos">Errores pedagógicos</h3>
+<p>El sistema de errores muestra:</p>
+<pre><code>¿Qué pasó?      → descripción del error
+¿Dónde?         → línea, columna y marca visual
+¿Por qué pasa?  → causa técnica
+¿Cómo arreglarlo? → sugerencia con ejemplo</code></pre>
+<script>
+(function(){var t=localStorage.getItem('tema');if(t==='dark'||(t===null&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})()
+</script>
+</body>
+</html>

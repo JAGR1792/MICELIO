@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>runtime — MICELIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg-page:#f8f1eb;--bg-main:#fffcf8;--bg-surface:#f4ece4;--fg-main:#2c1810;--fg-muted:#7a6658;--accent-terracotta:#c76b4a;--accent-amber:#d4922a;--code-bg:#2c1810;--code-fg:#e8d5c0;--border-light:rgba(199,107,74,0.12);--border-medium:rgba(199,107,74,0.2);--radius:12px;--radius-sm:8px;--font-display:'Playfair Display',serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace}
+[data-theme="dark"]{--bg-page:#1a120e;--bg-main:#241a14;--bg-surface:#2c2018;--fg-main:#e8ddd0;--fg-muted:#b8a89a;--accent-terracotta:#d4835a;--accent-amber:#d4a030;--code-bg:#0d0806;--code-fg:#e8ddd0;--border-light:rgba(212,131,90,0.15);--border-medium:rgba(212,131,90,0.25)}
+*{box-sizing:border-box}
+body{background:var(--bg-page);color:var(--fg-main);font-family:var(--font-body);font-weight:400;line-height:1.7;margin:0;padding:2rem 2rem 4rem;max-width:900px;margin:0 auto}
+h1{font-family:var(--font-display);font-size:2.8rem;font-weight:900;margin:2rem 0 0.3rem;color:var(--accent-terracotta)}
+h2{font-family:var(--font-display);color:var(--fg-main);font-size:1.8rem;font-weight:700;margin-top:3rem;border-bottom:2px solid var(--border-light);padding-bottom:0.5rem}
+h3{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-top:2rem;color:var(--accent-amber)}
+h4{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-top:1.5rem;color:var(--accent-terracotta)}
+a{color:var(--accent-terracotta)}
+code{font-family:var(--font-mono);background:rgba(199,107,74,0.08);color:var(--accent-terracotta);padding:0.15rem 0.5rem;border-radius:5px;font-size:0.85em}
+pre{background:var(--code-bg);color:var(--code-fg);padding:1.5rem;border-radius:var(--radius);overflow-x:auto;font-family:var(--font-mono);font-size:0.9em}
+pre code{background:transparent;color:inherit;padding:0}
+p{margin:0 0 1.2rem}
+strong{color:var(--fg-main)}
+.back{display:inline-block;margin-bottom:2rem;color:var(--fg-muted);text-decoration:none;font-size:0.9rem}
+.back:hover{color:var(--accent-terracotta)}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">&larr; Volver a Deep Learning</a>
+<h1 id="runtime-de-micelio">Runtime de Micelio</h1>
+<h2 id="vista-general">Vista general</h2>
+<p>La ejecucion de Micelio usa pipeline clasico:</p>
+<ol type="1">
+<li>Fuente <code>.mice</code></li>
+<li>Lexer/Parser ANTLR</li>
+<li>Parse tree</li>
+<li>Visitor evaluator</li>
+<li>Runtime (entorno, builtins, representacion de valores)</li>
+</ol>
+<h2 id="archivos-clave">Archivos clave</h2>
+<ul>
+<li><code>MICELIO/main.py</code>: entrada CLI/REPL, parse y errores
+pedagogicos.</li>
+<li><code>MICELIO/eval_visitor.py</code>: semantica del lenguaje por
+nodo.</li>
+<li><code>MICELIO/runtime.py</code>: tipos runtime, entorno, builtins,
+helpers.</li>
+</ul>
+<h2 id="entorno-y-alcance">Entorno y alcance</h2>
+<p><code>Environment</code> implementa:</p>
+<ul>
+<li><code>define(name, value, is_const=False)</code></li>
+<li><code>get(name)</code></li>
+<li><code>assign(name, value)</code></li>
+</ul>
+<p>Con soporte de scopes anidados (<code>parent</code>).</p>
+<h2 id="funciones-y-llamadas">Funciones y llamadas</h2>
+<ul>
+<li><code>FunctionValue</code>: representa funciones del lenguaje.</li>
+<li><code>BoundMethod</code>: habilita metodos sobre tipos runtime
+(lista, texto, set, dict).</li>
+<li><code>_call_callable</code>: unifica llamada de funciones declaradas
+y callables nativos.</li>
+</ul>
+<h2 id="builtins-relevantes">Builtins relevantes</h2>
+<ul>
+<li><code>map</code>, <code>filter</code>, <code>reduce</code>,
+<code>ordenar</code></li>
+<li>Conversiones: <code>aNumero</code>, <code>aTexto</code>,
+<code>aBooleano</code></li>
+<li>Bases numericas: <code>aBinario</code>, <code>aOctal</code>,
+<code>aHexadecimal</code>, <code>aBase</code>, <code>desdeBase</code>,
+etc.</li>
+</ul>
+<h2 id="modulo-grafico-desde-cero">Modulo grafico (desde cero)</h2>
+<p>La logica publica de <code>grafico</code> ahora vive en
+<code>MICELIO/modulos_std/grafico.mice</code>. El runtime solo aporta
+primitivas internas (prefijo <code>__grafico_</code>) para:</p>
+<ul>
+<li>crear/reiniciar lienzo</li>
+<li>dibujar pixeles/ejes</li>
+<li>guardar PPM</li>
+</ul>
+<p>De esta forma, la API que importa el usuario es modulo estandar
+(<code>importar "grafico.mice"</code>) y no funciones globales del
+runtime.</p>
+<ul>
+<li>Implementa renderizado pixel a pixel en memoria.</li>
+<li>Exporta imagenes en formato <code>PPM</code> (<code>P3</code>) con
+<code>guardar(ruta)</code>.</li>
+<li>Si se pasa una ruta <code>.png</code>, se guarda como
+<code>.ppm</code> equivalente para mantener implementacion 100%
+propia.</li>
+</ul>
+<p>Funciones disponibles:</p>
+<ul>
+<li><code>lineas(x, y)</code></li>
+<li><code>dispersion(x, y)</code></li>
+<li><code>histograma(datos, bins)</code></li>
+<li><code>titulo(texto)</code></li>
+<li><code>etiquetas(xlabel, ylabel)</code></li>
+<li><code>guardar(ruta)</code></li>
+<li><code>mostrar()</code></li>
+</ul>
+<p>Archivo de referencia del modulo estandar:</p>
+<ul>
+<li><code>MICELIO/modulos_std/grafico.mice</code></li>
+</ul>
+<h2 id="repl-interactivo">REPL interactivo</h2>
+<p>Arranca sin argumentos:</p>
+<pre><code>python main.py
+# o
+./micelio</code></pre>
+<h3 id="variable-_">Variable <code>_</code></h3>
+<p>El REPL guarda automaticamente el ultimo resultado en la variable
+<code>_</code>.</p>
+<pre><code>micelio&gt; var a = [2, 21, 32, 2]
+[2, 21, 32, 2]
+micelio&gt; _
+[2, 21, 32, 2]</code></pre>
+<h3 id="continuacion-con">Continuacion con <code>|&gt;</code></h3>
+<p>Una linea que empiece con <code>|&gt;</code> se encadena
+automaticamente al resultado anterior (<code>_</code>):</p>
+<pre><code>micelio&gt; var a = [0, 2, 1, 3]
+[0, 2, 1, 3]
+micelio&gt; a = a
+[0, 2, 1, 3]
+micelio&gt; |&gt; map(funcion(x) { regresa x + 1 })
+[1, 3, 2, 4]
+micelio&gt; |&gt; filter(funcion(x) { regresa x &gt; 2 })
+[3, 4]</code></pre>
+<p>Internamente, <code>|&gt; expr</code> se expande a
+<code>_ |&gt; expr</code> antes de parsear.</p>
+<blockquote>
+<p><strong>Nota:</strong> <code>_</code> se actualiza solo cuando la
+expresion devuelve un valor no nulo. Las sentencias (<code>var</code>,
+<code>imp</code>, etc.) no actualizan <code>_</code>.</p>
+</blockquote>
+<h2 id="azucar-sintactico-soportado">Azucar sintactico soportado</h2>
+<p>Desde <code>main.py</code> se preprocesan patrones antes de
+parsear:</p>
+<ul>
+<li><code>leer a, b</code> -&gt; llamada interna de lectura
+multiple.</li>
+<li><code>a, b = expr</code> -&gt; llamada interna de asignacion
+multiple.</li>
+</ul>
+<p>Eso permite tener sintaxis amigable sin romper la gramatica base
+vigente.</p>
+<h2 id="desempaquetado">Desempaquetado</h2>
+<p>Soportado en:</p>
+<ul>
+<li>Declaracion: <code>var a, b = expr</code></li>
+<li>Asignacion: <code>a, b = expr</code></li>
+</ul>
+<p>Reglas:</p>
+<ul>
+<li><code>expr</code> debe evaluar a lista/tupla.</li>
+<li>Debe coincidir cantidad de elementos y variables.</li>
+</ul>
+<h2 id="formato-de-salida">Formato de salida</h2>
+<p><code>micelio_repr</code> se encarga de imprimir valores con estilo
+del lenguaje:</p>
+<ul>
+<li><code>verdadero</code>, <code>falso</code>, <code>nulo</code></li>
+<li>listas, sets y dicts</li>
+<li>texto con comillas y escapes visibles</li>
+</ul>
+<h2 id="consideraciones-tecnicas">Consideraciones tecnicas</h2>
+<ul>
+<li>El parser generado (<code>MicelioParser.py</code>) puede no reflejar
+cambios recientes en <code>.g4</code> si no se regenera.</li>
+<li>En caso de divergencia gramatica/parser, el comportamiento real lo
+dicta el parser generado en uso.</li>
+</ul>
+<script>
+(function(){var t=localStorage.getItem('tema');if(t==='dark'||(t===null&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})()
+</script>
+</body>
+</html>

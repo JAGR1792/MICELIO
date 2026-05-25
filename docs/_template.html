@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>$title$ — MICELIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg-page:#f8f1eb;--bg-main:#fffcf8;--bg-surface:#f4ece4;--fg-main:#2c1810;--fg-muted:#7a6658;--accent-terracotta:#c76b4a;--accent-amber:#d4922a;--code-bg:#2c1810;--code-fg:#e8d5c0;--border-light:rgba(199,107,74,0.12);--border-medium:rgba(199,107,74,0.2);--radius:12px;--radius-sm:8px;--font-display:'Playfair Display',serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace}
+[data-theme="dark"]{--bg-page:#1a120e;--bg-main:#241a14;--bg-surface:#2c2018;--fg-main:#e8ddd0;--fg-muted:#b8a89a;--accent-terracotta:#d4835a;--accent-amber:#d4a030;--code-bg:#0d0806;--code-fg:#e8ddd0;--border-light:rgba(212,131,90,0.15);--border-medium:rgba(212,131,90,0.25)}
+*{box-sizing:border-box}
+body{background:var(--bg-page);color:var(--fg-main);font-family:var(--font-body);font-weight:400;line-height:1.7;margin:0;padding:2rem 2rem 4rem;max-width:900px;margin:0 auto}
+h1{font-family:var(--font-display);font-size:2.8rem;font-weight:900;margin:2rem 0 0.3rem;color:var(--accent-terracotta)}
+h2{font-family:var(--font-display);color:var(--fg-main);font-size:1.8rem;font-weight:700;margin-top:3rem;border-bottom:2px solid var(--border-light);padding-bottom:0.5rem}
+h3{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-top:2rem;color:var(--accent-amber)}
+h4{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-top:1.5rem;color:var(--accent-terracotta)}
+a{color:var(--accent-terracotta)}
+code{font-family:var(--font-mono);background:rgba(199,107,74,0.08);color:var(--accent-terracotta);padding:0.15rem 0.5rem;border-radius:5px;font-size:0.85em}
+pre{background:var(--code-bg);color:var(--code-fg);padding:1.5rem;border-radius:var(--radius);overflow-x:auto;font-family:var(--font-mono);font-size:0.9em}
+pre code{background:transparent;color:inherit;padding:0}
+p{margin:0 0 1.2rem}
+strong{color:var(--fg-main)}
+.back{display:inline-block;margin-bottom:2rem;color:var(--fg-muted);text-decoration:none;font-size:0.9rem}
+.back:hover{color:var(--accent-terracotta)}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">&larr; Volver a Deep Learning</a>
+$body$
+<script>
+(function(){var t=localStorage.getItem('tema');if(t==='dark'||(t===null&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})()
+</script>
+</body>
+</html>
