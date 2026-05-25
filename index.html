@@ -11,10 +11,30 @@
     <!-- Mermaid (diagrams) -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'base',
-            themeVariables: {
+        var temaMermaid = function() {
+            var esOscuro = localStorage.getItem('tema') === 'oscuro' ||
+                (localStorage.getItem('tema') === null &&
+                 window.matchMedia('(prefers-color-scheme: dark)').matches);
+            return esOscuro ? {
+                background: '#1a120e',
+                primaryColor: '#2c2018',
+                primaryTextColor: '#e8ddd0',
+                primaryBorderColor: '#d4835a',
+                lineColor: '#d4835a',
+                secondaryColor: '#241a14',
+                tertiaryColor: '#1a120e',
+                clusterBkg: '#2c2018',
+                clusterBorder: '#d4835a',
+                nodeBorder: '#d4835a',
+                nodeTextColor: '#e8ddd0',
+                edgeLabelBackground: '#1a120e',
+                fontFamily: 'DM Sans, sans-serif',
+                titleColor: '#e8ddd0',
+                mainBkg: '#2c2018',
+                textColor: '#e8ddd0',
+                labelTextColor: '#e8ddd0',
+                labelBackground: '#2c2018'
+            } : {
                 background: '#fffcf8',
                 primaryColor: '#f4ece4',
                 primaryTextColor: '#2c1810',
@@ -33,7 +53,12 @@
                 textColor: '#2c1810',
                 labelTextColor: '#2c1810',
                 labelBackground: '#fffcf8'
-            }
+            };
+        }();
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: temaMermaid
         });
     </script>
 
@@ -82,6 +107,46 @@
             --radius-sm: 8px;
         }
 
+        [data-theme="dark"] {
+            --bg-page: #1a120e;
+            --bg-main: #241a14;
+            --bg-surface: #2c2018;
+            --bg-surface-hover: #3a2a20;
+            --fg-main: #e8ddd0;
+            --fg-muted: #b8a89a;
+            --fg-light: #8a7a6a;
+            --fg-faint: #5a4a3a;
+
+            --accent-terracotta: #d4835a;
+            --accent-terracotta-dark: #e8a080;
+            --accent-amber: #d4a030;
+            --accent-gold: #e8b840;
+            --accent-coral: #e08060;
+            --accent-brick: #a06030;
+            --accent-olive: #8a9a6a;
+            --accent-deep: #5a3a28;
+
+            --code-bg: #0d0806;
+            --code-fg: #e8ddd0;
+            --code-keyword: #f0b860;
+            --code-string: #b0c890;
+
+            --border-light: rgba(212, 131, 90, 0.15);
+            --border-medium: rgba(212, 131, 90, 0.25);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+            --shadow-warm: 0 8px 32px rgba(212, 131, 90, 0.1);
+
+            --body-bg-gradient-1: rgba(212, 131, 90, 0.06);
+            --body-bg-gradient-2: rgba(212, 160, 48, 0.04);
+        }
+
+        :root {
+            --body-bg-gradient-1: rgba(199, 107, 74, 0.04);
+            --body-bg-gradient-2: rgba(212, 146, 42, 0.03);
+        }
+
         * { box-sizing: border-box; scroll-behavior: smooth; }
 
         ::selection {
@@ -100,8 +165,8 @@
         body {
             background: var(--bg-page);
             background-image:
-                radial-gradient(ellipse at 15% 20%, rgba(199, 107, 74, 0.04) 0%, transparent 50%),
-                radial-gradient(ellipse at 85% 80%, rgba(212, 146, 42, 0.03) 0%, transparent 50%);
+                radial-gradient(ellipse at 15% 20%, var(--body-bg-gradient-1) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 80%, var(--body-bg-gradient-2) 0%, transparent 50%);
             color: var(--fg-main);
             font-family: var(--font-body);
             font-weight: 400;
@@ -503,19 +568,47 @@
             color: var(--accent-terracotta);
         }
 
-        .crown-jewel-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber));
-            color: #2c1810;
-            font-weight: 800;
-            font-size: 0.7rem;
-            padding: 0.25rem 1rem;
-            border-radius: 20px;
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 2rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            background: var(--bg-surface);
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            color: var(--fg-muted);
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--border-medium);
+            background: var(--bg-surface-hover);
+        }
+
+        .theme-toggle .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-page);
+            border: 1px solid var(--border-light);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle .label {
+            flex: 1;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-left: 0.8rem;
-            vertical-align: middle;
-            font-family: var(--font-deco);
+            font-weight: 500;
+            font-size: 0.72rem;
         }
 
         .img-container {
@@ -578,7 +671,7 @@
 <body>
 
 <aside>
-    <h2>Índice</h2>
+    <h2>Indice</h2>
     <nav>
         <ul>
             <li><a href="#prefacio">Prefacio</a></li>
@@ -588,16 +681,54 @@
             <li><a href="#backpropagation">4. Backpropagation</a></li>
             <li><a href="#ciclo">5. Ciclo de entrenamiento</a></li>
             <li><a href="#api">6. API de dl.mice</a></li>
-            <li><a href="#ejemplo1">7. XOR clásico</a></li>
+            <li><a href="#ejemplo1">7. XOR clasico</a></li>
             <li><a href="#ejemplo2">8. Caperucita Roja</a></li>
             <li><a href="#ejemplo3">9. Autoencoder</a></li>
             <li><a href="#ejemplo4">10. Iris</a></li>
-            <li><a href="#joya" style="color: #f1c40f; font-weight: 600;">★ 11. La Joya de la Corona</a></li>
-            <li><a href="#matematicas">12. Matemáticas</a></li>
+            <li><a href="#joya">11. Clasificacion no-lineal</a></li>
+            <li><a href="#matematicas">12. Matematicas</a></li>
             <li><a href="#arquitectura">13. Arquitectura interna</a></li>
             <li><a href="#limitaciones">14. Limitaciones</a></li>
         </ul>
     </nav>
+    <div class="theme-toggle" onclick="alternarTema()" role="button" tabindex="0">
+        <span class="icon" id="toggle-icon">&#x25D0;</span>
+        <span class="label" id="toggle-label">Oscuro</span>
+    </div>
+    <script>
+        (function() {
+            var tema = localStorage.getItem('tema');
+            if (tema === 'dark' || (tema === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                var icon = document.getElementById('toggle-icon');
+                var label = document.getElementById('toggle-label');
+                if (icon) icon.innerHTML = '&#x2601;';
+                if (label) label.textContent = 'Claro';
+            }
+        })();
+        function alternarTema() {
+            var html = document.documentElement;
+            var icon = document.getElementById('toggle-icon');
+            var label = document.getElementById('toggle-label');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('tema', 'light');
+                if (icon) icon.innerHTML = '&#x25D0;';
+                if (label) label.textContent = 'Oscuro';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('tema', 'dark');
+                if (icon) icon.innerHTML = '&#x2601;';
+                if (label) label.textContent = 'Claro';
+            }
+            if (typeof mermaid !== 'undefined' && mermaid.run) {
+                document.querySelectorAll('.mermaid').forEach(function(el) {
+                    el.removeAttribute('data-processed');
+                });
+                mermaid.run();
+            }
+        }
+    </script>
 </aside>
 
 <main>
@@ -632,7 +763,27 @@
 6. Se repite hasta que el error es aceptable</code></pre>
         <p>Esto se conoce como <strong>aprendizaje supervisado</strong>: la red aprende de ejemplos etiquetados.</p>
 
-        <h3>1.2 La neurona artificial</h3>
+        <h3>1.2 Que es una Red Neuronal Artificial (RNA)</h3>
+        <p>Una <strong>Red Neuronal Artificial</strong> es un sistema de computo inspirado en el cerebro biologico. Esta formada por unidades simples llamadas <strong>neuronas artificiales</strong> conectadas entre si en capas. Cada conexion tiene un peso numerico que se ajusta durante el entrenamiento. La red en su conjunto puede aprender a reconocer patrones, clasificar datos, o predecir valores.</p>
+
+        <p><strong>Estructura tipica:</strong></p>
+        <ul>
+            <li><strong>Capa de entrada:</strong> recibe los datos brutos (por ejemplo, coordenadas x, y de un punto). No procesa, solo distribuye.</li>
+            <li><strong>Capas ocultas:</strong> procesan la informacion. Cada neurona oculta recibe senales de la capa anterior, las multiplica por pesos, las suma, y aplica una funcion de activacion. Son las que aprenden patrones no evidentes.</li>
+            <li><strong>Capa de salida:</strong> produce la respuesta final (por ejemplo, la probabilidad de pertenecer a cada clase).</li>
+        </ul>
+
+        <p><strong>Por que funciona:</strong> El Teorema de Aproximacion Universal demuestra que una red con una sola capa oculta y suficientes neuronas puede aproximar cualquier funcion continua con la precision que se desee. En la practica, esto significa que si existe una relacion matematica entre las entradas y las salidas (aunque sea muy compleja), la red puede aprenderla ajustando sus pesos a partir de ejemplos.</p>
+
+        <p><strong>El reto:</strong> Aprender los pesos correctos requiere:
+        <ol>
+            <li>Una forma de medir el error (funcion de perdida)</li>
+            <li>Una forma de propagar ese error hacia atras para ajustar cada peso (backpropagation)</li>
+            <li>Repetir el proceso cientos o miles de veces (epocas de entrenamiento)</li>
+        </ol>
+        Cada uno de estos pasos esta implementado en MICELIO puro dentro del modulo <code>dl.mice</code>.</p>
+
+        <h3>1.3 La neurona artificial</h3>
         <p>Una neurona artificial es la unidad m&iacute;nima de procesamiento. Recibe varias se&ntilde;ales de entrada, las combina, y decide si &laquo;se activa&raquo; o no.</p>
         <p><strong>Analog&iacute;a:</strong> Una neurona biol&oacute;gica recibe se&ntilde;ales de otras neuronas a trav&eacute;s de sus dendritas. Si la suma de esas se&ntilde;ales supera un umbral, la neurona &laquo;dispara&raquo; una se&ntilde;al a trav&eacute;s de su ax&oacute;n. La neurona artificial hace lo mismo con n&uacute;meros.</p>
 
@@ -670,7 +821,7 @@ flowchart LR
         </div>
         <p>Esta funci&oacute;n de activaci&oacute;n es crucial: sin ella, la red solo podr&iacute;a aprender relaciones lineales, y apilar varias capas no dar&iacute;a ninguna ventaja respecto a una sola.</p>
 
-        <h3>1.3 Capas y redes profundas</h3>
+        <h3>1.4 Capas y redes profundas</h3>
         <p>Varias neuronas agrupadas forman una <strong>capa</strong> (layer). Varias capas apiladas forman una <strong>red profunda</strong> (deep neural network).</p>
 
         <div class="mermaid-container">
@@ -1254,13 +1405,13 @@ imp "Clase predicha:", clase</code></pre>
     </section>
 
     <!-- ================================================================ -->
-    <!-- ★ 11. LA JOYA DE LA CORONA -->
+    <!-- 11. CLASIFICACION NO-LINEAL XOR-2D -->
     <!-- ================================================================ -->
     <section id="joya">
-        <h2>11. La Joya de la Corona: clasificaci&oacute;n no-lineal XOR-2D <span class="crown-jewel-badge">&hearts; joya</span></h2>
+        <h2>11. Clasificacion no-lineal XOR-2D</h2>
 
         <div class="info-note">
-            <strong>★</strong> Este es el ejemplo cumbre de MICELIO: una red neuronal que aprende una frontera de decisi&oacute;n no-lineal en 2D, genera gr&aacute;ficos de alta calidad, y alcanza <strong>100% de exactitud</strong> &mdash; todo en MICELIO puro.
+            Este es el ejemplo cumbre de MICELIO: una red neuronal que aprende una frontera de decision en 2D, genera graficos de alta calidad, y alcanza <strong>100% de exactitud</strong> &mdash; todo en MICELIO puro.
         </div>
 
         <h3>11.1 El problema: XOR en 2D</h3>
@@ -1293,34 +1444,42 @@ flowchart TD
             <strong>&iexcl;Atenci&oacute;n!</strong> Las etiquetas actuales siguen la regla <code>clase = 0 si y &gt; 0, clase = 1 si y &lt; 0</code>, que es <strong>linealmente separable</strong> por una recta horizontal. Esto NO es un problema XOR real. Para ser un XOR-2D genuino, las clases deber&iacute;an asignarse seg&uacute;n el signo: clase 1 cuando <code>sign(x) &ne; sign(y)</code>, clase 0 cuando <code>sign(x) = sign(y)</code>. Con esa correcci&oacute;n, la frontera ser&iacute;an las diagonales <code>|x| = |y|</code> y la red S&Iacute; demostrar&iacute;a su capacidad de representar no-linealidad.
         </div>
 
-        <h3>11.1b Tabla tautol&oacute;gica: XOR cl&aacute;sico vs XOR-2D actual vs XOR-2D verdadero</h3>
+        <h3>11.1b Tabla tautologica: que es, por que es correcto, y en que reta</h3>
 
-        <p><strong>XOR cl&aacute;sico</strong> (1D binaria, 4 puntos):</p>
+        <p>Para entender el problema de clasificacion, primero hay que definir exactamente que significa cada etiqueta. Comparemos tres casos.</p>
+
+        <h4>XOR clasico (1D binaria, 4 puntos)</h4>
+        <p><strong>Que es:</strong> Es la puerta logica XOR (o exclusivo). Toma dos bits (0 o 1) y da 1 solo cuando son diferentes.</p>
         <div class="math-block">
             $$\begin{array}{c|c|c} x_1 &amp; x_2 &amp; \text{salida} \\ \hline 0 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 1 \\ 1 &amp; 0 &amp; 1 \\ 1 &amp; 1 &amp; 0 \end{array}$$
         </div>
-        <p>Regla: salida = 1 si <strong>x&#x2081; &ne; x&#x2082;</strong>.</p>
+        <p><strong>Por que es correcto:</strong> La regla es <strong>salida = 1 si x1 &ne; x2</strong>. En el plano, los puntos (0,0) y (1,1) son clase 0, y (0,1) y (1,0) son clase 1. No existe una recta que separe ambas clases &mdash; esto se llama <strong>no-linealidad</strong>. Es el problema mas simple que una red de una sola neurona NO puede resolver.</p>
+        <p><strong>En que reta:</strong> Una red debe aprender una frontera curva (en este caso, dos rectas en forma de L). La capa oculta transforma el espacio para hacerlo separable.</p>
 
-        <p><strong>XOR-2D actual</strong> (c&oacute;mo est&aacute; etiquetado el c&oacute;digo):</p>
+        <h4>XOR-2D actual (como esta etiquetado el codigo)</h4>
+        <p><strong>Que es:</strong> Los 4 centros estan en las esquinas de un cuadrado de lado 4. Las etiquetas actuales son: clase 0 para los centros de arriba (y &gt; 0), clase 1 para los de abajo (y &lt; 0).</p>
         <div class="math-block">
-            $$\begin{array}{c|c|c|c|c} \text{centro} &amp; \text{sign}(x) &amp; \text{sign}(y) &amp; \text{clase actual} &amp; \text{regla} \\ \hline (-2, 2) &amp; 0 &amp; 1 &amp; 0 &amp; y &gt; 0 \\ (2, -2) &amp; 1 &amp; 0 &amp; 1 &amp; y &lt; 0 \\ (-2, -2) &amp; 0 &amp; 0 &amp; 1 &amp; y &lt; 0 \\ (2, 2) &amp; 1 &amp; 1 &amp; 0 &amp; y &gt; 0 \end{array}$$
+            $$\begin{array}{c|c|c|c|c} \text{centro} &amp; \text{signo de }x &amp; \text{signo de }y &amp; \text{clase} &amp; \text{regla implicita} \\ \hline (-2, 2) &amp; - &amp; + &amp; 0 &amp; y &gt; 0 \\ (2, -2) &amp; + &amp; - &amp; 1 &amp; y &lt; 0 \\ (-2, -2) &amp; - &amp; - &amp; 1 &amp; y &lt; 0 \\ (2, 2) &amp; + &amp; + &amp; 0 &amp; y &gt; 0 \end{array}$$
         </div>
-        <p>Regla real: <strong>clase = NOT(sign(y))</strong>. Es separable por una recta horizontal <code>y = 0</code>. No demuestra el poder de las redes neuronales.</p>
+        <p><strong>Por que es correcto (o no):</strong> La regla real es <strong>clase = 0 si y &gt; 0, clase = 1 si y &lt; 0</strong>. Esto es una funcion del signo de y solamente, x no importa. Ge metricamente, la frontera es la recta horizontal y = 0. Esta frontera <strong>es lineal</strong>: un clasificador lineal (como una regresion logistica) puede separar las clases con el mismo resultado. No se necesita una red neuronal multicapa.</p>
+        <p><strong>En que reta:</strong> El unico reto aqui es el ruido (±1.25): algunos puntos cerca de y = 0 pueden caer del lado equivocado. La red debe ser tolerante a ese ruido. Pero como la frontera es recta, el problema no demuestra la capacidad de las capas ocultas para representar formas complejas.</p>
 
-        <p><strong>XOR-2D verdadero</strong> (c&oacute;mo deber&iacute;a ser para ser un XOR genuino):</p>
+        <h4>XOR-2D verdadero (como deberia etiquetarse para ser un XOR genuino)</h4>
+        <p><strong>Que es:</strong> En un XOR-2D verdadero, la clase depende de si x e y tienen el mismo signo o no. Es la extension natural del XOR clasico a 2D: en lugar de comparar bits, comparamos signos.</p>
         <div class="math-block">
-            $$\begin{array}{c|c|c|c|c} \text{centro} &amp; \text{sign}(x) &amp; \text{sign}(y) &amp; \text{sign}(x) \neq \text{sign}(y)? &amp; \text{clase correcta} \\ \hline (-2, 2) &amp; 0 &amp; 1 &amp; \text{S&iacute;} &amp; 1 \\ (2, -2) &amp; 1 &amp; 0 &amp; \text{S&iacute;} &amp; 1 \\ (-2, -2) &amp; 0 &amp; 0 &amp; \text{No} &amp; 0 \\ (2, 2) &amp; 1 &amp; 1 &amp; \text{No} &amp; 0 \end{array}$$
+            $$\begin{array}{c|c|c|c|c} \text{centro} &amp; \text{signo de }x &amp; \text{signo de }y &amp; \text{signos iguales?} &amp; \text{clase XOR} \\ \hline (-2, 2) &amp; - &amp; + &amp; \text{No} &amp; 1 \\ (2, -2) &amp; + &amp; - &amp; \text{No} &amp; 1 \\ (-2, -2) &amp; - &amp; - &amp; \text{Si} &amp; 0 \\ (2, 2) &amp; + &amp; + &amp; \text{Si} &amp; 0 \end{array}$$
         </div>
-        <p>Regla: <strong>clase = 1 si sign(x) &ne; sign(y)</strong>. Las fronteras son las diagonales <code>y = x</code> y <code>y = -x</code>. Este problema <strong>no es linealmente separable</strong> y requiere una red con al menos una capa oculta &mdash; ese ser&iacute;a el verdadero an&aacute;logo 2D del XOR cl&aacute;sico.</p>
+        <p><strong>Por que es correcto:</strong> La regla es <strong>clase = 1 si sign(x) &ne; sign(y)</strong>. Esto replica exactamente el comportamiento del XOR clasico: la salida es 1 cuando las entradas (en este caso, los signos) difieren. Las fronteras de decision son las diagonales y = x e y = -x, que se cruzan en el origen formando una X. Ninguna recta puede separar las clases; se necesita una red con al menos una capa oculta.</p>
+        <p><strong>En que reta:</strong> La red debe aprender dos fronteras diagonales simultaneamente. Esto requiere que las neuronas ocultas se especialicen: algunas detectan cuando x e y tienen el mismo signo, otras cuando difieren. La capa oculta de 4 neuronas tiene justo la capacidad necesaria para representar esta forma de &laquo;X&raquo; en el espacio de decision. Es el analogo 2D exacto del problema XOR clasico y demuestra por que las capas ocultas son necesarias.</p>
 
         <div class="two-columns">
             <div class="img-container">
                 <img src="docs/img/ilustra_xor_actual.png" alt="XOR-2D actual">
-                <div class="caption"><strong>XOR-2D actual:</strong> la frontera es la recta y=0 (lineal). Una regresi&oacute;n log&iacute;stica lo resuelve. No hay no-linealidad que demostrar.</div>
+                <div class="caption"><strong>XOR-2D actual:</strong> la frontera es la recta y = 0 (lineal). Una regresion logistica simple lo resuelve. Las clases se separan solo por el signo de y; x no aporta informacion.</div>
             </div>
             <div class="img-container">
                 <img src="docs/img/ilustra_xor_verdadero.png" alt="XOR-2D verdadero">
-                <div class="caption"><strong>XOR-2D verdadero:</strong> las fronteras son las diagonales y=x, y=-x (no-lineal). Una red con capa oculta es necesaria.</div>
+                <div class="caption"><strong>XOR-2D verdadero:</strong> las fronteras son las diagonales y = x, y = -x (no-lineal). La clase depende de ambos ejes simultaneamente. Se necesita una capa oculta para doblar el espacio de decision.</div>
             </div>
         </div>
 
@@ -1337,8 +1496,8 @@ flowchart LR
 
         <p>Arquitectura <strong>2 &rarr; 4 &rarr; 2</strong>:</p>
         <ul>
-            <li><strong>Capa 1:</strong> 4 neuronas con activaci&oacute;n <strong>ReLU</strong>. Transforma el espacio de entrada (no-linealmente separable) en un espacio donde las clases son separables.</li>
-            <li><strong>Capa 2:</strong> 2 neuronas con activaci&oacute;n <strong>Softmax</strong>. Produce la probabilidad de pertenencia a cada clase.</li>
+            <li><strong>Capa 1:</strong> 4 neuronas con activacion <strong>ReLU</strong>. En teoria, transforma el espacio de entrada para hacerlo separable. Con las etiquetas actuales (frontera y = 0, lineal), esta capa podria no ser necesaria, pero la red la usa igualmente.</li>
+            <li><strong>Capa 2:</strong> 2 neuronas con activacion <strong>Softmax</strong>. Produce la probabilidad de pertenencia a cada clase. La clase elegida es la de mayor probabilidad.</li>
         </ul>
 
         <h3>11.3 Hiperpar&aacute;metros</h3>
@@ -1491,21 +1650,25 @@ var res_grid = dl.forward(modelo, grid_pts)
             </div>
         </div>
 
-        <h3>11.7 An&aacute;lisis de la frontera de decisi&oacute;n</h3>
-        <p>Con las etiquetas actuales (clase = 0 si y &gt; 0, clase = 1 si y &lt; 0), la red aprende una frontera que se aproxima a la recta horizontal <strong>y = 0</strong>:</p>
+        <h3>11.7 Analisis de la frontera de decision</h3>
+        <p>Con las etiquetas actuales (clase = 0 si y &gt; 0, clase = 1 si y &lt; 0), la red aprende una frontera horizontal:</p>
 
         <div class="math-block">
-            $$\text{Frontera actual: } y = 0$$
+            $$\text{Frontera aprendida: } y = 0$$
         </div>
 
-        <p>La red clasifica correctamente los 12 puntos de test porque el ruido (±1.25) no es suficiente para que los puntos de arriba crucen al hemisferio inferior. Sin embargo, este problema es <strong>linealmente separable</strong>: un perceptr&oacute;n simple sin capa oculta podr&iacute;a resolverlo con la misma exactitud.</p>
+        <p><strong>Como lo hace la red:</strong> La red asigna pesos grandes a la coordenada y y pesos cercanos a cero a la coordenada x. La neurona de salida para clase 0 se activa cuando la suma ponderada es positiva (y &gt; despues del sesgo), y la de clase 1 cuando es negativa. Es decir, la red se comporta como un clasificador lineal a pesar de tener una capa oculta.</p>
 
-        <p>Si las etiquetas se corrigieran para seguir el patr&oacute;n XOR verdadero (clase = 1 cuando sign(x) &ne; sign(y)), la frontera ser&iacute;a:</p>
+        <p><strong>Por que no se necesita la capa oculta:</strong> Este problema se puede resolver con una sola neurona (regresion logistica). La capa oculta de 4 neuronas es redundante: la red podria usar solo 2 conexiones (y -> clase 0, -y -> clase 1) y obtener el mismo resultado. Esto se nota en los pesos: despues del entrenamiento, los pesos de las neuronas ocultas convergen a valores que esencialmente replican la entrada y, y la combinacion lineal final produce la misma frontera y = 0.</p>
+
+        <p><strong>Que pasaria con etiquetas XOR verdaderas:</strong> Si las etiquetas siguieran el patron sign(x) &ne; sign(y), la frontera ideal seria:</p>
         <div class="math-block">
             $$\text{Frontera ideal: } |x| = |y|$$
         </div>
 
-        <p>Esa frontera <strong>no es linealmente separable</strong> y requerir&iacute;a una red con al menos una capa oculta. Con la correcci&oacute;n, el ejemplo 23 ser&iacute;a un verdadero an&aacute;logo 2D del XOR cl&aacute;sico y demostrar&iacute;a la capacidad de representaci&oacute;n no-lineal de la arquitectura 2&rarr;4&rarr;2.</p>
+        <p>Esta frontera forma una X en el plano. Ninguna recta puede separar las clases. Las neuronas ocultas tendrian que especializarse: unas detectarian la region donde x e y tienen el mismo signo (clase 0), otras donde difieren (clase 1). La capa oculta de 4 neuronas tendria justo la capacidad necesaria, y los pesos mostrarian patrones diagonales claros. Eso demostraria visualmente por que se necesita una profundidad de al menos una capa oculta.</p>
+
+        <p><strong>Conclusion:</strong> El ejemplo 23 actual entrena correctamente una red y alcanza 100% de exactitud, pero no demuestra la capacidad de representacion no-lineal de las capas ocultas porque las etiquetas lo hacen innecesario. Con la correccion a XOR verdadero, el mismo codigo y la misma arquitectura resolverian un problema genuinamente no-lineal y el resultado seria mucho mas ilustrativo.</p>
 
         <h3>11.8 Significado de este logro</h3>
         <p>Este ejemplo demuestra que MICELIO es capaz de <strong>deep learning real</strong>:</p>
@@ -1517,7 +1680,7 @@ var res_grid = dl.forward(modelo, grid_pts)
         </ul>
 
         <div class="info-note">
-            <strong>★ Archivo fuente:</strong> <code>MICELIO/ejemplos/23_joya_clasificacion.mice</code> &mdash; 209 l&iacute;neas de MICELIO puro que producen dos gr&aacute;ficos PNG: la curva de p&eacute;rdida y la frontera de decisi&oacute;n.
+            <strong>Archivo fuente:</strong> <code>MICELIO/ejemplos/23_joya_clasificacion.mice</code> &mdash; 209 lineas de MICELIO puro que producen dos graficos PNG: la curva de perdida y la frontera de decision.
         </div>
     </section>
 
