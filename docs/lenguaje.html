@@ -3,121 +3,383 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>lenguaje — MICELIO</title>
+<title>lenguaje -- MICELIO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-:root{--bg-page:#f8f1eb;--bg-main:#fffcf8;--bg-surface:#f4ece4;--fg-main:#2c1810;--fg-muted:#7a6658;--accent-terracotta:#c76b4a;--accent-amber:#d4922a;--code-bg:#2c1810;--code-fg:#e8d5c0;--border-light:rgba(199,107,74,0.12);--border-medium:rgba(199,107,74,0.2);--radius:12px;--radius-sm:8px;--font-display:'Playfair Display',serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace}
-[data-theme="dark"]{--bg-page:#1a120e;--bg-main:#241a14;--bg-surface:#2c2018;--fg-main:#e8ddd0;--fg-muted:#b8a89a;--accent-terracotta:#d4835a;--accent-amber:#d4a030;--code-bg:#0d0806;--code-fg:#e8ddd0;--border-light:rgba(212,131,90,0.15);--border-medium:rgba(212,131,90,0.25)}
-*{box-sizing:border-box}
-body{background:var(--bg-page);color:var(--fg-main);font-family:var(--font-body);font-weight:400;line-height:1.7;margin:0;padding:2rem 2rem 4rem;max-width:900px;margin:0 auto}
-h1{font-family:var(--font-display);font-size:2.8rem;font-weight:900;margin:2rem 0 0.3rem;color:var(--accent-terracotta)}
-h2{font-family:var(--font-display);color:var(--fg-main);font-size:1.8rem;font-weight:700;margin-top:3rem;border-bottom:2px solid var(--border-light);padding-bottom:0.5rem}
-h3{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-top:2rem;color:var(--accent-amber)}
-h4{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-top:1.5rem;color:var(--accent-terracotta)}
-a{color:var(--accent-terracotta)}
-code{font-family:var(--font-mono);background:rgba(199,107,74,0.08);color:var(--accent-terracotta);padding:0.15rem 0.5rem;border-radius:5px;font-size:0.85em}
-pre{background:var(--code-bg);color:var(--code-fg);padding:1.5rem;border-radius:var(--radius);overflow-x:auto;font-family:var(--font-mono);font-size:0.9em}
-pre code{background:transparent;color:inherit;padding:0}
-p{margin:0 0 1.2rem}
-strong{color:var(--fg-main)}
-.back{display:inline-block;margin-bottom:2rem;color:var(--fg-muted);text-decoration:none;font-size:0.9rem}
-.back:hover{color:var(--accent-terracotta)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg-page:#f7f2ec;--bg-main:#fefcf9;--bg-surface:#f0e8df;--fg-primary:#1a0f0a;--fg-secondary:#5c4a3a;--fg-muted:#8c7a6a;--accent:#b85c3a;--accent-hover:#d46a46;--accent-soft:rgba(184,92,58,0.08);--accent-code:#b85c3a;--accent-amber:#c9852a;--code-bg:#1a0f0a;--code-fg:#e6d4c0;--border-light:rgba(184,92,58,0.1);--border-med:rgba(184,92,58,0.2);--radius:12px;--radius-sm:6px;--font-body:'Inter',system-ui,-apple-system,sans-serif;--font-display:'Playfair Display',Georgia,serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--mermaid-bg:#f4eee7;--mermaid-pad:12px;--nav-width:260px}
+[data-theme="dark"]{--bg-page:#14100c;--bg-main:#1c1612;--bg-surface:#241e18;--fg-primary:#e6ddd4;--fg-secondary:#b8a898;--fg-muted:#887a6a;--accent:#d4835a;--accent-hover:#e09a76;--accent-soft:rgba(212,131,90,0.12);--accent-code:#d4835a;--accent-amber:#d4a030;--code-bg:#0d0906;--code-fg:#e6ddd4;--border-light:rgba(212,131,90,0.12);--border-med:rgba(212,131,90,0.22);--mermaid-bg:#2a221c}
+html{scroll-behavior:smooth;scroll-padding-top:1rem}
+body{background:var(--bg-page);color:var(--fg-primary);font-family:var(--font-body);font-weight:400;line-height:1.7;margin:0;min-height:100vh}
+.theme-floating{position:fixed;bottom:1.5rem;right:1.5rem;z-index:1000;width:48px;height:48px;border-radius:50%;border:1px solid var(--border-med);background:var(--bg-surface);color:var(--fg-primary);font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,0.12);transition:all .2s;backdrop-filter:blur(8px)}
+.theme-floating:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(1.05)}
+.wrapper{display:flex;max-width:1200px;margin:0 auto;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;width:var(--nav-width);flex-shrink:0;overflow-y:auto;padding:2rem 1rem;border-right:1px solid var(--border-light);background:var(--bg-surface)}
+.sidebar-logo{font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--accent);text-decoration:none;display:block;margin-bottom:1.5rem}
+.sidebar-logo small{display:block;font-family:var(--font-body);font-size:0.7rem;font-weight:400;color:var(--fg-muted);margin-top:0.1rem}
+.toc-title{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--fg-muted);margin-bottom:0.75rem}
+.sidebar a{display:block;padding:0.3rem 0.5rem;font-size:0.85rem;color:var(--fg-secondary);text-decoration:none;border-radius:var(--radius-sm);transition:all .15s;line-height:1.4}
+.sidebar a:hover{background:var(--accent-soft);color:var(--accent)}
+.sidebar a.toc-h2{padding-left:1.2rem;font-size:0.8rem}
+.sidebar a.toc-h3{padding-left:2rem;font-size:0.78rem;color:var(--fg-muted)}
+.sidebar a.toc-h4{padding-left:2.8rem;font-size:0.75rem;color:var(--fg-muted)}
+.sidebar-toggle{display:none;background:none;border:none;color:var(--fg-primary);font-size:1.5rem;cursor:pointer;padding:0.5rem;position:fixed;top:0.5rem;left:0.5rem;z-index:999}
+.content{flex:1;padding:3rem 3rem 6rem;max-width:840px;margin:0 auto}
+h1{font-family:var(--font-display);font-size:2.6rem;font-weight:700;margin:0 0 0.5rem;color:var(--accent);line-height:1.2}
+h2{font-family:var(--font-body);font-size:1.5rem;font-weight:700;margin:3rem 0 0.75rem;color:var(--fg-primary);border-bottom:1px solid var(--border-light);padding-bottom:0.4rem}
+h3{font-size:1.15rem;font-weight:600;margin:2rem 0 0.5rem;color:var(--accent-amber)}
+h4{font-size:1rem;font-weight:600;margin:1.5rem 0 0.5rem;color:var(--fg-secondary)}
+p{margin:0 0 1rem}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--accent-hover);text-decoration:underline}
+strong{color:var(--fg-primary)}
+ul,ol{margin:0 0 1.5rem 1.5rem}
+li{margin-bottom:0.3rem}
+code{font-family:var(--font-mono);font-size:0.85em;background:var(--accent-soft);color:var(--accent-code);padding:0.1rem 0.5rem;border-radius:4px}
+pre{background:var(--code-bg);color:var(--code-fg);padding:1.25rem 1.5rem;border-radius:var(--radius);overflow-x:auto;font-family:var(--font-mono);font-size:0.85rem;line-height:1.6;margin:0 0 1.5rem}
+pre code{background:transparent;color:inherit;padding:0;font-size:inherit}
+blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);padding:0.75rem 1.25rem;margin:0 0 1.5rem;border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--fg-secondary)}
+hr{border:none;border-top:1px solid var(--border-light);margin:2rem 0}
+table{width:100%;border-collapse:collapse;margin:0 0 1.5rem;font-size:0.9rem}
+th,td{border:1px solid var(--border-light);padding:0.5rem 0.75rem;text-align:left}
+th{background:var(--bg-surface);font-weight:600;color:var(--fg-primary)}
+tr:nth-child(even){background:var(--accent-soft)}
+.mermaid{background:var(--mermaid-bg);border-radius:var(--radius);padding:var(--mermaid-pad);margin:0 0 1.5rem;overflow-x:auto;text-align:center}
+.mermaid svg{max-width:100%}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;margin-bottom:2rem;font-size:0.85rem;color:var(--fg-muted);padding:0.4rem 0.8rem;border-radius:var(--radius-sm);border:1px solid var(--border-light);transition:all .15s}
+.back-link:hover{background:var(--accent-soft);color:var(--accent);text-decoration:none}
+@media(max-width:900px){
+.sidebar{position:fixed;left:-280px;z-index:100;transition:left .25s;box-shadow:2px 0 20px rgba(0,0,0,0.15)}
+.sidebar.open{left:0}
+.sidebar-toggle{display:block}
+.content{padding:2rem 1.5rem 5rem}
+.theme-floating{bottom:1rem;right:1rem;width:42px;height:42px;font-size:1.2rem}
+}
 </style>
 </head>
 <body>
-<a class="back" href="../index.html">&larr; Volver a Deep Learning</a>
-<h1 id="lenguaje-micelio">Lenguaje Micelio</h1>
-<h2 id="objetivo">Objetivo</h2>
-<p>Micelio es un lenguaje interpretado en espanol con enfoque didactico,
-soporte funcional y crecimiento hacia ciencia de datos y ML.</p>
-<h2 id="elementos-principales">Elementos principales</h2>
-<ul>
-<li>Declaracion: <code>var</code>, <code>const</code></li>
-<li>Control de flujo: <code>si</code>, <code>sino</code>,
-<code>mientras</code>, <code>para</code>, <code>segun</code></li>
-<li>Funciones: <code>funcion</code>, <code>regresa</code></li>
-<li>IO: <code>leer</code>, <code>imp</code></li>
-<li>Modulos: <code>importar "archivo.mice" como alias</code></li>
-<li>Operadores funcionales: <code>map</code>, <code>filter</code>,
-<code>reduce</code>, <code>ordenar</code>, <code>|&gt;</code></li>
-</ul>
-<h2 id="tipos-y-colecciones">Tipos y colecciones</h2>
-<ul>
-<li>Numero</li>
-<li>Booleano: <code>verdadero</code>, <code>falso</code></li>
-<li>Texto</li>
-<li>Lista</li>
-<li>Set</li>
-<li>Dict</li>
-<li>Nulo: <code>nulo</code></li>
-</ul>
-<h2 id="ejemplos">Ejemplos</h2>
-<h3 id="variables-y-salida">Variables y salida</h3>
-<pre class="mice"><code>var x = 10
-const base = 2
-imp x + base</code></pre>
-<h3 id="condicional">Condicional</h3>
-<pre class="mice"><code>var x = 5
-si (x &gt; 0) {
+<button class="sidebar-toggle" id="sidebarToggle">&#x2630;</button>
+<nav class="sidebar" id="sidebar">
+  <a class="sidebar-logo" href="../index.html">
+    MICELIO
+    <small>lenguaje</small>
+  </a>
+  <div class="toc-title">Contenido</div>
+  <div id="toc"></div>
+</nav>
+<div class="wrapper">
+<div class="content">
+<a class="back-link" href="../index.html">&larr; Volver al inicio</a>
+<h1 id="lenguaje-micelio">Lenguaje MICELIO</h1>
+<h2 id="descripcion-general">Descripcion general</h2>
+<p>MICELIO es un lenguaje interpretado en español con paradigma
+funcional. Su sintaxis esta disenada para ser legible y expresiva. Este
+documento es la referencia completa del lenguaje.</p>
+<h2 id="variables-y-constantes">Variables y constantes</h2>
+<pre class="mice"><code>var x = 10            # variable mutable
+const PI = 3.1416     # constante (no reasignable)
+var a, b              # declaracion sin inicializar
+var a, b = [1, 2]     # declaracion con desempaquetado</code></pre>
+<p>Las variables sin inicializar valen <code>nulo</code> hasta que se
+les asigne un valor.</p>
+<h2 id="tipos-de-datos">Tipos de datos</h2>
+<table>
+<thead>
+<tr>
+<th>Tipo</th>
+<th>Ejemplo</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Numero</td>
+<td><code>42</code>, <code>3.14</code>, <code>-7</code></td>
+<td>Enteros y flotantes</td>
+</tr>
+<tr>
+<td>Booleano</td>
+<td><code>verdadero</code>, <code>falso</code></td>
+<td>Valores logicos</td>
+</tr>
+<tr>
+<td>Texto</td>
+<td><code>"hola"</code>, <code>'mundo'</code></td>
+<td>Cadenas UTF-8</td>
+</tr>
+<tr>
+<td>Lista</td>
+<td><code>[1, 2, 3]</code></td>
+<td>Coleccion ordenada mutable</td>
+</tr>
+<tr>
+<td>Set</td>
+<td><code>#{1, 2, 3}</code></td>
+<td>Coleccion no ordenada sin duplicados</td>
+</tr>
+<tr>
+<td>Dict</td>
+<td><code>{"a": 1, "b": 2}</code></td>
+<td>Mapa clave-valor</td>
+</tr>
+<tr>
+<td>Nulo</td>
+<td><code>nulo</code></td>
+<td>Ausencia de valor</td>
+</tr>
+<tr>
+<td>Funcion</td>
+<td><code>funcion (x) { ... }</code></td>
+<td>Ciudadano de primera clase</td>
+</tr>
+</tbody>
+</table>
+<h2 id="operaciones-aritmeticas">Operaciones aritmeticas</h2>
+<pre class="mice"><code>var s = 10 + 5        # suma       -&gt; 15
+var r = 10 - 5        # resta      -&gt; 5
+var p = 10 * 5        # producto   -&gt; 50
+var d = 10 / 5        # division   -&gt; 2.0
+var m = 10 % 3        # modulo     -&gt; 1
+var e = 2 ^ 3         # potencia   -&gt; 8</code></pre>
+<h2 id="operadores-de-comparacion">Operadores de comparacion</h2>
+<pre class="mice"><code>==  igualdad
+!=  desigualdad
+&lt;   menor que
+&gt;   mayor que
+&lt;=  menor o igual
+&gt;=  mayor o igual</code></pre>
+<h2 id="operadores-logicos">Operadores logicos</h2>
+<pre class="mice"><code>y   # AND logico (cortocircuito)
+o   # OR logico (cortocircuito)
+no  # NOT logico</code></pre>
+<h2 id="control-de-flujo">Control de flujo</h2>
+<h3 id="condicional-sisino">Condicional si/sino</h3>
+<pre class="mice"><code>si (x &gt; 0) {
   imp &quot;positivo&quot;
 } sino {
   imp &quot;no positivo&quot;
 }</code></pre>
-<h3 id="pipeline-funcional">Pipeline funcional</h3>
-<pre class="mice"><code>var datos = [1, 2, 3, 4, 5]
-
-var total = datos
+<h3 id="bucle-mientras">Bucle mientras</h3>
+<pre class="mice"><code>var i = 0
+mientras (i &lt; 5) {
+  imp i
+  i = i + 1
+}</code></pre>
+<h3 id="bucle-para">Bucle para</h3>
+<pre class="mice"><code>para (var i = 0; i &lt; 5; i = i + 1) {
+  imp i
+}</code></pre>
+<h3 id="bucle-para-cada-recorrer-coleccion">Bucle para-cada (recorrer
+coleccion)</h3>
+<pre class="mice"><code>para (var elem in lista) {
+  imp elem
+}</code></pre>
+<h3 id="segun-switch">Segun (switch)</h3>
+<pre class="mice"><code>segun (x) {
+  caso 1 { imp &quot;uno&quot; }
+  caso 2 { imp &quot;dos&quot; }
+  defecto { imp &quot;otro&quot; }
+}</code></pre>
+<h2 id="funciones">Funciones</h2>
+<h3 id="definicion-basica">Definicion basica</h3>
+<pre class="mice"><code>funcion saludar(nombre) {
+  imp &quot;Hola, &quot; + nombre
+}</code></pre>
+<h3 id="retorno">Retorno</h3>
+<pre class="mice"><code>funcion suma(a, b) {
+  regresa a + b
+}</code></pre>
+<h3 id="funcion-anonima-lambda">Funcion anonima (lambda)</h3>
+<pre class="mice"><code>var doble = funcion (x) { regresa x * 2 }</code></pre>
+<h3 id="parametros-variables-args">Parametros variables (*args)</h3>
+<pre class="mice"><code>funcion sumar_todo(*args) {
+  regresa reduce(funcion (a, b) { regresa a + b }, args, 0)
+}</code></pre>
+<h3 id="parametros-con-nombre-kwargs">Parametros con nombre
+(**kwargs)</h3>
+<pre class="mice"><code>funcion configurar(**kwargs) {
+  imp kwargs
+}</code></pre>
+<h2 id="programacion-funcional">Programacion funcional</h2>
+<h3 id="pipeline-operador">Pipeline (operador |&gt; )</h3>
+<pre class="mice"><code>var resultado = [1, 2, 3, 4, 5]
   |&gt; map(funcion (x) { regresa x * 2 })
   |&gt; filter(funcion (x) { regresa x &gt; 5 })
-  |&gt; reduce(funcion (acc, x) { regresa acc + x }, 0)
-
-imp total</code></pre>
-<h3 id="entrada-multiple-y-desempaquetado">Entrada multiple y
-desempaquetado</h3>
-<pre class="mice"><code>var a, b
-leer a, b
-
-var x, y = [10, 20]
-a, b = [x, y]
-
-imp a + b</code></pre>
-<h2 id="reglas-utiles">Reglas utiles</h2>
-<ul>
-<li><code>leer</code> simple: <code>leer variable</code></li>
-<li><code>leer</code> multiple: <code>leer a, b, c</code> (una linea de
-entrada con misma cantidad de valores)</li>
-<li>Desempaquetado:
-<ul>
-<li><code>var a, b = expr</code></li>
-<li><code>a, b = expr</code></li>
-</ul></li>
-<li>Para desempaquetar, <code>expr</code> debe evaluar a lista/tupla con
-misma longitud.</li>
-</ul>
+  |&gt; reduce(funcion (a, b) { regresa a + b }, 0)</code></pre>
+<h3 id="map">map</h3>
+<pre class="mice"><code>var cuadrados = map(funcion (x) { regresa x ^ 2 }, [1, 2, 3])
+# -&gt; [1, 4, 9]</code></pre>
+<h3 id="filter">filter</h3>
+<pre class="mice"><code>var pares = filter(funcion (x) { regresa x % 2 == 0 }, [1, 2, 3, 4])
+# -&gt; [2, 4]</code></pre>
+<h3 id="reduce">reduce</h3>
+<pre class="mice"><code>var total = reduce(funcion (a, b) { regresa a + b }, [1, 2, 3, 4], 0)
+# -&gt; 10</code></pre>
+<h3 id="ordenar">ordenar</h3>
+<pre class="mice"><code>var nums = ordenar([3, 1, 4, 1, 5])</code></pre>
+<h2 id="entradasalida">Entrada/Salida</h2>
+<pre class="mice"><code>imp &quot;Hola mundo&quot;          # imprime con salto de linea
+imp &quot;Hola&quot;, &quot; mundo&quot;      # imprime multiples valores
+leer variable             # lee una linea de entrada
+leer a, b, c              # lee multiples valores de una linea</code></pre>
+<h2 id="modulos">Modulos</h2>
+<pre class="mice"><code>importar &quot;math.mice&quot; como math
+importar &quot;grafico.mice&quot; como grafico
+importar &quot;../modulos_std/dl.mice&quot; como dl</code></pre>
+<p>Las rutas son relativas al archivo que importa. Si el modulo ya fue
+cargado, se reutiliza la instancia en cache.</p>
+<h2 id="listas-metodos-incorporados">Listas (metodos incorporados)</h2>
+<pre class="mice"><code>lista.agregar(elem)       # agrega al final
+lista.insertar(i, elem)   # inserta en posicion
+lista.eliminar(elem)      # elimina primera ocurrencia
+lista.largo()             # longitud
+lista.contiene(elem)      # busqueda -&gt; verdadero/falso
+lista.invertir()          # invierte in-place
+lista.copiar()            # copia superficial
+lista.limpiar()           # vacia la lista
+lista.ordenar()           # ordena in-place
+lista.unico()             # elimina duplicados</code></pre>
+<h2 id="texto-metodos-incorporados">Texto (metodos incorporados)</h2>
+<pre class="mice"><code>txt.largo()               # longitud
+txt.contiene(sub)         # contiene subcadena?
+txt.empezar_con(pre)      # empieza con prefijo?
+txt.terminar_con(suf)     # termina con sufijo?
+txt.minusculas()          # a minusculas
+txt.mayusculas()          # a MAYUSCULAS
+txt.reemplazar(viejo, nuevo)
+txt.partir(sep)           # split -&gt; lista
+txt.segmento(inicio, fin) # substring
+txt.numero()              # convierte a numero
+txt.trim()                # elimina espacios extremos</code></pre>
+<h2 id="dict-metodos-incorporados">Dict (metodos incorporados)</h2>
+<pre class="mice"><code>dict.claves()             # lista de claves
+dict.valores()            # lista de valores
+dict.items()              # lista de [clave, valor]
+dict.contiene(clave)      # existe clave?
+dict.obtener(clave, def)  # get con valor por defecto
+dict.copiar()             # copia superficial
+dict.limpiar()            # vacia el dict</code></pre>
+<h2 id="set-metodos-incorporados">Set (metodos incorporados)</h2>
+<pre class="mice"><code>set.agregar(elem)
+set.eliminar(elem)
+set.contiene(elem)
+set.largo()
+set.copiar()
+set.limpiar()</code></pre>
+<h2 id="conversiones-entre-tipos">Conversiones entre tipos</h2>
+<pre class="mice"><code>aNumero(&quot;42&quot;)      # texto -&gt; numero
+aTexto(42)         # numero -&gt; texto
+aBooleano(1)       # numero -&gt; bool (0 es falso)
+aLista(conjunto)   # set -&gt; lista</code></pre>
+<h2 id="operador-de-propagacion">Operador de propagacion (…)</h2>
+<pre class="mice"><code>var a = [1, 2, 3]
+var b = [0, ...a, 4]  # -&gt; [0, 1, 2, 3, 4]</code></pre>
+<h2 id="desempaquetado">Desempaquetado</h2>
+<pre class="mice"><code>var a, b = [10, 20]        # declaracion
+a, b = [x, y]              # asignacion</code></pre>
+<p>Ambos lados deben tener la misma cantidad de elementos.</p>
 <h2 id="palabras-reservadas">Palabras reservadas</h2>
-<p>No uses como identificadores: <code>si</code>, <code>sino</code>,
-<code>y</code>, <code>o</code>, <code>no</code>, <code>funcion</code>,
-<code>var</code>, <code>const</code>, etc.</p>
-<h2 id="estado-actual-vs-especificacion">Estado actual vs
-especificacion</h2>
-<p>La referencia de vision amplia esta en <code>main.tex</code>. El
-comportamiento real se define por:</p>
+<p><code>si</code>, <code>sino</code>, <code>y</code>, <code>o</code>,
+<code>no</code>, <code>funcion</code>, <code>regresa</code>,
+<code>var</code>, <code>const</code>, <code>mientras</code>,
+<code>para</code>, <code>in</code>, <code>segun</code>,
+<code>caso</code>, <code>defecto</code>, <code>leer</code>,
+<code>imp</code>, <code>importar</code>, <code>como</code>,
+<code>nulo</code>, <code>verdadero</code>, <code>falso</code>,
+<code>modulo</code>, <code>clase</code></p>
+<h2 id="modulos-de-la-biblioteca-estandar">Modulos de la biblioteca
+estandar</h2>
 <ul>
-<li><code>MICELIO/gramatica/Micelio.g4</code></li>
-<li><code>MICELIO/nucleo/eval_visitor.py</code></li>
-<li><code>MICELIO/nucleo/runtime.py</code></li>
+<li><code>builtins.mice</code>: funciones base auto-cargadas (exp,
+aleatorio, ordenar, map, filter, reduce)</li>
+<li><code>math.mice</code>: constantes (PI, E) y funciones (raiz, seno,
+coseno, tan, log, etc.)</li>
+<li><code>matriz.mice</code>: operaciones con matrices (suma, resta,
+multiplicacion, transpuesta, determinante)</li>
+<li><code>grafico.mice</code>: graficacion 2D (lineas, dispersion,
+histograma, ejes, guardar PNG)</li>
+<li><code>gui.mice</code>: ventanas y controles GTK</li>
+<li><code>hifa.mice</code>: framework web (rutas, peticiones,
+respuestas, sesiones)</li>
+<li><code>archivo.mice</code>: lectura/escritura de archivos</li>
+<li><code>lista.mice</code>: funciones auxiliares para listas</li>
+<li><code>dict.mice</code>: funciones auxiliares para diccionarios</li>
+<li><code>set.mice</code>: funciones auxiliares para conjuntos</li>
+<li><code>ml.mice</code>: machine learning basico (regresion lineal,
+KNN, k-medias)</li>
+<li><code>dl.mice</code>: deep learning (perceptron multicapa,
+retropropagacion)</li>
 </ul>
-<h2 id="proxima-ampliacion-sugerida">Proxima ampliacion sugerida</h2>
-<ol type="1">
-<li>Modulo <code>matriz.mice</code></li>
-<li>Modulo <code>estadistica.mice</code></li>
-<li>Modulo <code>aleatorio.mice</code></li>
-<li>Modulo <code>ml_basico.mice</code></li>
-</ol>
+<h2 id="ejemplos-practicos">Ejemplos practicos</h2>
+<h3 id="numeros-primos">Numeros primos</h3>
+<pre class="mice"><code>funcion es_primo(n) {
+  si (n &lt; 2) { regresa falso }
+  var i = 2
+  mientras (i * i &lt;= n) {
+    si (n % i == 0) { regresa falso }
+    i = i + 1
+  }
+  regresa verdadero
+}
+
+var primos = filter(funcion (x) { regresa es_primo(x) }, [1..100])
+imp primos</code></pre>
+<h3 id="fibonacci-recursivo-con-memoizacion">Fibonacci recursivo con
+memoizacion</h3>
+<pre class="mice"><code>var memo = {}
+
+funcion fib(n) {
+  si (n &lt;= 1) { regresa n }
+  si (memo.contiene(n)) { regresa memo.obtener(n) }
+  var r = fib(n - 1) + fib(n - 2)
+  memo[n] = r
+  regresa r
+}
+
+imp fib(30)  # 832040</code></pre>
+<h3 id="archivo-leer-lineas-y-procesar">Archivo: leer lineas y
+procesar</h3>
+<pre class="mice"><code>importar &quot;archivo.mice&quot; como archivo
+
+var lineas = archivo.leer_lineas(&quot;datos.txt&quot;)
+var numeros = map(funcion (l) { regresa aNumero(l) }, lineas)
+var suma = reduce(funcion (a, b) { regresa a + b }, numeros, 0)
+imp &quot;Suma: &quot; + suma</code></pre>
+</div>
+</div>
+<button class="theme-floating" id="themeToggle">&#x25D0;</button>
 <script>
 (function(){var t=localStorage.getItem('tema');if(t==='dark'||(t===null&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})()
+document.getElementById('themeToggle').addEventListener('click',function(){
+ var html=document.documentElement;
+ if(html.getAttribute('data-theme')==='dark'){html.removeAttribute('data-theme');localStorage.setItem('tema','light')}
+ else{html.setAttribute('data-theme','dark');localStorage.setItem('tema','dark')}
+})
+(function(){
+ var toc=document.getElementById('toc');if(!toc)return;
+ var items=[];var sel='h1,h2,h3,h4';
+ var content=document.querySelector('.content');if(!content)return;
+ var headers=content.querySelectorAll(sel);
+ if(headers.length===0){toc.innerHTML='<span style="color:var(--fg-muted);font-size:0.85rem">(sin secciones)</span>';return}
+ for(var i=0;i<headers.length;i++){
+  var el=headers[i];var txt=el.textContent.trim();
+  var id=el.id||txt.toLowerCase().replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g,'-').replace(/^-+/,'').replace(/-+$/g,'');
+  if(!id)id='sec'+i;el.id=id;
+  items.push({tag:el.tagName.toLowerCase(),id:id,text:txt})
+ }
+ for(var i=0;i<items.length;i++){
+  var it=items[i];var a=document.createElement('a');
+  if(it.tag==='h2')a.className='toc-h2';else if(it.tag==='h3')a.className='toc-h3';else if(it.tag==='h4')a.className='toc-h4';
+  a.href='#'+it.id;a.textContent=it.text;toc.appendChild(a)
+ }
+})();
+document.getElementById('sidebarToggle').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('open')});
+document.addEventListener('click',function(e){
+ var s=document.getElementById('sidebar');var st=document.getElementById('sidebarToggle');
+ if(s.classList.contains('open')&&!s.contains(e.target)&&e.target!==st){s.classList.remove('open')}
+});
 </script>
 </body>
 </html>
