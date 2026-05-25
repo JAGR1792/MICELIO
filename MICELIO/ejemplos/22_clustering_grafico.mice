@@ -1,0 +1,89 @@
+# Ejemplo 22: Clustering K-Means con visualización mejorada
+importar "../modulos_std/ml.mice" como ml
+importar "../modulos_std/grafico.mice" como g
+
+imp "--- Clustering K-Means Visual (3 clusters) ---"
+
+# Generar datos sintéticos: 3 nubes alrededor de (2,2), (7,7) y (4,9)
+var datos = []
+datos.agregar([1.8, 1.9])
+datos.agregar([2.1, 2.2])
+datos.agregar([1.9, 1.7])
+datos.agregar([2.3, 2.0])
+datos.agregar([1.6, 2.1])
+datos.agregar([6.8, 6.9])
+datos.agregar([7.2, 7.1])
+datos.agregar([6.9, 6.7])
+datos.agregar([7.3, 7.0])
+datos.agregar([6.6, 7.2])
+datos.agregar([3.8, 8.9])
+datos.agregar([4.2, 9.1])
+datos.agregar([3.9, 8.7])
+datos.agregar([4.3, 9.0])
+datos.agregar([3.6, 9.2])
+
+imp "Total de puntos: " + aTexto(datos.longitud())
+imp ""
+
+imp "Ejecutando K-Means (k=3, 20 iteraciones)..."
+var resultado = ml.k_means(datos, 3, 20)
+var centroides = resultado["centroides"]
+var asignaciones = resultado["asignaciones"]
+
+imp "Centroides finales:"
+var i = 0
+mientras (i < centroides.longitud()) {
+    imp "  Cluster " + aTexto(i) + ": (" + aTexto(centroides[i][0]) + ", " + aTexto(centroides[i][1]) + ")"
+    i = i + 1
+}
+
+# Contar puntos por cluster
+var conteo = [0, 0, 0]
+i = 0
+mientras (i < asignaciones.longitud()) {
+    conteo[asignaciones[i]] = conteo[asignaciones[i]] + 1
+    i = i + 1
+}
+i = 0
+mientras (i < 3) {
+    imp "  Cluster " + aTexto(i) + ": " + aTexto(conteo[i]) + " puntos"
+    i = i + 1
+}
+imp ""
+
+# --- Visualización ---
+g.estilo("claro")
+g.iniciar_grafico(0, 10, 0, 11)
+g.titulo("Clustering K-Means (k=3)")
+g.etiquetas("X", "Y")
+
+# Separar puntos por cluster
+var cluster_xs = [[], [], []]
+var cluster_ys = [[], [], []]
+i = 0
+mientras (i < datos.longitud()) {
+    var c = asignaciones[i]
+    cluster_xs[c].agregar(datos[i][0])
+    cluster_ys[c].agregar(datos[i][1])
+    i = i + 1
+}
+
+# Dibujar cada cluster con su color
+g.pintar_puntos(cluster_xs[0], cluster_ys[0], 200, 50, 50, 6)
+g.pintar_puntos(cluster_xs[1], cluster_ys[1], 50, 130, 200, 6)
+g.pintar_puntos(cluster_xs[2], cluster_ys[2], 50, 180, 80, 6)
+
+# Dibujar centroides como círculos grandes
+var centro_xs = [centroides[0][0], centroides[1][0], centroides[2][0]]
+var centro_ys = [centroides[0][1], centroides[1][1], centroides[2][1]]
+g.pintar_puntos(centro_xs, centro_ys, 0, 0, 0, 10)
+
+# Etiquetas de centroides
+g.texto(centroides[0][0] + 0.2, centroides[0][1], "C0", 0, 0, 0)
+g.texto(centroides[1][0] + 0.2, centroides[1][1], "C1", 0, 0, 0)
+g.texto(centroides[2][0] + 0.2, centroides[2][1], "C2", 0, 0, 0)
+
+g.guardar("graficos/clustering_k3.png")
+imp "Guardado: graficos/clustering_k3.png"
+
+g.mostrar()

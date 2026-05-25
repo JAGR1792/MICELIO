@@ -90,15 +90,35 @@ funcion predecir_lineal(x, modelo) {
 # K-Means: agrupa datos en k clusters
 funcion k_means(X, k, iteraciones) {
     var n = X.longitud()
-    var centroides = []
+    var dim = 2
+    si (n > 0 y tipo(X[0]) == "lista") {
+        dim = X[0].longitud()
+    }
+    # Inicialización: elegir k indices aleatorios distintos (Fisher-Yates parcial)
+    var indices = []
     var i = 0
-    mientras (i < k) {
-        centroides.agregar(X[i])
+    mientras (i < n) {
+        indices.agregar(i)
         i = i + 1
     }
+    i = 0
+    mientras (i < k y i < n) {
+        var r = i + aEntero(aleatorio() * (n - i))
+        var tmp = indices[i]
+        indices[i] = indices[r]
+        indices[r] = tmp
+        i = i + 1
+    }
+    var centroides = []
+    i = 0
+    mientras (i < k) {
+        centroides.agregar(X[indices[i]])
+        i = i + 1
+    }
+    var asignaciones = []
     var iter = 0
     mientras (iter < iteraciones) {
-        var asignaciones = []
+        asignaciones = []
         para punto en X {
             var dist_min = 999999
             var indice_cercano = 0
@@ -112,6 +132,42 @@ funcion k_means(X, k, iteraciones) {
                 j = j + 1
             }
             asignaciones.agregar(indice_cercano)
+        }
+        var nuevos = []
+        var conteos = []
+        i = 0
+        mientras (i < k) {
+            var suma = []
+            var d = 0
+            mientras (d < dim) {
+                suma.agregar(0)
+                d = d + 1
+            }
+            nuevos.agregar(suma)
+            conteos.agregar(0)
+            i = i + 1
+        }
+        i = 0
+        mientras (i < n) {
+            var cid = asignaciones[i]
+            var d = 0
+            mientras (d < dim) {
+                nuevos[cid][d] = nuevos[cid][d] + X[i][d]
+                d = d + 1
+            }
+            conteos[cid] = conteos[cid] + 1
+            i = i + 1
+        }
+        i = 0
+        mientras (i < k) {
+            si (conteos[i] > 0) {
+                var d = 0
+                mientras (d < dim) {
+                    centroides[i][d] = nuevos[i][d] / conteos[i]
+                    d = d + 1
+                }
+            }
+            i = i + 1
         }
         iter = iter + 1
     }
