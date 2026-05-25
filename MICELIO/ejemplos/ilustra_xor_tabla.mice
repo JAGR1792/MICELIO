@@ -1,0 +1,97 @@
+# ─── Ilustracion: Tabla tautologica XOR-2D verdadera ──────────────
+#   Compara: XOR clasico, XOR-2D actual, XOR-2D verdadero
+#   Genera scatter de los 4 centros con ambas etiquetas
+# ────────────────────────────────────────────────────────────────────
+importar "../modulos_std/grafico.mice" como g
+
+# ── XOR clasico (1D) ──
+imp "╔══════════════════════════════════════════════════╗"
+imp "║  XOR CLASICO (1D binaria)                       ║"
+imp "╠══════════════════════════════════════════════════╣"
+imp "║  x1  x2 │ salida                                ║"
+imp "║─────────┼─────────────────────────────────────── ║"
+imp "║  0   0  │   0                                    ║"
+imp "║  0   1  │   1                                    ║"
+imp "║  1   0  │   1                                    ║"
+imp "║  1   1  │   0                                    ║"
+imp "╚══════════════════════════════════════════════════╝"
+
+# ── XOR-2D actual (linealmente separable) ──
+imp ""
+imp "╔══════════════════════════════════════════════════╗"
+imp "║  XOR-2D ACTUAL (NO es XOR — separable por y=0)  ║"
+imp "╠══════════════════════════════════════════════════╣"
+imp "║  centro     sign(x) sign(y) │ clase              ║"
+imp "║──────────── ───────────────┼──────────────────── ║"
+imp "║  (-2,  2)    0        1    │   0  ← y>0         ║"
+imp "║  ( 2, -2)    1        0    │   1  ← y<0         ║"
+imp "║  (-2, -2)    0        0    │   1  ← y<0         ║"
+imp "║  ( 2,  2)    1        1    │   0  ← y>0         ║"
+imp "╠══════════════════════════════════════════════════╣"
+imp "║  Regla real: clase = 0 si y > 0, 1 si y < 0    ║"
+imp "║  → Una recta horizontal separa las clases       ║"
+imp "║  → NO requiere red neuronal                     ║"
+imp "╚══════════════════════════════════════════════════╝"
+
+# ── XOR-2D verdadero (no-lineal) ──
+imp ""
+imp "╔══════════════════════════════════════════════════╗"
+imp "║  XOR-2D VERDADERO (no-lineal)                   ║"
+imp "╠══════════════════════════════════════════════════╣"
+imp "║  centro     sign(x) sign(y) │ XOR │ clase        ║"
+imp "║──────────── ───────────────┼─────┼────────────── ║"
+imp "║  (-2,  2)    0        1    │  1  │   1  ← opuestos║"
+imp "║  ( 2, -2)    1        0    │  1  │   1  ← opuestos║"
+imp "║  (-2, -2)    0        0    │  0  │   0  ← iguales ║"
+imp "║  ( 2,  2)    1        1    │  0  │   0  ← iguales ║"
+imp "╠══════════════════════════════════════════════════╣"
+imp "║  Regla: clase = 1 si sign(x) ≠ sign(y)         ║"
+imp "║  → Las diagonales separan las clases            ║"
+imp "║  → REQUIERE red neuronal con capa oculta        ║"
+imp "╚══════════════════════════════════════════════════╝"
+
+# ── Grafico 1: XOR-2D ACTUAL (separacion horizontal) ──
+g.iniciar_grafico(-3.5, 3.5, -3.5, 3.5)
+g.titulo("XOR-2D ACTUAL — Separable por y=0 (NO es XOR)")
+g.etiquetas("x", "y")
+
+# Clase 0 (y>0): (-2,2) y (2,2)
+g.pintar_puntos([-2, 2], [2, 2], 60, 100, 200, 16)
+g.texto(60, 32, "Clase 0", 60, 100, 200)
+
+# Clase 1 (y<0): (2,-2) y (-2,-2)
+g.pintar_puntos([2, -2], [-2, -2], 200, 60, 60, 16)
+g.texto(430, 415, "Clase 1", 200, 60, 60)
+
+# Frontera lineal y=0
+g.color_linea(212, 146, 42)
+g.linea_sobre_grafico([-3, 3], [0, 0])
+g.texto(280, 240, "frontera: y = 0", 212, 146, 42)
+
+g.guardar("ejemplos/graficos/ilustra_xor_actual.png")
+imp ""
+imp "Grafico: ejemplos/graficos/ilustra_xor_actual.png"
+g.mostrar()
+
+# ── Grafico 2: XOR-2D VERDADERO (separacion diagonal) ──
+g.iniciar_grafico(-3.5, 3.5, -3.5, 3.5)
+g.titulo("XOR-2D VERDADERO — Frontera diagonal (NO separable)")
+g.etiquetas("x", "y")
+
+# Clase 1 (signos opuestos): (-2,2) y (2,-2)
+g.pintar_puntos([-2, 2], [2, -2], 200, 60, 60, 16)
+g.texto(60, 32, "Clase 1 (signos opuestos)", 200, 60, 60)
+
+# Clase 0 (signos iguales): (-2,-2) y (2,2)
+g.pintar_puntos([-2, 2], [-2, 2], 60, 100, 200, 16)
+g.texto(60, 415, "Clase 0 (signos iguales)", 60, 100, 200)
+
+# Frontera diagonal: |x| = |y|
+g.color_linea(212, 146, 42)
+g.linea_sobre_grafico([-3, 3], [-3, 3])
+g.linea_sobre_grafico([-3, 3], [3, -3])
+g.texto(290, 240, "fronteras: y = x, y = -x", 212, 146, 42)
+
+g.guardar("ejemplos/graficos/ilustra_xor_verdadero.png")
+imp "Grafico: ejemplos/graficos/ilustra_xor_verdadero.png"
+g.mostrar()

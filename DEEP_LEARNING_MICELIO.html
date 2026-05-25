@@ -1269,25 +1269,60 @@ imp "Clase predicha:", clase</code></pre>
         <div class="mermaid-container">
             <div class="mermaid">
 flowchart TD
-    subgraph XOR2D["XOR-2D: 4 Clusters, 2 Clases"]
-        C0["Clase 0<br/>Centro: (−2, 2)<br/>15 puntos"]
-        C1["Clase 1<br/>Centro: (2, −2)<br/>15 puntos"]
-        C2["Clase 1<br/>Centro: (−2, −2)<br/>15 puntos"]
-        C3["Clase 0<br/>Centro: (2, 2)<br/>15 puntos"]
+    subgraph XOR2D["Distribucion actual de los 4 clusters"]
+        C0["(−2, 2) → Clase 0"]
+        C1["(2, −2) → Clase 1"]
+        C2["(−2, −2) → Clase 1"]
+        C3["(2, 2) → Clase 0"]
     end
 
-    subgraph Regla["Regla XOR en 2D"]
-        R["Clase 0 si (x &lt; 0 y y &gt; 0) o (x &gt; 0 y y &lt; 0)<br/>Clase 1 si (x &lt; 0 y y &lt; 0) o (x &gt; 0 y y &gt; 0)"]
+    subgraph Regla["Regla real (NO es XOR)"]
+        R["Clase = 0 cuando y &gt; 0<br/>Clase = 1 cuando y &lt; 0<br/>→ Linealmente separable por y=0"]
     end
             </div>
         </div>
 
         <div class="img-container">
             <img src="docs/img/ilustra_xor2d_clusters.png" alt="Clusters XOR-2D">
-            <div class="caption">Distribuci&oacute;n de los 60 puntos sint&eacute;ticos generados para el problema XOR-2D. Cada cluster tiene 15 puntos con centro en las esquinas de un cuadrado de lado 4: (-2, 2), (2, -2), (-2, -2) y (2, 2). Los puntos azules (clase 0, xor = 0) ocupan las esquinas (-2, 2) y (2, 2), mientras que los rojos (clase 1, xor = 1) ocupan (2, -2) y (-2, -2). Los c&iacute;rculos grandes marcan los centros de cada cluster. El ruido (±1.25) hace que los clusters se solapen ligeramente en el centro, lo que obliga a la red a encontrar una frontera no-lineal.</div>
+            <div class="caption">Distribuci&oacute;n de los 60 puntos. Los azules (clase 0) est&aacute;n arriba (y &gt; 0), los rojos (clase 1) abajo (y &lt; 0). La frontera real es la recta horizontal y = 0 &mdash; es decir, el problema es <strong>linealmente separable</strong>. La red neuronal lo resuelve, pero una regresi&oacute;n log&iacute;stica simple har&iacute;a lo mismo.</div>
         </div>
 
         <p>Los 60 puntos se generan a&ntilde;adiendo ruido (±1.25) alrededor de 4 centros. El split de entrenamiento/test usa <code>i % 5 == 0</code> para mantener balance de clases (48 train, 12 test).</p>
+
+        <div class="info-note">
+            <strong>&iexcl;Atenci&oacute;n!</strong> Las etiquetas actuales siguen la regla <code>clase = 0 si y &gt; 0, clase = 1 si y &lt; 0</code>, que es <strong>linealmente separable</strong> por una recta horizontal. Esto NO es un problema XOR real. Para ser un XOR-2D genuino, las clases deber&iacute;an asignarse seg&uacute;n el signo: clase 1 cuando <code>sign(x) &ne; sign(y)</code>, clase 0 cuando <code>sign(x) = sign(y)</code>. Con esa correcci&oacute;n, la frontera ser&iacute;an las diagonales <code>|x| = |y|</code> y la red S&Iacute; demostrar&iacute;a su capacidad de representar no-linealidad.
+        </div>
+
+        <h3>11.1b Tabla tautol&oacute;gica: XOR cl&aacute;sico vs XOR-2D actual vs XOR-2D verdadero</h3>
+
+        <p><strong>XOR cl&aacute;sico</strong> (1D binaria, 4 puntos):</p>
+        <div class="math-block">
+            $$\begin{array}{c|c|c} x_1 &amp; x_2 &amp; \text{salida} \\ \hline 0 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 1 \\ 1 &amp; 0 &amp; 1 \\ 1 &amp; 1 &amp; 0 \end{array}$$
+        </div>
+        <p>Regla: salida = 1 si <strong>x&#x2081; &ne; x&#x2082;</strong>.</p>
+
+        <p><strong>XOR-2D actual</strong> (c&oacute;mo est&aacute; etiquetado el c&oacute;digo):</p>
+        <div class="math-block">
+            $$\begin{array}{c|c|c|c|c} \text{centro} &amp; \text{sign}(x) &amp; \text{sign}(y) &amp; \text{clase actual} &amp; \text{regla} \\ \hline (-2, 2) &amp; 0 &amp; 1 &amp; 0 &amp; y &gt; 0 \\ (2, -2) &amp; 1 &amp; 0 &amp; 1 &amp; y &lt; 0 \\ (-2, -2) &amp; 0 &amp; 0 &amp; 1 &amp; y &lt; 0 \\ (2, 2) &amp; 1 &amp; 1 &amp; 0 &amp; y &gt; 0 \end{array}$$
+        </div>
+        <p>Regla real: <strong>clase = NOT(sign(y))</strong>. Es separable por una recta horizontal <code>y = 0</code>. No demuestra el poder de las redes neuronales.</p>
+
+        <p><strong>XOR-2D verdadero</strong> (c&oacute;mo deber&iacute;a ser para ser un XOR genuino):</p>
+        <div class="math-block">
+            $$\begin{array}{c|c|c|c|c} \text{centro} &amp; \text{sign}(x) &amp; \text{sign}(y) &amp; \text{sign}(x) \neq \text{sign}(y)? &amp; \text{clase correcta} \\ \hline (-2, 2) &amp; 0 &amp; 1 &amp; \text{S&iacute;} &amp; 1 \\ (2, -2) &amp; 1 &amp; 0 &amp; \text{S&iacute;} &amp; 1 \\ (-2, -2) &amp; 0 &amp; 0 &amp; \text{No} &amp; 0 \\ (2, 2) &amp; 1 &amp; 1 &amp; \text{No} &amp; 0 \end{array}$$
+        </div>
+        <p>Regla: <strong>clase = 1 si sign(x) &ne; sign(y)</strong>. Las fronteras son las diagonales <code>y = x</code> y <code>y = -x</code>. Este problema <strong>no es linealmente separable</strong> y requiere una red con al menos una capa oculta &mdash; ese ser&iacute;a el verdadero an&aacute;logo 2D del XOR cl&aacute;sico.</p>
+
+        <div class="two-columns">
+            <div class="img-container">
+                <img src="docs/img/ilustra_xor_actual.png" alt="XOR-2D actual">
+                <div class="caption"><strong>XOR-2D actual:</strong> la frontera es la recta y=0 (lineal). Una regresi&oacute;n log&iacute;stica lo resuelve. No hay no-linealidad que demostrar.</div>
+            </div>
+            <div class="img-container">
+                <img src="docs/img/ilustra_xor_verdadero.png" alt="XOR-2D verdadero">
+                <div class="caption"><strong>XOR-2D verdadero:</strong> las fronteras son las diagonales y=x, y=-x (no-lineal). Una red con capa oculta es necesaria.</div>
+            </div>
+        </div>
 
         <h3>11.2 Arquitectura de la red</h3>
 
@@ -1452,23 +1487,25 @@ var res_grid = dl.forward(modelo, grid_pts)
 
             <div class="img-container">
                 <img src="docs/img/ilustra_xor2d_clusters.png" alt="Clusters XOR-2D con clases">
-                <div class="caption">Distribuci&oacute;n de los datos de entrenamiento y test del problema XOR-2D. Los puntos azules pertenecen a la clase 0; los rojos a la clase 1. La red 2&rarr;4&rarr;2 aprende una frontera de decisi&oacute;n que separa correctamente ambas clases en todo el espacio, logrando 100% de exactitud en los 12 puntos de test (6 de cada clase, 0 errores).</div>
+                <div class="caption">Distribuci&oacute;n de los datos: azul = clase 0 (y &gt; 0), rojo = clase 1 (y &lt; 0). La red 2&rarr;4&rarr;2 alcanza 100% de exactitud, pero la frontera real es la recta <strong>y = 0</strong> (linealmente separable). Con las etiquetas actuales, no se requiere no-linealidad &mdash; v&eacute;ase la discusi&oacute;n en 11.1b.</div>
             </div>
         </div>
 
         <h3>11.7 An&aacute;lisis de la frontera de decisi&oacute;n</h3>
-        <p>La red aprende a separar las dos clases con una frontera que sigue aproximadamente las diagonales del espacio:
+        <p>Con las etiquetas actuales (clase = 0 si y &gt; 0, clase = 1 si y &lt; 0), la red aprende una frontera que se aproxima a la recta horizontal <strong>y = 0</strong>:</p>
 
         <div class="math-block">
-            $$\text{Frontera: } \{(x, y) : \text{softmax}_0(x, y) = \text{softmax}_1(x, y)\}$$
+            $$\text{Frontera actual: } y = 0$$
         </div>
 
-        <p>En un problema XOR-2D ideal, la frontera se aproxima a:</p>
+        <p>La red clasifica correctamente los 12 puntos de test porque el ruido (±1.25) no es suficiente para que los puntos de arriba crucen al hemisferio inferior. Sin embargo, este problema es <strong>linealmente separable</strong>: un perceptr&oacute;n simple sin capa oculta podr&iacute;a resolverlo con la misma exactitud.</p>
+
+        <p>Si las etiquetas se corrigieran para seguir el patr&oacute;n XOR verdadero (clase = 1 cuando sign(x) &ne; sign(y)), la frontera ser&iacute;a:</p>
         <div class="math-block">
-            $$|x| = |y|$$
+            $$\text{Frontera ideal: } |x| = |y|$$
         </div>
 
-        <p>La red logra esto con solo 4 neuronas ocultas, demostrando que la arquitectura 2&rarr;4&rarr;2 con ReLU+Softmax tiene suficiente capacidad de representaci&oacute;n para este problema no-lineal. El resultado visual es una frontera limpia que separa correctamente las 4 regiones del espacio.</p>
+        <p>Esa frontera <strong>no es linealmente separable</strong> y requerir&iacute;a una red con al menos una capa oculta. Con la correcci&oacute;n, el ejemplo 23 ser&iacute;a un verdadero an&aacute;logo 2D del XOR cl&aacute;sico y demostrar&iacute;a la capacidad de representaci&oacute;n no-lineal de la arquitectura 2&rarr;4&rarr;2.</p>
 
         <h3>11.8 Significado de este logro</h3>
         <p>Este ejemplo demuestra que MICELIO es capaz de <strong>deep learning real</strong>:</p>
