@@ -1,0 +1,14 @@
+importar "../modulos_std/set.mice" como conjunto
+
+imp "-- Ejemplo 25: Conjuntos didactico --"
+
+var a = conjunto.crear_conjunto([1, 2, 2, 3, 4])
+var b = conjunto.crear_conjunto([3, 4, 4, 5, 6])
+
+imp "A = " + aTexto(a)
+imp "B = " + aTexto(b)
+imp "union = " + aTexto(conjunto.union(a, b))
+imp "interseccion = " + aTexto(conjunto.interseccion(a, b))
+imp "diferencia A-B = " + aTexto(conjunto.diferencia(a, b))
+imp "simetrica = " + aTexto(conjunto.diferencia_simetrica(a, b))
+imp "subconjunto? " + aTexto(conjunto.es_subconjunto([1, 2], a))

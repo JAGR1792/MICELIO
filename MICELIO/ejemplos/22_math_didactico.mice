@@ -1,0 +1,11 @@
+importar "../modulos_std/math.mice" como math
+
+imp "-- Ejemplo 22: Math didactico --"
+imp "PI = " + aTexto(math.PI)
+imp "E = " + aTexto(math.E)
+imp "raiz(81) = " + aTexto(math.raiz(81))
+imp "potencia(2, 10) = " + aTexto(math.potencia(2, 10))
+imp "seno(0) = " + aTexto(math.seno(0))
+imp "seno(PI/2) = " + aTexto(math.seno(math.PI / 2))
+imp "coseno(0) = " + aTexto(math.coseno(0))
+imp "coseno(PI) = " + aTexto(math.coseno(math.PI))

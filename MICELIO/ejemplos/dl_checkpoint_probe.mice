@@ -1,0 +1,9 @@
+importar "../modulos_std/dl.mice" como dl
+
+var arq = [{"in":2, "out":2, "act":"softmax"}]
+var modelo = dl.perceptron_multicapa(arq)
+var X = [[0, 0], [1, 1]]
+var Y = [[1, 0], [0, 1]]
+
+dl.entrenar_red(modelo, X, Y, 3, 0.01)
+imp "OK checkpoint probe"

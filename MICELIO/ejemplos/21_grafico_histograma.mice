@@ -1,0 +1,22 @@
+importar "../modulos_std/grafico.mice" como graf
+
+imp "-- Ejemplo 21: Histograma --"
+
+# 1. Generar una muestra de datos aleatorios
+var datos = []
+var i = 0
+mientras (i < 200) {
+    datos.agregar((aleatorio() * 100))
+    i = i + 1
+}
+
+# 2. Preparar el gráfico y sus etiquetas
+graf.titulo("Histograma de muestra")
+graf.etiquetas("valor", "frecuencia")
+
+# 3. Dibujar el histograma
+graf.histograma(datos, 12)
+
+# 4. Guardar la imagen
+var guardado = graf.guardar("histograma_muestra.ppm")
+imp "Guardado: " + aTexto(guardado)

@@ -71,6 +71,15 @@ class MicelioListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MicelioParser#assign_target.
+    def enterAssign_target(self, ctx:MicelioParser.Assign_targetContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#assign_target.
+    def exitAssign_target(self, ctx:MicelioParser.Assign_targetContext):
+        pass
+
+
     # Enter a parse tree produced by MicelioParser#return_stmt.
     def enterReturn_stmt(self, ctx:MicelioParser.Return_stmtContext):
         pass

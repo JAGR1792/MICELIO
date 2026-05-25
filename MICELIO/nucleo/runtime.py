@@ -601,6 +601,31 @@ def _plot_guardar(path: Any, title: Any, xlabel: Any, ylabel: Any) -> str:
                 line.append(f"{rr} {gg} {bb}")
             f.write(" ".join(line) + "\n")
 
+    png_path = os.path.splitext(out_path)[0] + ".png"
+    png_written = False
+    try:
+        from PIL import Image
+
+        img = Image.new("RGB", (_PLOT_STATE["width"], _PLOT_STATE["height"]))
+        pixels = [tuple(pixel) for row in _PLOT_STATE["pixels"] for pixel in row]
+        img.putdata(pixels)
+        img.save(png_path)
+        png_written = True
+    except Exception:
+        png_writer = shutil.which("magick") or shutil.which("convert")
+        if png_writer is not None:
+            try:
+                command = [png_writer, out_path, png_path]
+                subprocess.run(
+                    command,
+                    check=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                png_written = True
+            except Exception:
+                png_written = False
+
     _PLOT_STATE["last_path"] = out_path
     return out_path
 
@@ -789,18 +814,22 @@ def _plot_mostrar(path: Any, title: Any, xlabel: Any, ylabel: Any) -> str:
         os.close(fd)
         out_path = _plot_guardar(tmp_path, title, xlabel, ylabel)
 
-    if _gtk_show_image_window(out_path, "Micelio Plot", allow_save=True):
+    display_path = os.path.splitext(out_path)[0] + ".png"
+    if not os.path.isfile(display_path):
+        display_path = out_path
+
+    if _gtk_show_image_window(display_path, "Micelio Plot", allow_save=True):
         return out_path
 
     # Headless fallback to external viewer.
     opened = False
     try:
         if os.name == "nt":
-            os.startfile(out_path)  # type: ignore[attr-defined]
+            os.startfile(display_path)  # type: ignore[attr-defined]
             opened = True
         elif sys.platform == "darwin":
             subprocess.Popen(
-                ["open", out_path],
+                ["open", display_path],
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
@@ -812,7 +841,7 @@ def _plot_mostrar(path: Any, title: Any, xlabel: Any, ylabel: Any) -> str:
             viewer = shutil.which("xdg-open")
             if viewer is not None:
                 subprocess.Popen(
-                    [viewer, out_path],
+                    [viewer, display_path],
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
@@ -826,7 +855,7 @@ def _plot_mostrar(path: Any, title: Any, xlabel: Any, ylabel: Any) -> str:
     if opened:
         _gui_alert(
             "Se abrio la vista previa con el visor del sistema.\\n"
-            f"Ruta: {out_path}",
+            f"Ruta: {display_path}",
             "Micelio Plot",
         )
 
@@ -1785,6 +1814,13 @@ def make_primitives() -> dict[str, Any]:
             os.remove(str(ruta))
         except Exception as e:
             raise MicelioRuntimeError(f"Error eliminando archivo: {e}")
+
+    def _archivo_tamano(ruta: Any) -> int:
+        """Devuelve el tamaño de un archivo en bytes."""
+        try:
+            return os.path.getsize(str(ruta))
+        except Exception as e:
+            raise MicelioRuntimeError(f"Error obteniendo tamaño de archivo: {e}")
     
     def _directorio_existe(ruta: Any) -> bool:
         """Verifica si un directorio existe."""
@@ -1819,6 +1855,7 @@ def make_primitives() -> dict[str, Any]:
         '__archivo_anexar': _archivo_anexar,
         '__archivo_existe': _archivo_existe,
         '__archivo_eliminar': _archivo_eliminar,
+        '__archivo_tamaño': _archivo_tamano,
         '__directorio_existe': _directorio_existe,
         '__directorio_crear': _directorio_crear,
     }

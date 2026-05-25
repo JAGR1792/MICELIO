@@ -1,0 +1,15 @@
+importar "../modulos_std/ml.mice" como ml
+
+imp "-- Ejemplo 28: ML didactico --"
+
+var X = [1, 2, 3, 4, 5, 6]
+var Y = [2, 4, 6, 8, 10, 12]
+var modelo = ml.regresion_lineal(X, Y)
+var pred = ml.predecir_lineal(7, modelo)
+
+imp "modelo = " + aTexto(modelo)
+imp "prediccion para x=7 = " + aTexto(pred)
+
+var particion = ml.dividir_datos([[1], [2], [3], [4]], [0, 0, 1, 1], 0.5)
+imp "dividir_datos = " + aTexto(particion)
+imp "exactitud ejemplo = " + aTexto(ml.exactitud([1, 0, 1, 1], [1, 0, 0, 1]))

@@ -1,0 +1,13 @@
+importar "../modulos_std/archivo.mice" como arch
+
+imp "-- Ejemplo 27: Archivo didactico --"
+
+var ruta = "graficos/archivo_demo.txt"
+arch.escribir_lineas(ruta, ["Linea 1", "Linea 2", "Linea 3"])
+imp "existe? " + aTexto(arch.existe(ruta))
+imp "tamano = " + aTexto(arch.tamano(ruta))
+imp "leer_lineas = " + aTexto(arch.leer_lineas(ruta))
+arch.anexar(ruta, "\nLinea 4")
+imp "despues de anexar = " + aTexto(arch.leer_lineas(ruta))
+arch.eliminar(ruta)
+imp "eliminado? " + aTexto(no arch.existe(ruta))

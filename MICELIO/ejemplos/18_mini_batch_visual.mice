@@ -1,0 +1,108 @@
+importar "../modulos_std/dl.mice" como dl
+importar "../modulos_std/grafico.mice" como graf
+importar "../modulos_std/math.mice" como math
+
+imp "-- Mini-batch demo con visualizacion (circulo) --"
+
+# Generar datos: puntos en el plano con etiqueta según si caen dentro de un circulo
+var X = []
+var Y = []
+para i en rango(200) {
+    var x1 = (aleatorio() * 10) - 5
+    var x2 = (aleatorio() * 10) - 5
+    X.agregar([x1, x2])
+    si (math.raiz(x1*x1 + x2*x2) < 3.0) {
+        Y.agregar([0, 1])
+    } sino {
+        Y.agregar([1, 0])
+    }
+}
+
+var arq = [{"in":2, "out":8, "act":"relu"}, {"in":8, "out":2, "act":"softmax"}]
+var modelo = dl.perceptron_multicapa(arq)
+
+var epochs = 40
+var batch_size = 20
+var lr = 0.05
+
+funcion slice(lst, start, end) {
+    var r = []
+    var i = start
+    mientras (i < end y i < longitud(lst)) {
+        r.agregar(lst[i])
+        i = i + 1
+    }
+    regresa r
+}
+
+para e en rango(epochs) {
+    var i = 0
+    mientras (i < longitud(X)) {
+        var Xb = slice(X, i, i + batch_size)
+        var Yb = slice(Y, i, i + batch_size)
+        dl.entrenar_red(modelo, Xb, Yb, 1, lr)
+        i = i + batch_size
+    }
+
+    si (e % 10 == 0 o e == epochs - 1) {
+        imp "Checkpoint epoch " + aTexto(e)
+        # Visualizar: clasificar una rejilla y guardar imagen
+        var gx0 = []
+        var gy0 = []
+        var gx1 = []
+        var gy1 = []
+
+        var pasos = 40
+        var xmin = -5
+        var xmax = 5
+        var ymin = -5
+        var ymax = 5
+
+        var xi = 0
+        mientras (xi < pasos) {
+            var xval = xmin + (xi * (xmax - xmin) / (pasos - 1))
+            var yi = 0
+            mientras (yi < pasos) {
+                var yval = ymin + (yi * (ymax - ymin) / (pasos - 1))
+                var res = dl.forward(modelo, [[xval, yval]])
+                var out = res["salida"][0]
+                si (out[0] >= out[1]) {
+                    gx0.agregar(xval)
+                    gy0.agregar(yval)
+                } sino {
+                    gx1.agregar(xval)
+                    gy1.agregar(yval)
+                }
+                yi = yi + 1
+            }
+            xi = xi + 1
+        }
+
+        graf.iniciar_grafico(xmin, xmax, ymin, ymax)
+        graf.pintar_puntos(gx0, gy0, 230,230,230, 1)
+        graf.pintar_puntos(gx1, gy1, 200,200,200, 1)
+
+        # pintar datos de entrenamiento sobre la rejilla
+        var groups = {"x0": [], "y0": [], "x1": [], "y1": []}
+        var j = 0
+        mientras (j < longitud(X)) {
+            si (Y[j][0] == 1) {
+                groups["x0"].agregar(X[j][0])
+                groups["y0"].agregar(X[j][1])
+            } sino {
+                groups["x1"].agregar(X[j][0])
+                groups["y1"].agregar(X[j][1])
+            }
+            j = j + 1
+        }
+
+        graf.pintar_puntos(groups["x0"], groups["y0"], 220,40,40, 2)
+        graf.pintar_puntos(groups["x1"], groups["y1"], 32,178,170, 2)
+
+        var fname = "mini_batch_epoch_" + aTexto(e) + ".ppm"
+        var saved = graf.guardar(fname)
+        imp "Guardado: " + aTexto(saved)
+    }
+}
+
+imp "Mini-batchfinalizado"

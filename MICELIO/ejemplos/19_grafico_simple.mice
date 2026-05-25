@@ -1,0 +1,11 @@
+importar "../modulos_std/grafico.mice" como graf
+
+imp "-- Ejemplo 19: Grafo simple --"
+
+var nodos = ["A", "B", "C", "D"]
+var aristas = [[0,1], [1,2], [2,3], [3,0], [0,2]]
+
+graf.dibujar_grafo(nodos, aristas, 100, 100)
+graf.titulo("Grafo simple")
+graf.guardar("grafo_simple.ppm")
+imp "Guardado: grafo_simple.ppm"

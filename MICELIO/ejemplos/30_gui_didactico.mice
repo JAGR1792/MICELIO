@@ -1,0 +1,7 @@
+importar "../modulos_std/gui.mice" como gui
+
+imp "-- Ejemplo 30: GUI didactico --"
+imp "estilo actual = " + aTexto(gui.estilo_actual())
+imp "estilos disponibles = " + aTexto(gui.estilos_disponibles())
+gui.estilo("claro")
+imp "estilo luego de aplicar claro = " + aTexto(gui.estilo_actual())

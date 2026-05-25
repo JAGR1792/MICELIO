@@ -1,0 +1,43 @@
+importar "../modulos_std/grafico.mice" como graf
+importar "../modulos_std/math.mice" como math
+
+imp "-- Ejemplo 20: Seno y coseno --"
+
+# 1. Crear el eje x en el rango [-pi, pi]
+var xs = []
+var ys_seno = []
+var ys_coseno = []
+var pasos = 240
+var i = 0
+mientras (i <= pasos) {
+    var x = -math.PI + ((2 * math.PI) * i / pasos)
+    xs.agregar(x)
+    ys_seno.agregar(math.seno(x))
+    ys_coseno.agregar(math.coseno(x))
+    i = i + 1
+}
+
+# 2. Preparar el lienzo y los ejes
+graf.iniciar_grafico(-math.PI, math.PI, -1.5, 1.5)
+graf.titulo("Seno y coseno")
+graf.etiquetas("x (rad)", "y")
+graf.marcadores(falso, 1)
+
+# 3. Dibujar la curva del seno
+graf.color_linea(220, 60, 60)
+graf.linea_sobre_grafico(xs, ys_seno)
+
+# Etiqueta visual para distinguirla
+graf.texto(590, 70, "seno", 220, 60, 60)
+
+# 4. Dibujar la curva del coseno encima
+graf.color_linea(40, 110, 220)
+graf.linea_sobre_grafico(xs, ys_coseno)
+
+# Etiqueta visual para distinguirla
+graf.texto(590, 92, "coseno", 40, 110, 220)
+
+# 5. Guardar el resultado
+var archivo = "seno_coseno.ppm"
+var guardado = graf.guardar(archivo)
+imp "Guardado: " + aTexto(guardado)

@@ -1,0 +1,17 @@
+importar "../modulos_std/dict.mice" como dic
+
+imp "-- Ejemplo 24: Diccionario didactico --"
+
+funcion doble(x) {
+	regresa x * 2
+}
+
+var config = {"nombre": "Micelio", "version": 1, "activo": verdadero}
+var extras = {"version": 2, "autor": "antonio", "activo": falso}
+var combinado = dic.combinar(config, extras)
+
+imp "config = " + aTexto(config)
+imp "combinado = " + aTexto(combinado)
+imp "tiene_clave('autor') = " + aTexto(dic.tiene_clave(combinado, "autor"))
+imp "invertir = " + aTexto(dic.invertir({"a": 1, "b": 2}))
+imp "mapear_valores = " + aTexto(dic.mapear_valores({"x": 2, "y": 3}, doble))

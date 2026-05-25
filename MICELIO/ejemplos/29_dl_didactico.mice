@@ -1,0 +1,12 @@
+importar "../modulos_std/dl.mice" como dl
+
+imp "-- Ejemplo 29: Deep Learning didactico --"
+
+var arquitectura = [{"in":2, "out":4, "act":"relu"}, {"in":4, "out":2, "act":"softmax"}]
+var modelo = dl.perceptron_multicapa(arquitectura)
+var X = [[0, 0], [0, 1], [1, 0], [1, 1]]
+var Y = [[1, 0], [0, 1], [0, 1], [1, 0]]
+
+dl.entrenar_red(modelo, X, Y, 10, 0.05)
+var salida = dl.forward(modelo, X)
+imp "salida final = " + aTexto(salida["salida"])

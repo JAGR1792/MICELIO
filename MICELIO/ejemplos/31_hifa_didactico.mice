@@ -1,0 +1,11 @@
+importar "../modulos_std/hifa.mice" como hifa
+
+imp "-- Ejemplo 31: Hifa didactico --"
+
+var app = hifa.crear("demo_hifa")
+hifa.ruta_texto(app, "GET", "/", "<h1>Hola desde Hifa</h1>", "text/html; charset=utf-8")
+hifa.ruta_json(app, "GET", "/api/ping", {"ok": verdadero, "framework": "hifa"})
+hifa.not_found_json(app, {"error": "no encontrado"})
+
+imp "rutas = " + aTexto(hifa.rutas(app))
+imp "app = " + aTexto(app)

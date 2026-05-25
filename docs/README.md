@@ -1,28 +1,17 @@
-# Documentacion de Micelio
+# Documentación de MICELIO
 
-Este directorio contiene la documentacion completa y tecnica del proyecto.
+- **`DOCUMENTACION.md`**: documentación completa (recomendado para empezar)
+- `lenguaje.md`: sintaxis y semántica detallada
+- `estructura-proyecto.md`: mapa de carpetas y responsabilidades
+- `runtime.md`: arquitectura de ejecución, entorno y builtins
+- `errores-pedagogicos.md`: formato de errores y catálogo de casos
+- `vscode-extension.md`: instalación y desarrollo de la extensión VS Code
+- `deep_learning.md`: guía técnica de Deep Learning
+- `gtk-gui-readme.md`: backend GTK embebido
+- `release.md`: versionado y empaquetado
+- "Guia TO DO.md": roadmap histórico del proyecto
 
-## Indice
+## Relación con README raíz
 
-- `docs/lenguaje.md`: sintaxis, semantica y ejemplos del lenguaje.
-- `docs/estructura-proyecto.md`: mapa de carpetas y responsabilidades.
-- `docs/runtime.md`: arquitectura de ejecucion, entorno y builtins.
-- `docs/gtk-gui-readme.md`: backend GTK embebido, integracion GUI y fallbacks.
-- `docs/errores-pedagogicos.md`: formato de errores y catalogo de casos.
-- `docs/vscode-extension.md`: instalacion, uso y desarrollo de la extension.
-- `docs/release.md`: versionado, empaquetado e instaladores.
-
-## Recomendacion de lectura
-
-1. `docs/lenguaje.md`
-2. `docs/estructura-proyecto.md`
-3. `docs/runtime.md`
-4. `docs/gtk-gui-readme.md`
-5. `docs/errores-pedagogicos.md`
-6. `docs/vscode-extension.md`
-7. `docs/release.md`
-
-## Relacion con README raiz
-
-- `README.md` (raiz): onboarding rapido y estado general.
-- `docs/`: referencia completa para desarrollo, mantenimiento y releases.
+- `README.md` (raíz): onboarding rápido
+- `docs/`: referencia completa

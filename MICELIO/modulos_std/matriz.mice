@@ -1,7 +1,9 @@
 # ===================================================================
-# matriz.mice – Módulo de álgebra lineal y matrices  
+# matriz.mice – Módulo de álgebra lineal y matrices
 # Operaciones sobre matrices y álgebra lineal
 # ===================================================================
+
+importar "math.mice" como math
 
 # Crea una matriz de ceros
 funcion ceros(filas, columnas) {
@@ -216,7 +218,7 @@ funcion norma_frobenius(m) {
         }
         i = i + 1
     }
-    regresa sqrt(suma)
+    regresa math.raiz(suma)
 }
 
 # Aplana matriz a vector

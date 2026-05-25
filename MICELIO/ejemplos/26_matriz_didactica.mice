@@ -1,0 +1,15 @@
+importar "../modulos_std/matriz.mice" como mat
+
+imp "-- Ejemplo 26: Matriz didactica --"
+
+var A = [[1, 2], [3, 4]]
+var B = [[5, 6], [7, 8]]
+
+imp "A = " + aTexto(A)
+imp "B = " + aTexto(B)
+imp "A + B = " + aTexto(mat.suma_matrices(A, B))
+imp "A x B = " + aTexto(mat.multiplicar(A, B))
+imp "transpuesta(A) = " + aTexto(mat.transpuesta(A))
+imp "traza(A) = " + aTexto(mat.traza(A))
+imp "norma_frobenius(A) = " + aTexto(mat.norma_frobenius(A))
+imp "aplanar(A) = " + aTexto(mat.aplanar(A))

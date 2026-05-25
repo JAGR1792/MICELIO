@@ -1,0 +1,9 @@
+importar "../modulos_std/grafico.mice" como graf
+
+imp "-- Test grafico simple --"
+var xs = [0, 1, 2, 3, 4]
+var ys = [0, 1, 4, 9, 16]
+graf.titulo("Test linea simple")
+graf.lineas(xs, ys)
+graf.guardar("test_linea.ppm")
+imp "Guardado: test_linea.ppm"

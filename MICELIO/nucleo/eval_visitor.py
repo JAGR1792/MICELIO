@@ -43,6 +43,9 @@ class EvalVisitor(MicelioVisitor):
         primitives = make_primitives()
         for name, fn in primitives.items():
             self.global_env.define(name, fn)
+        # No inyectamos aquí las funciones high-level de `make_builtins()`
+        # que podrían colisionar con las definiciones en builtins.mice.
+        # Las añadiremos después de ejecutar builtins.mice.
         
         # ─── 2. Definir funciones especiales que requieren acceso a self
         
@@ -102,6 +105,12 @@ class EvalVisitor(MicelioVisitor):
         
         # ─── 3. Cargar el archivo builtins.mice que define las funciones globales
         self._cargar_builtins_micelio()
+        # Tras cargar builtins.mice, inyectar las funciones nativas faltantes
+        # desde `make_builtins()` (solo si no están ya definidas).
+        builtins = make_builtins()
+        for name, fn in builtins.items():
+            if name not in self.global_env.values:
+                self.global_env.define(name, fn)
     
     def _cargar_builtins_micelio(self):
         """
@@ -480,9 +489,14 @@ class EvalVisitor(MicelioVisitor):
         path = self._decode_string_literal(raw)
         module_name = os.path.splitext(os.path.basename(path))[0]
 
-        module = self.modules.get(module_name)
-        if module is None:
+        module = None
+        full_path = None
+        try:
             full_path = self._resolve_module_path(path)
+        except MicelioRuntimeError:
+            full_path = None
+
+        if full_path is not None:
             if full_path in self.loaded_modules:
                 module = self.loaded_modules[full_path]
             else:
@@ -508,6 +522,9 @@ class EvalVisitor(MicelioVisitor):
                     if not name.startswith("_")
                 }
                 self.loaded_modules[full_path] = module
+
+        if module is None:
+            module = self.modules.get(module_name)
 
         alias = ctx.ID().getText() if ctx.ID() else module_name
         self.env.define(alias, module)

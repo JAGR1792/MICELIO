@@ -5,12 +5,12 @@
 
 # Lee contenido completo de un archivo
 funcion leer(ruta) {
-    regresa __leer_archivo(ruta)
+    regresa __archivo_leer(ruta)
 }
 
 # Escribe contenido a un archivo
 funcion escribir(ruta, contenido) {
-    __escribir_archivo(ruta, contenido)
+    __archivo_escribir(ruta, contenido)
 }
 
 # Lee líneas de un archivo
@@ -21,7 +21,7 @@ funcion leer_lineas(ruta) {
     var i = 0
     mientras (i < contenido.longitud()) {
         var car = contenido[i]
-        si (car == "\\n") {
+        si (car == "\n") {
             lineas.agregar(linea_actual)
             linea_actual = ""
         } sino {
@@ -41,7 +41,7 @@ funcion escribir_lineas(ruta, lineas) {
     var primera = verdadero
     para linea en lineas {
         si (!primera) {
-            contenido = contenido + "\\n"
+            contenido = contenido + "\n"
         }
         contenido = contenido + linea
         primera = falso
@@ -62,12 +62,12 @@ funcion existe(ruta) {
 
 # Elimina un archivo
 funcion eliminar(ruta) {
-    __eliminar_archivo(ruta)
+    __archivo_eliminar(ruta)
 }
 
 # Obtiene tamaño de archivo en bytes
-funcion tamaño(ruta) {
-    regresa __tamaño_archivo(ruta)
+funcion tamano(ruta) {
+    regresa __archivo_tamaño(ruta)
 }
 
 # Lee un archivo CSV

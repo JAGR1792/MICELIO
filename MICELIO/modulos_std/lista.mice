@@ -40,7 +40,7 @@ funcion indice_de(lista, elemento) {
 funcion sin_duplicados(lista) {
     var result = []
     para item en lista {
-        si (!contiene(result, item)) {
+        si (no contiene(result, item)) {
             result.agregar(item)
         }
     }
@@ -103,13 +103,13 @@ funcion rellenar(lista, longitud, valor) {
     regresa result
 }
 
-# Particiona una lista en grupos de tamaño n
-funcion agrupar(lista, tamaño) {
+# Particiona una lista en grupos de tamano n
+funcion agrupar(lista, tamano) {
     var result = []
     var grupo = []
     para item en lista {
         grupo.agregar(item)
-        si (grupo.longitud() == tamaño) {
+        si (grupo.longitud() == tamano) {
             result.agregar(grupo)
             grupo = []
         }

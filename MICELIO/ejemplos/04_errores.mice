@@ -4,7 +4,7 @@ imp "--- Pruebas de Errores en Micelio ---"
 
 funcion dividir(a, b) {
     si (b == 0) {
-        error("¡No se puede dividir por cero en este micelio!")
+        error("¡No se puede dividir por cero en este micelio, ni en esta matematica!")
     }
     regresa a / b
 }

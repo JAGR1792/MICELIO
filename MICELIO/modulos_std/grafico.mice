@@ -1,3 +1,5 @@
+importar "../modulos_std/math.mice" como math
+
 const _ANCHO = 800
 const _ALTO = 500
 const _MARGEN = 48
@@ -32,6 +34,10 @@ var _text_b = 50
 
 var _usar_marcadores = verdadero
 var _tam_marcador = 2
+var _last_xmin = 0
+var _last_xmax = 1
+var _last_ymin = 0
+var _last_ymax = 1
 
 funcion _abs(v) {
     si (v < 0) {
@@ -342,6 +348,73 @@ funcion marcadores(activo, tamano) {
     regresa [_usar_marcadores, _tam_marcador]
 }
 
+# ------------------------------------------------------------------
+# Nuevas utilidades para visualizaciones compuestas (no resetean)
+# ------------------------------------------------------------------
+
+funcion iniciar_grafico(xmin, xmax, ymin, ymax) {
+    __grafico_reset(_ANCHO, _ALTO, _MARGEN)
+    _dibujar_rejilla()
+    _dibujar_ejes()
+    _dibujar_ticks(xmin, xmax, ymin, ymax)
+    _last_xmin = xmin
+    _last_xmax = xmax
+    _last_ymin = ymin
+    _last_ymax = ymax
+    regresa nulo
+}
+
+funcion pintar_puntos(xs, ys, r, g, b, tam) {
+    si (longitud(xs) != longitud(ys)) {
+        imp "Error: pintar_puntos requiere listas x e y del mismo tamano"
+        regresa nulo
+    }
+    var left = _MARGEN
+    var right = _ANCHO - _MARGEN
+    var top = _MARGEN
+    var bottom = _ALTO - _MARGEN
+    var spanx = _last_xmax - _last_xmin
+    var spany = _last_ymax - _last_ymin
+    si (spanx == 0) { spanx = 1 }
+    si (spany == 0) { spany = 1 }
+
+    var i = 0
+    mientras (i < longitud(xs)) {
+        var px = left + aEntero(( (xs[i] - _last_xmin) * (right - left)) / spanx)
+        var py = bottom - aEntero(( (ys[i] - _last_ymin) * (bottom - top)) / spany)
+
+        var dx = -aEntero(tam)
+        mientras (dx <= aEntero(tam)) {
+            var dy = -aEntero(tam)
+            mientras (dy <= aEntero(tam)) {
+                __grafico_set_pixel(px + dx, py + dy, aEntero(r), aEntero(g), aEntero(b))
+                dy = dy + 1
+            }
+            dx = dx + 1
+        }
+        i = i + 1
+    }
+    regresa longitud(xs)
+}
+
+funcion pintar_mapa(xs, ys, clases, color0, color1) {
+    # xs, ys: grid points; clases: lista de 0/1
+    si (longitud(xs) != longitud(ys) o longitud(xs) != longitud(clases)) {
+        imp "Error: pintar_mapa requiere listas x,y,clases del mismo tamano"
+        regresa nulo
+    }
+    var i = 0
+    mientras (i < longitud(xs)) {
+        si (clases[i] == 1) {
+            __grafico_set_pixel(aEntero(xs[i]), aEntero(ys[i]), color1[0], color1[1], color1[2])
+        } sino {
+            __grafico_set_pixel(aEntero(xs[i]), aEntero(ys[i]), color0[0], color0[1], color0[2])
+        }
+        i = i + 1
+    }
+    regresa longitud(xs)
+}
+
 funcion color_linea(r, g, b) {
     _line_r = aEntero(r)
     _line_g = aEntero(g)
@@ -562,4 +635,159 @@ funcion guardar(path) {
 
 funcion mostrar() {
     regresa __grafico_mostrar("grafico.ppm", _titulo, _xlabel, _ylabel)
+}
+
+funcion texto(x, y0, texto_str, r, g, b) {
+    # Dibuja texto en coordenadas de pixeles usando el glifo interno
+    var xx = aEntero(x)
+    var yy = aEntero(y0)
+    var rr = aEntero(r)
+    var gg = aEntero(g)
+    var bb = aEntero(b)
+    _dibujar_texto(xx, yy, texto_str, rr, gg, bb)
+    regresa nulo
+}
+
+# ------------------------------------------------------------------
+# Funciones de layout y dibujo de grafos (consolidado aquí)
+# ------------------------------------------------------------------
+
+funcion _layout_circular(n) {
+    var coords = []
+    var i = 0
+    mientras (i < n) {
+        var ang = (i * 2 * 3.14159265) / n
+        var x = 0.5 + 0.4 * math.coseno(ang)
+        var yy = 0.5 + 0.4 * math.seno(ang)
+        coords.agregar([x, yy])
+        i = i + 1
+    }
+    regresa coords
+}
+
+funcion dibujar_grafo(nodos, aristas, ancho, alto) {
+    # nodos: lista de etiquetas (texto) o diccionarios {"label":..., "x":..., "y":...}
+    # aristas: lista de pares [i,j] indices de nodos
+    si (ancho == nulo) { ancho = 1 }
+    si (alto == nulo) { alto = 1 }
+
+    var n = longitud(nodos)
+    var coords = []
+    var i = 0
+    var has_coords = verdadero
+    mientras (i < n) {
+        var nd = nodos[i]
+        si (tipo(nd) == "dict") {
+            si (nd["x"] == nulo o nd["y"] == nulo) { has_coords = falso }
+        } sino {
+            has_coords = falso
+        }
+        i = i + 1
+    }
+
+    si (has_coords == falso) {
+        var circ = _layout_circular(n)
+        i = 0
+        mientras (i < n) {
+            coords.agregar([circ[i][0] * ancho, circ[i][1] * alto])
+            i = i + 1
+        }
+    } sino {
+        i = 0
+        mientras (i < n) {
+            var nd = nodos[i]
+            coords.agregar([nd["x"] * ancho, nd["y"] * alto])
+            i = i + 1
+        }
+    }
+
+    # Iniciar grafico con bounds
+    iniciar_grafico(0, ancho, 0, alto)
+
+    # Dibujar aristas
+    i = 0
+    mientras (i < longitud(aristas)) {
+        var e = aristas[i]
+        var a = e[0]
+        var b = e[1]
+        var x0 = coords[a][0]
+        var y0 = coords[a][1]
+        var x1 = coords[b][0]
+        var y1 = coords[b][1]
+        lineas([x0, x1], [y0, y1])
+        i = i + 1
+    }
+
+    # Dibujar nodos
+    var xs = []
+    var ys = []
+    i = 0
+    mientras (i < n) {
+        xs.agregar(coords[i][0])
+        ys.agregar(coords[i][1])
+        i = i + 1
+    }
+    pintar_puntos(xs, ys, 0, 100, 200, 3)
+
+    # Etiquetas
+    i = 0
+    mientras (i < n) {
+        var label = nodos[i]
+        si (tipo(label) == "dict") { label = label["label"] }
+        var lx = aEntero(coords[i][0]) + 6
+        var ly = aEntero(coords[i][1]) - 6
+        texto(lx, ly, aTexto(label), 50, 50, 50)
+        i = i + 1
+    }
+
+    regresa n
+}
+
+funcion linea_sobre_grafico(xs, ys) {
+    si (longitud(xs) != longitud(ys)) {
+        imp "Error: linea_sobre_grafico requiere listas x e y del mismo tamano"
+        regresa nulo
+    }
+    si (longitud(xs) == 0) {
+        imp "Error: linea_sobre_grafico requiere al menos un punto"
+        regresa nulo
+    }
+
+    var left = _MARGEN
+    var right = _ANCHO - _MARGEN
+    var top = _MARGEN
+    var bottom = _ALTO - _MARGEN
+    var spanx = _last_xmax - _last_xmin
+    var spany = _last_ymax - _last_ymin
+
+    si (spanx == 0) { spanx = 1 }
+    si (spany == 0) { spany = 1 }
+
+    var puntos = []
+    var i = 0
+    mientras (i < longitud(xs)) {
+        var px = left + aEntero(((xs[i] - _last_xmin) * (right - left)) / spanx)
+        var py = bottom - aEntero(((ys[i] - _last_ymin) * (bottom - top)) / spany)
+        puntos.agregar([px, py])
+        i = i + 1
+    }
+
+    i = 0
+    mientras ((i + 1) < longitud(puntos)) {
+        var p0 = puntos[i]
+        var p1 = puntos[i + 1]
+        _dibujar_linea(aEntero(p0[0]), aEntero(p0[1]), aEntero(p1[0]), aEntero(p1[1]), _line_r, _line_g, _line_b)
+        i = i + 1
+    }
+
+    si (_usar_marcadores) {
+        i = 0
+        mientras (i < longitud(puntos)) {
+            var p = puntos[i]
+            _dibujar_marcador(aEntero(p[0]), aEntero(p[1]))
+            i = i + 1
+        }
+    }
+
+    regresa longitud(puntos)
 }

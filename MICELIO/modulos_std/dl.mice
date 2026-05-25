@@ -154,9 +154,17 @@ funcion forward(modelo, X) {
 
 funcion entrenar_red(modelo, X, Y, epochs, lr) {
     para e en rango(epochs) {
+        si (e % 50 == 0 o e == epochs - 1) {
+            imp "[dl] checkpoint inicio epoch " + aTexto(e)
+        }
+
         var fwd = forward(modelo, X)
         var pred = fwd["salida"]
         var activaciones = fwd["activaciones"]
+
+        si (e % 50 == 0 o e == epochs - 1) {
+            imp "[dl] checkpoint forward epoch " + aTexto(e)
+        }
         
         var delta = mat.resta_matrices(pred, Y)
         
@@ -191,6 +199,10 @@ funcion entrenar_red(modelo, X, Y, epochs, lr) {
             capa["b"] = mat.resta_matrices(capa["b"], mat.escalar(db, lr))
             
             i = i - 1
+        }
+
+        si (e % 50 == 0 o e == epochs - 1) {
+            imp "[dl] checkpoint update epoch " + aTexto(e)
         }
         
         si (e % 200 == 0 o e == epochs - 1) {

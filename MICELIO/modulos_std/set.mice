@@ -13,7 +13,7 @@ funcion crear_conjunto(lista) {
                 encontrado = verdadero
             }
         }
-        si (!encontrado) {
+        si (no encontrado) {
             result.agregar(item)
         }
     }
@@ -33,7 +33,7 @@ funcion union(conjunto1, conjunto2) {
                 encontrado = verdadero
             }
         }
-        si (!encontrado) {
+        si (no encontrado) {
             result.agregar(item)
         }
     }
@@ -52,7 +52,7 @@ funcion interseccion(conjunto1, conjunto2) {
                         encontrado = verdadero
                     }
                 }
-                si (!encontrado) {
+                si (no encontrado) {
                     result.agregar(item)
                 }
             }
@@ -71,7 +71,7 @@ funcion diferencia(conjunto_a, conjunto_b) {
                 encontrado = verdadero
             }
         }
-        si (!encontrado) {
+        si (no encontrado) {
             result.agregar(item)
         }
     }
@@ -94,7 +94,7 @@ funcion es_subconjunto(conjunto_a, conjunto_b) {
                 encontrado = verdadero
             }
         }
-        si (!encontrado) {
+        si (no encontrado) {
             regresa falso
         }
     }
@@ -121,7 +121,7 @@ funcion complemento(conjunto, universo) {
                 encontrado = verdadero
             }
         }
-        si (!encontrado) {
+        si (no encontrado) {
             result.agregar(item)
         }
     }

@@ -99,13 +99,13 @@ funcion de_listas(claves_lista, valores_lista) {
 }
 
 # Cuenta entradas en el diccionario
-funcion tamaño(diccionario) {
+funcion tamano(diccionario) {
     regresa claves(diccionario).longitud()
 }
 
 # Verifica si diccionario está vacío
 funcion esta_vacio(diccionario) {
-    regresa tamaño(diccionario) == 0
+    regresa tamano(diccionario) == 0
 }
 
 # Obtiene subcadena de diccionario
