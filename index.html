@@ -428,7 +428,7 @@
         .mermaid-container {
             margin: 2.5rem 0;
             padding: 2rem;
-            background: var(--bg-main);
+            background: #ece8e2;
             border: 1px solid var(--border-light);
             border-radius: var(--radius);
             box-shadow: var(--shadow-sm);
@@ -545,47 +545,28 @@
             color: var(--accent-terracotta);
         }
 
-        .theme-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            margin-top: 2rem;
-            padding: 0.5rem 0.8rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-light);
+        .toggle-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(184,92,58,0.2);
             background: var(--bg-surface);
+            color: var(--fg-main);
+            font-size: 1.3rem;
             cursor: pointer;
-            font-family: var(--font-body);
-            font-size: 0.82rem;
-            color: var(--fg-muted);
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-
-        .theme-toggle:hover {
-            border-color: var(--border-medium);
-            background: var(--bg-surface-hover);
-        }
-
-        .theme-toggle .icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--bg-page);
-            border: 1px solid var(--border-light);
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        .theme-toggle .label {
-            flex: 1;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 500;
-            font-size: 0.72rem;
+        .toggle-btn:hover {
+            background: var(--accent-terracotta);
+            color: #fff;
+            border-color: var(--accent-terracotta);
         }
 
         .img-container {
@@ -647,44 +628,15 @@
 </head>
 <body>
 
-<aside>
-    <h2>Indice</h2>
-    <nav>
-        <ul>
-            <li><a href="#prefacio">Prefacio</a></li>
-            <li><a href="#fundamentos">1. Fundamentos</a></li>
-            <li><a href="#componentes">2. Componentes</a></li>
-            <li><a href="#forward">3. Forward propagation</a></li>
-            <li><a href="#backpropagation">4. Backpropagation</a></li>
-            <li><a href="#ciclo">5. Ciclo de entrenamiento</a></li>
-            <li><a href="#api">6. API de dl.mice</a></li>
-            <li><a href="#ejemplo1">7. XOR clasico</a></li>
-            <li><a href="#ejemplo2">8. Caperucita Roja</a></li>
-            <li><a href="#ejemplo3">9. Autoencoder</a></li>
-            <li><a href="#ejemplo4">10. Iris</a></li>
-            <li><a href="#joya">11. Clasificacion no-lineal</a></li>
-            <li><a href="#matematicas">12. Matematicas</a></li>
-            <li><a href="#arquitectura">13. Arquitectura interna</a></li>
-            <li><a href="#limitaciones">14. Limitaciones</a></li>
-        </ul>
-    </nav>
-    <div class="theme-toggle" onclick="alternarTema()" role="button" tabindex="0">
-        <span class="icon">&#x25D0;</span>
-        <span class="label">Cambiar tema</span>
-    </div>
-    <script>
-        try {
-            if (localStorage.getItem('tema') === 'dark' ||
-                (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-        } catch(e) {}
-        function alternarTema() {
-            try { localStorage.setItem('tema', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); } catch(e) {}
-            location.reload();
-        }
-    </script>
-</aside>
+<button class="toggle-btn" id="themeBtn">&#x25D0;</button>
+<script>
+try{(function(){var t;try{t=localStorage.getItem('tema')}catch(e){}if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}})()}catch(e){}
+try{document.getElementById('themeBtn').onclick=function(){
+ var h=document.documentElement;
+ if(h.getAttribute('data-theme')==='dark'){h.removeAttribute('data-theme');try{localStorage.setItem('tema','light')}catch(e){}}
+ else{h.setAttribute('data-theme','dark');try{localStorage.setItem('tema','dark')}catch(e){}}
+}}catch(e){}
+</script>
 
 <main>
 
