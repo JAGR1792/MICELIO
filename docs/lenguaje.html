@@ -6,8 +6,8 @@
 <title>lenguaje -- MICELIO</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f7f2ec;--fg:#1a0f0a;--fg2:#5c4a3a;--fg3:#8c7a6a;--accent:#b85c3a;--accent2:rgba(184,92,58,0.08);--accent3:#c9852a;--code-bg:#1a0f0a;--code-fg:#e6d4c0;--border:rgba(184,92,58,0.1);--r:12px;--r2:6px;--font:system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,sans-serif;--font-display:Georgia,Times New Roman,serif;--font-mono:Cascadia Code,JetBrains Mono,Fira Code,Consolas,monospace;--mermaid-bg:#ece8e2}
-[data-theme="dark"]{--bg:#14100c;--fg:#e6ddd4;--fg2:#b8a898;--fg3:#887a6a;--accent:#d4835a;--accent2:rgba(212,131,90,0.12);--accent3:#d4a030;--code-bg:#0d0906;--code-fg:#e6ddd4;--border:rgba(212,131,90,0.12);--mermaid-bg:#ece8e2}
+:root{--bg:#f7f2ec;--fg:#1a0f0a;--fg2:#5c4a3a;--fg3:#8c7a6a;--accent:#b85c3a;--accent2:rgba(184,92,58,0.08);--accent3:#c9852a;--code-bg:#1a0f0a;--code-fg:#e6d4c0;--border:rgba(184,92,58,0.1);--r:12px;--r2:6px;--font:system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,sans-serif;--font-display:Georgia,Times New Roman,serif;--font-mono:Cascadia Code,JetBrains Mono,Fira Code,Consolas,monospace}
+[data-theme="dark"]{--bg:#14100c;--fg:#e6ddd4;--fg2:#b8a898;--fg3:#887a6a;--accent:#d4835a;--accent2:rgba(212,131,90,0.12);--accent3:#d4a030;--code-bg:#0d0906;--code-fg:#e6ddd4;--border:rgba(212,131,90,0.12)}
 body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.7;margin:0;padding:2rem 1.5rem 5rem;max-width:860px;margin-left:auto;margin-right:auto}
 h1{font-family:var(--font-display);font-size:2.5rem;font-weight:700;margin:0 0 0.3rem;color:var(--accent);line-height:1.2}
 h2{font-size:1.4rem;font-weight:700;margin:2.5rem 0 0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)}
@@ -26,19 +26,21 @@ hr{border:none;border-top:1px solid var(--border);margin:2rem 0}
 table{width:100%;border-collapse:collapse;margin:0 0 1.5rem;font-size:0.9rem}
 th,td{border:1px solid var(--border);padding:0.5rem 0.75rem;text-align:left}
 th{background:var(--accent2);font-weight:600}
-.mermaid{background:var(--mermaid-bg);border-radius:var(--r);padding:12px;margin:0 0 1.5rem;overflow-x:auto;text-align:center}
+.mermaid{background:#ece8e2;border-radius:var(--r);padding:12px;margin:0 0 1.5rem;overflow-x:auto;text-align:center}
 .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
 .top a{font-size:0.9rem;color:var(--fg3);padding:0.3rem 0.8rem;border:1px solid var(--border);border-radius:var(--r2);text-decoration:none}
 .top a:hover{background:var(--accent2);color:var(--accent)}
 .toggle-btn{background:none;border:none;color:var(--fg2);font-size:1.2rem;cursor:pointer;padding:0.3rem 0.6rem;border-radius:var(--r2)}
 .toggle-btn:hover{background:var(--accent2);color:var(--accent)}
-.toc{background:var(--accent2);border-radius:var(--r);padding:1rem 1.5rem;margin-bottom:2rem;font-size:0.9rem}
-.toc strong{display:block;margin-bottom:0.5rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--fg3)}
-.toc a{display:inline-block;margin-right:1rem;margin-bottom:0.3rem;color:var(--fg2)}
-.toc a:hover{color:var(--accent)}
-.toc-2{margin-left:0}
-.toc-3{margin-left:1rem}
-.toc-4{margin-left:2rem}
+.toc-hdr{display:flex;align-items:center;gap:0.5rem;cursor:pointer;user-select:none;background:var(--accent2);border-radius:var(--r);padding:0.6rem 1rem;margin-bottom:0;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--fg3)}
+.toc-hdr:hover{background:var(--accent2);color:var(--accent)}
+.toc-body{background:var(--accent2);border-radius:0 0 var(--r) var(--r);padding:0 1rem 0.8rem;margin-bottom:2rem;font-size:0.9rem;overflow:hidden;transition:max-height .25s ease,padding .25s ease}
+.toc-body a{display:inline-block;margin-right:1rem;margin-bottom:0.3rem;color:var(--fg2)}
+.toc-body a:hover{color:var(--accent)}
+.toc-body.collapsed{max-height:0!important;padding-top:0;padding-bottom:0}
+.toc-3{margin-left:1rem}.toc-4{margin-left:2rem}
+.arrow{display:inline-block;transition:transform .2s}
+.arrow.open{transform:rotate(90deg)}
 @media(max-width:600px){body{padding:1.5rem 1rem 4rem}}
 </style>
 </head>
@@ -47,7 +49,10 @@ th{background:var(--accent2);font-weight:600}
   <a href="../index.html">&larr; Inicio</a>
   <button class="toggle-btn" id="themeBtn">&#x25D0;</button>
 </div>
-<div class="toc" id="toc"><strong>&#x25B6; Indice</strong><span id="tocLinks"></span></div>
+<div id="tocWrap">
+  <div class="toc-hdr" id="tocHdr"><span class="arrow" id="tocArrow">&#x25B6;</span> Indice</div>
+  <div class="toc-body" id="tocBody"><span id="tocLinks"></span></div>
+</div>
 <h1 id="lenguaje-micelio">Lenguaje MICELIO</h1>
 <h2 id="descripcion-general">Descripcion general</h2>
 <p>MICELIO es un lenguaje interpretado en español con paradigma
@@ -331,22 +336,36 @@ try{document.getElementById('themeBtn').onclick=function(){
  else{h.setAttribute('data-theme','dark');try{localStorage.setItem('tema','dark')}catch(e){}}
 }}catch(e){}
 try{(function(){
- var h=document.querySelectorAll('h2,h3,h4');
- var c=document.getElementById('tocLinks');
- if(!c||h.length<3){document.getElementById('toc').style.display='none';return}
+ var hd=document.querySelectorAll('h2,h3,h4');
+ var ct=document.getElementById('tocLinks');
+ var wr=document.getElementById('tocWrap');
+ if(!ct||hd.length<3){if(wr)wr.style.display='none';return}
  var s=[];
- for(var i=0;i<h.length;i++){
-  var e=h[i];var t=e.textContent.trim();
+ for(var i=0;i<hd.length;i++){
+  var e=hd[i];var t=e.textContent.trim();
   var id=e.id||t.toLowerCase().replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g,'-').replace(/^-+/,'').replace(/-+$/g,'');
   if(!id)id='s'+i;e.id=id;
   s.push({tag:e.tagName.toLowerCase(),id:id,text:t})
  }
- c.innerHTML='';
+ ct.innerHTML='';
  for(var i=0;i<s.length;i++){
   var a=document.createElement('a');a.href='#'+s[i].id;
   a.className='toc-'+s[i].tag.substr(1);
   a.textContent=s[i].text;
-  c.appendChild(a)
+  ct.appendChild(a)
+ }
+ var body=document.getElementById('tocBody');
+ var arr=document.getElementById('tocArrow');
+ var hdr=document.getElementById('tocHdr');
+ var key='toc_'+location.pathname;
+ var open=true;
+ try{var saved=localStorage.getItem(key);if(saved==='0')open=false}catch(e){}
+ if(!open){body.classList.add('collapsed');arr.classList.remove('open')}
+ hdr.onclick=function(){
+  open=!open;
+  if(open){body.classList.remove('collapsed');arr.classList.add('open')}
+  else{body.classList.add('collapsed');arr.classList.remove('open')}
+  try{localStorage.setItem(key,open?'1':'0')}catch(e){}
  }
 })()}catch(e){}
 </script>

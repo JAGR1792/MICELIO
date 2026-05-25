@@ -11,30 +11,28 @@
     <!-- Mermaid (diagrams) -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
-        var esOscuro = false;
-        try { esOscuro = localStorage.getItem('tema') === 'dark' || (localStorage.getItem('tema') === null && window.matchMedia('(prefers-color-scheme: dark)').matches); } catch(e) {};
         mermaid.initialize({
             startOnLoad: true,
             theme: 'base',
             themeVariables: {
-                background: '#f8f1eb',
-                primaryColor: '#f4ece4',
+                background: '#ece8e2',
+                primaryColor: '#d4c9be',
                 primaryTextColor: '#2c1810',
-                primaryBorderColor: '#c76b4a',
-                lineColor: '#c76b4a',
-                secondaryColor: '#ede3d8',
-                tertiaryColor: '#f8f1eb',
-                clusterBkg: '#f4ece4',
-                clusterBorder: '#c76b4a',
-                nodeBorder: '#c76b4a',
+                primaryBorderColor: '#b85c3a',
+                lineColor: '#b85c3a',
+                secondaryColor: '#e8e0d6',
+                tertiaryColor: '#ece8e2',
+                clusterBkg: '#d4c9be',
+                clusterBorder: '#b85c3a',
+                nodeBorder: '#b85c3a',
                 nodeTextColor: '#2c1810',
-                edgeLabelBackground: '#fffcf8',
-                fontFamily: 'DM Sans, sans-serif',
+                edgeLabelBackground: '#ece8e2',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
                 titleColor: '#2c1810',
-                mainBkg: '#f4ece4',
+                mainBkg: '#d4c9be',
                 textColor: '#2c1810',
                 labelTextColor: '#2c1810',
-                labelBackground: '#fffcf8'
+                labelBackground: '#ece8e2'
             }
         });
     </script>
@@ -545,6 +543,15 @@
             color: var(--accent-terracotta);
         }
 
+        .toc-hdr{display:flex;align-items:center;gap:0.5rem;cursor:pointer;user-select:none;background:var(--accent2);border-radius:var(--radius);padding:0.6rem 1rem;margin-bottom:0;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--fg-dark)}
+        .toc-hdr:hover{color:var(--accent-terracotta)}
+        .toc-body{background:var(--accent2);border-radius:0 0 var(--radius) var(--radius);padding:0 1rem 0.8rem;margin-bottom:2rem;font-size:0.9rem;overflow:hidden;transition:max-height .25s ease,padding .25s ease}
+        .toc-body a{display:inline-block;margin-right:1rem;margin-bottom:0.3rem;color:var(--fg-muted)}
+        .toc-body a:hover{color:var(--accent-terracotta)}
+        .toc-body.collapsed{max-height:0!important;padding-top:0;padding-bottom:0}
+        .toc-3{margin-left:1.2rem}.toc-4{margin-left:2.4rem}
+        .arrow{display:inline-block;transition:transform .2s}
+        .arrow.open{transform:rotate(90deg)}
         .toggle-btn {
             position: fixed;
             bottom: 1.5rem;
@@ -636,12 +643,49 @@ try{document.getElementById('themeBtn').onclick=function(){
  if(h.getAttribute('data-theme')==='dark'){h.removeAttribute('data-theme');try{localStorage.setItem('tema','light')}catch(e){}}
  else{h.setAttribute('data-theme','dark');try{localStorage.setItem('tema','dark')}catch(e){}}
 }}catch(e){}
+try{(function(){
+ var hd=document.querySelectorAll('h2');
+ var ct=document.getElementById('tocLinks');
+ var wr=document.getElementById('tocWrap');
+ if(!ct||hd.length<3){if(wr)wr.style.display='none';return}
+ var s=[];
+ for(var i=0;i<hd.length;i++){
+  var e=hd[i];var t=e.textContent.trim();
+  var id=e.id||t.toLowerCase().replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g,'-').replace(/^-+/,'').replace(/-+$/g,'');
+  if(!id)id='s'+i;e.id=id;
+  s.push({id:id,text:t})
+ }
+ ct.innerHTML='';
+ for(var i=0;i<s.length;i++){
+  var a=document.createElement('a');a.href='#'+s[i].id;
+  a.textContent=s[i].text;
+  ct.appendChild(a)
+ }
+ var body=document.getElementById('tocBody');
+ var arr=document.getElementById('tocArrow');
+ var hdr=document.getElementById('tocHdr');
+ var key='toc_'+location.pathname;
+ var open=true;
+ try{var saved=localStorage.getItem(key);if(saved==='0')open=false}catch(e){}
+ if(!open){body.classList.add('collapsed');arr.classList.remove('open')}
+ hdr.onclick=function(){
+  open=!open;
+  if(open){body.classList.remove('collapsed');arr.classList.add('open')}
+  else{body.classList.add('collapsed');arr.classList.remove('open')}
+  try{localStorage.setItem(key,open?'1':'0')}catch(e){}
+ }
+})()}catch(e){}
 </script>
 
 <main>
 
     <h1>Deep Learning en MICELIO</h1>
     <p class="subtitle">Una implementaci&oacute;n completa de redes neuronales en MICELIO puro, sin dependencias externas de machine learning</p>
+
+    <div id="tocWrap">
+      <div class="toc-hdr" id="tocHdr"><span class="arrow" id="tocArrow">&#x25B6;</span> Indice</div>
+      <div class="toc-body" id="tocBody"><span id="tocLinks"></span></div>
+    </div>
 
     <!-- ================================================================ -->
     <!-- PREFACIO -->
