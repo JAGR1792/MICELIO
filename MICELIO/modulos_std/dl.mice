@@ -166,7 +166,7 @@ funcion entrenar_red(modelo, X, Y, epochs, lr) {
             i = i - 1
         }
         
-        si (e % 200 == 0 o e == epochs - 1) {
+        si (epochs > 5 y (e % 200 == 0 o e == epochs - 1)) {
             imp "Epoch " + aTexto(e) + " - Error: " + aTexto(error_mse(Y, pred))
         }
     }

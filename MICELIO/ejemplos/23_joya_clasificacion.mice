@@ -1,0 +1,209 @@
+# ═══════════════════════════════════════════════════════════════════════
+#  🏆 La Joya de la Corona — Clasificacion No-Lineal (XOR-2D)
+#     MICELIO: Red Neuronal 2->6->2 con frontera de decision
+# ═══════════════════════════════════════════════════════════════════════
+importar "../modulos_std/dl.mice" como dl
+importar "../modulos_std/ml.mice" como ml
+importar "../modulos_std/grafico.mice" como g
+
+# ─── Utilerias ──────────────────────────────────────────────────────
+
+funcion argmax(fila) {
+    var idx = 0
+    var max_v = fila[0]
+    var i = 1
+    mientras (i < longitud(fila)) {
+        si (fila[i] > max_v) { idx = i; max_v = fila[i] }
+        i = i + 1
+    }
+    regresa idx
+}
+
+funcion generar_xor2d() {
+    var X = []
+    var Y = []
+    var centros = [[-2, 2], [2, -2], [-2, -2], [2, 2]]
+    var labels = [[1, 0], [0, 1], [0, 1], [1, 0]]
+    var c = 0
+    mientras (c < 4) {
+        var i = 0
+        mientras (i < 15) {
+            var xv = centros[c][0] + (aleatorio() * 2.5 - 1.25)
+            var yv = centros[c][1] + (aleatorio() * 2.5 - 1.25)
+            X.agregar([xv, yv])
+            Y.agregar(labels[c])
+            i = i + 1
+        }
+        c = c + 1
+    }
+    regresa {"X": X, "Y": Y}
+}
+
+# ─── Inicio ─────────────────────────────────────────────────────────
+
+imp "╔══════════════════════════════════════════════════════╗"
+imp "║   MICELIO — Clasificacion XOR-2D (2 clases)        ║"
+imp "╚══════════════════════════════════════════════════════╝"
+imp ""
+
+var todo = generar_xor2d()
+var X = todo["X"]
+var Y = todo["Y"]
+imp "Datos: " + aTexto(longitud(X)) + " puntos, 2 clases (XOR en 2D)"
+imp ""
+
+var X_train = []
+var Y_train = []
+var X_test = []
+var Y_test = []
+var i = 0
+var n_total = longitud(X)
+mientras (i < n_total) {
+    si (i % 5 == 0) { X_test.agregar(X[i]); Y_test.agregar(Y[i]) }
+    sino { X_train.agregar(X[i]); Y_train.agregar(Y[i]) }
+    i = i + 1
+}
+imp "Train: " + aTexto(longitud(X_train)) + " | Test: " + aTexto(longitud(X_test))
+imp ""
+
+# ─── Construir red: 2 -> 6 -> 2 (ReLU + ReLU + Softmax) ────────────
+
+imp "Construyendo red 2->4->2..."
+var arq = [{"in": 2, "out": 4, "act": "relu"}, {"in": 4, "out": 2, "act": "softmax"}]
+var modelo = dl.perceptron_multicapa(arq)
+imp "Red creada (" + aTexto(longitud(modelo["capas"])) + " capas, 2->4->2)"
+imp ""
+
+var lr = 0.01
+var epochs = 150
+var track_ep = []
+var track_loss = []
+
+imp "Entrenando " + aTexto(epochs) + " epocas (lr=" + aTexto(lr) + ")..."
+
+para ep en rango(epochs) {
+    dl.entrenar_red(modelo, X_train, Y_train, 1, lr)
+
+    si (ep % 50 == 0 o ep == epochs - 1) {
+        var fwd = dl.forward(modelo, X_test)
+        var loss = dl.error_mse(Y_test, fwd["salida"])
+        track_ep.agregar(ep)
+        track_loss.agregar(loss)
+        imp "  Epoca " + aTexto(ep) + "  Loss: " + aTexto(loss)
+    }
+}
+imp "Entrenamiento completado."
+imp ""
+
+# ─── Evaluacion ─────────────────────────────────────────────────────
+
+var fwd_test = dl.forward(modelo, X_test)
+var preds = fwd_test["salida"]
+var pred_clases = []
+var real_clases = []
+i = 0
+    mientras (i < longitud(X_test)) {
+        pred_clases.agregar(argmax(preds[i]))
+        real_clases.agregar(argmax(Y_test[i]))
+        i = i + 1
+    }
+
+var acc = ml.exactitud(pred_clases, real_clases)
+var f1 = ml.f1_score(pred_clases, real_clases)
+var mc = ml.matriz_confusion(pred_clases, real_clases)
+
+imp "╔══════════════════════════════════════════════════════╗"
+imp "║   RESULTADOS                                        ║"
+imp "╚══════════════════════════════════════════════════════╝"
+imp "  Exactitud: " + aTexto(acc)
+imp "  F1-Score:  " + aTexto(f1)
+imp "  TP: " + aTexto(mc["tp"]) + "  TN: " + aTexto(mc["tn"]) + "  FP: " + aTexto(mc["fp"]) + "  FN: " + aTexto(mc["fn"])
+imp ""
+
+# ─── Grafico 1: Curva de aprendizaje ────────────────────────────────
+
+g.color_linea(60, 100, 200)
+g.lineas(track_ep, track_loss)
+g.titulo("Curva de Aprendizaje — XOR-2D")
+g.etiquetas("Epoca", "Error MSE")
+g.guardar("graficos/xor_loss.png")
+imp "Guardado: graficos/xor_loss.png"
+
+# ─── Grafico 2: Frontera de decision ───────────────────────────────
+
+imp "Generando mapa de decision 40x40..."
+var xmin = -4.5
+var xmax = 4.5
+var ymin = -4.5
+var ymax = 4.5
+var pasos = 40
+var grid_pts = []
+var xi = 0
+mientras (xi < pasos) {
+    var xv = xmin + (xi * (xmax - xmin) / (pasos - 1))
+    var yi = 0
+    mientras (yi < pasos) {
+        var yv = ymin + (yi * (ymax - ymin) / (pasos - 1))
+        grid_pts.agregar([xv, yv])
+        yi = yi + 1
+    }
+    xi = xi + 1
+}
+
+var res_grid = dl.forward(modelo, grid_pts)
+var salida_grid = res_grid["salida"]
+
+var g0x = []
+var g0y = []
+var g1x = []
+var g1y = []
+i = 0
+mientras (i < longitud(grid_pts)) {
+    var c = argmax(salida_grid[i])
+    si (c == 0) { g0x.agregar(grid_pts[i][0]); g0y.agregar(grid_pts[i][1]) }
+    sino { g1x.agregar(grid_pts[i][0]); g1y.agregar(grid_pts[i][1]) }
+    i = i + 1
+}
+
+g.iniciar_grafico(xmin, xmax, ymin, ymax)
+g.titulo("Frontera de Decision — Red 2-6-2")
+g.etiquetas("X", "Y")
+
+g.pintar_puntos(g0x, g0y, 200, 200, 240, 2)
+g.pintar_puntos(g1x, g1y, 240, 200, 200, 2)
+
+var t0x = []
+var t0y = []
+var t1x = []
+var t1y = []
+i = 0
+mientras (i < longitud(X_test)) {
+    si (real_clases[i] == 0) { t0x.agregar(X_test[i][0]); t0y.agregar(X_test[i][1]) }
+    sino { t1x.agregar(X_test[i][0]); t1y.agregar(X_test[i][1]) }
+    i = i + 1
+}
+
+g.pintar_puntos(t0x, t0y, 40, 80, 200, 7)
+g.pintar_puntos(t1x, t1y, 200, 60, 60, 7)
+
+i = 0
+mientras (i < longitud(X_test)) {
+    si (pred_clases[i] != real_clases[i]) {
+        g.pintar_puntos([X_test[i][0]], [X_test[i][1]], 255, 255, 80, 10)
+    }
+    i = i + 1
+}
+
+g.guardar("graficos/xor_frontera.png")
+imp "Guardado: graficos/xor_frontera.png"
+
+# ─── Fin ────────────────────────────────────────────────────────────
+
+imp ""
+imp "╔══════════════════════════════════════════════════════╗"
+imp "║   Listo!                                            ║"
+imp "╚══════════════════════════════════════════════════════╝"
+imp "  graficos/xor_loss.png"
+imp "  graficos/xor_frontera.png"
+
+g.mostrar()
