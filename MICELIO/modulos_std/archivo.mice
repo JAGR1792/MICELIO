@@ -203,3 +203,15 @@ funcion guardar_datos(ruta, datos, cabecera, delimitador) {
     escribir_csv(ruta, filas_texto, delimitador)
 }
 
+# Lee archivo JSON y retorna estructura (lista, diccionario, número, texto)
+funcion leer_json(ruta) {
+    var texto = leer_archivo(ruta)
+    regresa __json_parse(texto)
+}
+
+# Escribe estructura como JSON
+funcion escribir_json(ruta, datos) {
+    var texto = __json_stringify(datos)
+    escribir(ruta, texto)
+}
+

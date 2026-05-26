@@ -1,1163 +1,402 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentacion -- MICELIO</title>
+# Modulos de la biblioteca estandar
 
-    <!-- MathJax (LaTeX formulas) -->
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+MICELIO incluye una biblioteca estandar implementada en MICELIO puro.
+Los modulos se cargan con `importar "ruta" como alias`.
 
-    <!-- Mermaid (diagrams) -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-    <script>
-        // Mermaid configuration using a fixed neutral palette for absolute legibility
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'base',
-            themeVariables: {
-                /* General */
-                fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
-                fontSize: '14px',
-                background: '#ffffff',
-                mainBkg: '#ffffff',
-                
-                /* Nodes */
-                nodeBorder: '#94a3b8',
-                nodeTextColor: '#1e293b',
-                
-                /* Clusters (subgraphs) */
-                clusterBkg: '#f8fafc',
-                clusterBorder: '#cbd5e1',
-                
-                /* Lines & Markers */
-                lineColor: '#475569',
-                tertiaryColor: '#f1f5f9',
-                
-                /* Edge Labels */
-                edgeLabelBackground: '#ffffff',
-                labelTextColor: '#1e293b',
-                
-                /* Primary elements */
-                primaryColor: '#f1f5f9',
-                primaryTextColor: '#0f172a',
-                primaryBorderColor: '#94a3b8'
-            },
-            flowchart: {
-                htmlLabels: true,
-                curve: 'linear'
-            }
-        });
-    </script>
+---
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+## builtins.mice (auto-cargado)
 
-    <style>
-        :root {
-            --bg-page: #f8f1eb;
-            --bg-main: #fffcf8;
-            --bg-surface: #f4ece4;
-            --bg-surface-hover: #ede3d8;
-            --fg-main: #2c1810;
-            --fg-muted: #7a6658;
-            --fg-light: #a89484;
-            --fg-faint: #d4c8bc;
-            --accent-primary: #c76b4a;
-            --accent-primary-dark: #a8553a;
-            --accent-secondary: #d4922a;
-            --accent-highlight: #e07050;
-            --accent-glow: rgba(199, 107, 74, 0.1);
-            --code-bg: #2c1810;
-            --code-fg: #e8d5c0;
-            --code-keyword: #f0b060;
-            --code-string: #a8c080;
-            --border-light: rgba(199, 107, 74, 0.12);
-            --border-medium: rgba(199, 107, 74, 0.2);
-            --shadow-sm: 0 2px 8px rgba(44, 24, 16, 0.06);
-            --shadow-md: 0 8px 32px rgba(44, 24, 16, 0.08);
-            --shadow-lg: 0 16px 48px rgba(44, 24, 16, 0.12);
-            --shadow-glow: 0 8px 32px rgba(199, 107, 74, 0.08);
-            --font-display: 'Syne', sans-serif;
-            --font-body: 'Plus Jakarta Sans', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --radius: 16px;
-            --radius-sm: 8px;
-        }
+Se carga automaticamente al iniciar el interprete. No necesita `importar`.
 
-        [data-theme="dark"] {
-            --bg-page: #020617;
-            --bg-main: #0f172a;
-            --bg-surface: #1e293b;
-            --bg-surface-hover: #334155;
-            --fg-main: #f0fdf4;
-            --fg-muted: #94a3b8;
-            --fg-light: #64748b;
-            --fg-faint: #334155;
-            --accent-primary: #34d399;
-            --accent-primary-dark: #10b981;
-            --accent-secondary: #a78bfa;
-            --accent-highlight: #fb7185;
-            --accent-glow: rgba(52, 211, 153, 0.2);
-            --code-bg: #020617;
-            --code-fg: #f8fafc;
-            --code-keyword: #7dd3fc;
-            --code-string: #86efac;
-            --border-light: rgba(52, 211, 153, 0.15);
-            --border-medium: rgba(52, 211, 153, 0.25);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
-            --shadow-glow: 0 0 25px rgba(52, 211, 153, 0.15);
-            --body-bg-gradient-1: rgba(52, 211, 153, 0.08);
-            --body-bg-gradient-2: rgba(167, 139, 250, 0.06);
-        }
+### Funciones de orden superior
 
-        .mermaid text, .mermaid tspan { color: #1e293b !important; fill: #1e293b !important; font-family: var(--font-body) !important; }
-        .mermaid .edgePath path { stroke: #475569 !important; stroke-width: 1.5px !important; }
-        .mermaid .marker { fill: #475569 !important; stroke: #475569 !important; }
-        .mermaid .edgeLabel, .mermaid .edgeLabel span, .mermaid .label, .mermaid .label span { color: #1e293b !important; background-color: rgba(255, 255, 255, 0.95) !important; padding: 2px 4px !important; border-radius: 4px !important; font-weight: 500 !important; font-size: 11px !important; }
-        .mermaid .node rect, .mermaid .node circle, .mermaid .node polygon, .mermaid .node path { fill: #ffffff !important; stroke: #94a3b8 !important; stroke-width: 1.2px !important; }
-        .mermaid .cluster rect { fill: #f8fafc !important; stroke: #e2e8f0 !important; stroke-style: dashed !important; }
-        
-        .mermaid-container { margin: 4rem 0; padding: 3.5rem 2.5rem 2.5rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); display: flex; justify-content: center; overflow-x: auto; position: relative; }
-        .mermaid-container::after { content: "Esquema T&eacute;cnico"; position: absolute; top: 1.2rem; left: 1.5rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; font-weight: 700; }
-
-        :root { --body-bg-gradient-1: rgba(199, 107, 74, 0.06); --body-bg-gradient-2: rgba(212, 146, 42, 0.04); }
-        * { box-sizing: border-box; scroll-behavior: smooth; }
-        ::selection { background: rgba(16, 185, 129, 0.2); color: var(--fg-main); }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-page); }
-        ::-webkit-scrollbar-thumb { background: var(--fg-faint); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
-
-        body {
-            background: var(--bg-page);
-            background-image: radial-gradient(ellipse at 15% 20%, var(--body-bg-gradient-1) 0%, transparent 50%), radial-gradient(ellipse at 85% 80%, var(--body-bg-gradient-2) 0%, transparent 50%);
-            color: var(--fg-main); font-family: var(--font-body); line-height: 1.7; margin: 0; min-height: 100vh;
-        }
-        body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-highlight), var(--accent-primary)); background-size: 200% 100%; animation: shimmer 4s ease-in-out infinite; z-index: 100; }
-        @keyframes shimmer { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 0%; } }
-
-        main { margin: 0 auto; padding: 4rem 2rem 6rem; max-width: 900px; width: 100%; }
-        h1 { font-family: var(--font-display); font-size: 3.5rem; font-weight: 800; margin: 0 0 1rem; color: var(--fg-main); letter-spacing: -2px; line-height: 1; text-transform: uppercase; }
-        h1::first-line { color: var(--accent-primary); }
-        h2 { font-family: var(--font-display); color: var(--accent-primary-dark); font-size: 2rem; font-weight: 800; margin: 4rem 0 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border-light); position: relative; text-transform: uppercase; letter-spacing: -1px; }
-        h2::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 80px; height: 3px; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); border-radius: 3px; }
-        h3 { font-family: var(--font-display); color: var(--fg-main); font-size: 1.5rem; font-weight: 700; margin: 2.5rem 0 1rem; letter-spacing: -0.5px; }
-        h4 { font-family: var(--font-display); color: var(--accent-primary); font-size: 1.2rem; margin: 2rem 0 0.8rem; font-weight: 700; }
-        p { margin: 0 0 1.2rem; opacity: 0.9; }
-        a { color: var(--accent-primary); text-decoration: none; font-weight: 600; transition: all 0.2s ease; border-bottom: 1px solid transparent; }
-        a:hover { color: var(--accent-secondary); border-bottom-color: var(--accent-secondary); }
-        ul, ol { margin: 0 0 1.5rem 1.5rem; }
-        li { margin-bottom: 0.5rem; opacity: 0.9; }
-        code { font-family: var(--font-mono); background: var(--bg-surface); color: var(--accent-primary-dark); padding: 0.2rem 0.4rem; border-radius: 6px; font-size: 0.9em; border: 1px solid var(--border-light); }
-        pre { background: var(--code-bg); padding: 2rem 1.5rem 1.5rem; border-radius: var(--radius); overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; margin: 2rem 0; }
-        pre::before { content: ""; position: absolute; top: 14px; left: 16px; width: 8px; height: 8px; border-radius: 50%; background: #ff5f56; box-shadow: 15px 0 0 #ffbd2e, 30px 0 0 #27c93f; }
-        pre code { background: transparent; color: var(--code-fg); padding: 0; border: none; font-size: 0.9em; line-height: 1.6; }
-        blockquote { border-left: 4px solid var(--accent-primary); background: rgba(199, 107, 74, 0.05); padding: 1rem 1.5rem; margin: 0 0 1.5rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--fg-muted); }
-        hr { border: 0; height: 1px; background: linear-gradient(to right, transparent, var(--border-medium), transparent); margin: 3rem 0; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2.5rem 0; background: var(--bg-main); border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border-light); }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); }
-        th { background: var(--bg-surface); color: var(--accent-primary-dark); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
-
-        .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem; padding: 1.5rem 2rem; background: var(--bg-main); border-bottom: 1px solid var(--border-light); position: relative; z-index: 90; }
-        .top a { font-size: 0.9rem; color: var(--fg-muted); padding: 0.5rem 1rem; border: 1px solid var(--border-light); border-radius: var(--radius-sm); text-decoration: none; }
-        .top a:hover { background: var(--bg-surface); color: var(--accent-primary); }
-        
-        .menu-btn { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1001; width: 50px; height: 50px; border-radius: 14px; background: var(--bg-surface); border: 1px solid var(--border-medium); color: var(--fg-main); font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); backdrop-filter: blur(8px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .menu-btn:hover { transform: scale(1.05) rotate(5deg); background: var(--accent-primary); color: #fff; border-color: var(--accent-primary); box-shadow: var(--shadow-glow); }
-        
-        .sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100vh; z-index: 2000; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); border-left: 1px solid var(--border-medium); padding: 5rem 2rem 2rem; overflow-y: auto; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.2); }
-        .sidebar.open { right: 0; }
-        .sidebar h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent-primary); margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
-        .sidebar a { display: block; padding: 0.6rem 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.8); text-decoration: none; border-radius: var(--radius-sm); margin-bottom: 0.2rem; transition: all 0.2s ease; }
-        .sidebar a:hover { background: rgba(16, 185, 129, 0.1); color: var(--accent-primary); transform: translateX(5px); }
-        
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1999; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: all 0.4s ease; }
-        .overlay.show { opacity: 1; pointer-events: auto; }
-        
-        #themeBtnSidebar { background: var(--bg-surface); border: 1px solid var(--border-medium); color: var(--fg-main); padding: 0.8rem; border-radius: var(--radius-sm); cursor: pointer; width: 100%; margin-top: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
-
-        @media(max-width:768px) {
-            main { padding: 2rem 1.5rem; }
-            h1 { font-size: 2.5rem; }
-        }
-    </style>
-</head>
-<body>
-<div class="overlay" id="overlay"></div>
-<div class="sidebar" id="sidebar">
-  <h3>Navegacion</h3>
-  <a href="../index.html">&#x2190; Inicio (Deep Learning)</a>
-  <a href="lenguaje.html">Lenguaje MICELIO</a>
-  <a href="modulos.html">Modulos std</a>
-  <a href="estructura-proyecto.html">Estructura del proyecto</a>
-  <a href="runtime.html">Runtime interno</a>
-  <a href="DOCUMENTACION.html">Documentacion tecnica</a>
-  <a href="vscode-extension.html">Extension VS Code</a>
-  <a href="gtk-gui-readme.html">Interfaz GTK</a>
-  <hr style="margin:1.5rem 0; opacity:0.1">
-  <h3>Indice</h3>
-  <div id="tocLinks"></div>
-  <hr style="margin:1.5rem 0; opacity:0.1">
-  <button id="themeBtnSidebar">&#x25D0; Modo oscuro</button>
-</div>
-
-<button class="menu-btn" id="menuBtn">&#x2630;</button>
-
-<div class="top">
-  <a href="../index.html">&larr; Inicio</a>
-</div>
-
-<main>
-<h1 id="modulos-de-la-biblioteca-estandar">Modulos de la biblioteca
-estandar</h1>
-<p>MICELIO incluye una biblioteca estandar implementada en MICELIO puro.
-Los modulos se cargan con <code>importar "ruta" como alias</code>.</p>
-<hr />
-<h2 id="builtins.mice-auto-cargado">builtins.mice (auto-cargado)</h2>
-<p>Se carga automaticamente al iniciar el interprete. No necesita
-<code>importar</code>.</p>
-<h3 id="funciones-de-orden-superior">Funciones de orden superior</h3>
-<pre class="mice"><code>map(funcion, lista)      # Aplica funcion a cada elemento
+```mice
+map(funcion, lista)      # Aplica funcion a cada elemento
 filter(predicado, lista)  # Filtra segun predicado
 reduce(funcion, lista, inicio)  # Reduce a un valor
 todos(predicado, lista)  # True si todos cumplen
 alguno(predicado, lista)  # True si alguno cumple
-contar(predicado, lista)  # Cuantos cumplen</code></pre>
-<h3 id="transformacion-de-datos">Transformacion de datos</h3>
-<pre class="mice"><code>ordenar(lista)           # Quicksort, devuelve copia ordenada
+contar(predicado, lista)  # Cuantos cumplen
+```
+
+### Transformacion de datos
+
+```mice
+ordenar(lista)           # Quicksort, devuelve copia ordenada
 invertir(lista)          # Invierte orden
 concatenar(lista1, lista2)
 aNumero(valor)           # Texto a numero (0b, 0o, 0x)
 aTexto(valor)            # Cualquier valor a texto
 rango(*args)             # rango(fin) o rango(inicio, fin)
 primero(lista)           # Primer elemento
-ultimo(lista)            # Ultimo elemento</code></pre>
-<h3 id="matematicas-basicas">Matematicas basicas</h3>
-<pre class="mice"><code>abs(x)                   # Valor absoluto
+ultimo(lista)            # Ultimo elemento
+```
+
+### Matematicas basicas
+
+```mice
+abs(x)                   # Valor absoluto
 maximo(a, b), minimo(a, b)
 exp(x)                   # e^x por Taylor (6 terminos)
 aleatorio()              # Pseudoaleatorio [0, 1) via LCG
 suma(lista), producto(lista), promedio(lista)
-max_lista(lista), min_lista(lista)</code></pre>
-<h3 id="introspection">Introspection</h3>
-<pre class="mice"><code>tipo(valor)              # Tipo del valor
-longitud(coleccion)      # Largo de lista/texto/dict</code></pre>
-<hr />
-<h2 id="math.mice">math.mice</h2>
-<p>Trigonometria, logaritmos, redondeo y constantes.</p>
-<pre><code>importar &quot;math.mice&quot; como math</code></pre>
-<h3 id="constantes">Constantes</h3>
-<pre><code>PI = 3.141592653589793
-E  = 2.718281828459045</code></pre>
-<h3 id="redondeo-y-conversion">Redondeo y conversion</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>entero(x)</code></td>
-<td>Trunca a entero (hacia cero)</td>
-</tr>
-<tr>
-<td><code>flotante(x)</code></td>
-<td>Convierte a flotante</td>
-</tr>
-<tr>
-<td><code>piso(x)</code></td>
-<td>Parte entera inferior (floor)</td>
-</tr>
-<tr>
-<td><code>techo(x)</code></td>
-<td>Parte entera superior (ceil)</td>
-</tr>
-<tr>
-<td><code>redondear(x)</code></td>
-<td>Redondeo clasico</td>
-</tr>
-</tbody>
-</table>
-<h3 id="potencias-y-factorial">Potencias y factorial</h3>
-<table>
-<colgroup>
-<col style="width: 40%" />
-<col style="width: 59%" />
-</colgroup>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>potencia_entera(base, exp)</code></td>
-<td><code>base^exp</code> con exp entero (soporta negativos)</td>
-</tr>
-<tr>
-<td><code>potencia(x, exponente)</code></td>
-<td><code>x^y</code> con exponente real</td>
-</tr>
-<tr>
-<td><code>factorial(n)</code></td>
-<td><code>n!</code> recursivo</td>
-</tr>
-<tr>
-<td><code>raiz(x)</code></td>
-<td>Raiz cuadrada (Newton-Raphson)</td>
-</tr>
-<tr>
-<td><code>exp(x)</code></td>
-<td><code>e^x</code> por Taylor (30 terminos)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="logaritmos">Logaritmos</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>log(x)</code></td>
-<td>Logaritmo natural</td>
-</tr>
-<tr>
-<td><code>log10(x)</code></td>
-<td>Logaritmo base 10</td>
-</tr>
-</tbody>
-</table>
-<h3 id="trigonometria">Trigonometria</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>seno(x)</code></td>
-<td>Seno en radianes</td>
-</tr>
-<tr>
-<td><code>coseno(x)</code></td>
-<td>Coseno en radianes</td>
-</tr>
-<tr>
-<td><code>tangente(x)</code></td>
-<td>Tangente en radianes</td>
-</tr>
-<tr>
-<td><code>arcotangente(x)</code></td>
-<td>Arco tangente (atan)</td>
-</tr>
-<tr>
-<td><code>arcoseno(x)</code></td>
-<td>Arco seno (asin)</td>
-</tr>
-<tr>
-<td><code>arcocoseno(x)</code></td>
-<td>Arco coseno (acos)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="utilerias">Utilerias</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>normalizar_angulo(x)</code></td>
-<td>Normaliza angulo a <code>[-PI, PI]</code></td>
-</tr>
-<tr>
-<td><code>abs(x)</code></td>
-<td>Valor absoluto</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="matriz.mice">matriz.mice</h2>
-<p>Algebra lineal: matrices, determinante, inversa, multiplicacion.</p>
-<pre><code>importar &quot;matriz.mice&quot; como mat</code></pre>
-<h3 id="creacion">Creacion</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>ceros(filas, columnas)</code></td>
-<td>Matriz de ceros</td>
-</tr>
-<tr>
-<td><code>unos(filas, columnas)</code></td>
-<td>Matriz de unos</td>
-</tr>
-<tr>
-<td><code>identidad(n)</code></td>
-<td>Matriz identidad <code>n x n</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="propiedades">Propiedades</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>filas(m)</code></td>
-<td>Numero de filas</td>
-</tr>
-<tr>
-<td><code>columnas(m)</code></td>
-<td>Numero de columnas</td>
-</tr>
-<tr>
-<td><code>dimensiones(m)</code></td>
-<td><code>[filas, columnas]</code></td>
-</tr>
-<tr>
-<td><code>traza(m)</code></td>
-<td>Suma diagonal (cuadrada)</td>
-</tr>
-<tr>
-<td><code>norma_frobenius(m)</code></td>
-<td>Norma de Frobenius</td>
-</tr>
-<tr>
-<td><code>es_matriz_valida(m)</code></td>
-<td>Valida estructura</td>
-</tr>
-<tr>
-<td><code>copia(m)</code></td>
-<td>Copia superficial</td>
-</tr>
-</tbody>
-</table>
-<h3 id="acceso">Acceso</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>fila(m, n)</code></td>
-<td>Fila n-esima</td>
-</tr>
-<tr>
-<td><code>columna(m, n)</code></td>
-<td>Columna n-esima</td>
-</tr>
-<tr>
-<td><code>aplanar(m)</code></td>
-<td>Convierte a vector</td>
-</tr>
-</tbody>
-</table>
-<h3 id="operaciones">Operaciones</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>suma_matrices(m1, m2)</code></td>
-<td>Suma elemento a elemento</td>
-</tr>
-<tr>
-<td><code>resta_matrices(m1, m2)</code></td>
-<td>Resta elemento a elemento</td>
-</tr>
-<tr>
-<td><code>multiplicar(m1, m2)</code></td>
-<td>Multiplicacion matricial</td>
-</tr>
-<tr>
-<td><code>escalar(m, valor)</code></td>
-<td>Multiplicacion por escalar</td>
-</tr>
-<tr>
-<td><code>transpuesta(m)</code></td>
-<td>Transposicion</td>
-</tr>
-<tr>
-<td><code>determinante(m)</code></td>
-<td>Determinante (Sarrus o LU)</td>
-</tr>
-<tr>
-<td><code>gauss_jordan(m)</code></td>
-<td>Eliminacion con pivoteo</td>
-</tr>
-<tr>
-<td><code>inversa(m)</code></td>
-<td>Matriz inversa</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="ml.mice">ml.mice</h2>
-<p>Machine learning clasico: regresion lineal/logistica, K-Means,
-metricas.</p>
-<pre><code>importar &quot;ml.mice&quot; como ml</code></pre>
-<h3 id="regresion-lineal">Regresion lineal</h3>
-<table>
-<colgroup>
-<col style="width: 40%" />
-<col style="width: 59%" />
-</colgroup>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>regresion_lineal(X, Y)</code></td>
-<td>Pendiente e intercepcion por minimos cuadrados</td>
-</tr>
-<tr>
-<td><code>predecir_lineal(x, modelo)</code></td>
-<td>Predice con modelo lineal</td>
-</tr>
-<tr>
-<td><code>regresion_lineal_descenso(X, Y, lr, iter)</code></td>
-<td>Regresion por descenso de gradiente</td>
-</tr>
-<tr>
-<td><code>regresion_lineal_matricial(X, Y)</code></td>
-<td>Minimos cuadrados via <code>(X^T X)^-1 X^T Y</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="regresion-logistica">Regresion logistica</h3>
-<table>
-<colgroup>
-<col style="width: 40%" />
-<col style="width: 59%" />
-</colgroup>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>sigmoid(z)</code></td>
-<td>Funcion sigmoide</td>
-</tr>
-<tr>
-<td><code>sigmoid_derivada(z)</code></td>
-<td>Derivada de sigmoide</td>
-</tr>
-<tr>
-<td><code>regresion_logistica(X, Y, lr, iter)</code></td>
-<td>Clasificacion binaria por gradiente</td>
-</tr>
-<tr>
-<td><code>predecir_logistica(x, modelo)</code></td>
-<td>Predice clase (0/1) con umbral 0.5</td>
-</tr>
-</tbody>
-</table>
-<h3 id="clustering">Clustering</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>k_means(X, k, iteraciones)</code></td>
-<td>K-Means: agrupa en k clusters</td>
-</tr>
-<tr>
-<td><code>distancia_euclidiana(p1, p2)</code></td>
-<td>Distancia entre dos puntos</td>
-</tr>
-</tbody>
-</table>
-<h3 id="metricas">Metricas</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>mse(y_real, y_pred)</code></td>
-<td>Error cuadratico medio</td>
-</tr>
-<tr>
-<td><code>r_cuadrado(y_real, y_pred)</code></td>
-<td>Coeficiente de determinacion</td>
-</tr>
-<tr>
-<td><code>matriz_confusion(pred, reales)</code></td>
-<td><code>{tp, tn, fp, fn}</code></td>
-</tr>
-<tr>
-<td><code>exactitud(pred, reales)</code></td>
-<td>Accuracy</td>
-</tr>
-<tr>
-<td><code>precision(pred, reales)</code></td>
-<td>Precision</td>
-</tr>
-<tr>
-<td><code>recall(pred, reales)</code></td>
-<td>Sensibilidad</td>
-</tr>
-<tr>
-<td><code>f1_score(pred, reales)</code></td>
-<td>F1-score</td>
-</tr>
-</tbody>
-</table>
-<h3 id="preprocesamiento">Preprocesamiento</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>dividir_datos(X, Y, proporcion_train)</code></td>
-<td>Divide en train/test</td>
-</tr>
-<tr>
-<td><code>media(valores)</code></td>
-<td>Media aritmetica</td>
-</tr>
-<tr>
-<td><code>varianza(valores)</code></td>
-<td>Varianza</td>
-</tr>
-<tr>
-<td><code>desviacion_estandar(valores)</code></td>
-<td>Desviacion estandar</td>
-</tr>
-<tr>
-<td><code>normalizar(valores)</code></td>
-<td>Z-score</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="dl.mice">dl.mice</h2>
-<p>Deep learning: perceptron multicapa con retropropagacion.</p>
-<pre><code>importar &quot;../modulos_std/dl.mice&quot; como dl</code></pre>
-<h3 id="activaciones">Activaciones</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>sigmoid(m)</code></td>
-<td>Sigmoide sobre matriz</td>
-</tr>
-<tr>
-<td><code>sigmoid_derivada(m)</code></td>
-<td>Derivada de sigmoide</td>
-</tr>
-<tr>
-<td><code>relu(m)</code></td>
-<td>ReLU sobre matriz</td>
-</tr>
-<tr>
-<td><code>relu_derivada(m)</code></td>
-<td>Derivada de ReLU</td>
-</tr>
-<tr>
-<td><code>softmax(m)</code></td>
-<td>Softmax por filas (con estabilidad numerica)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="red-neuronal">Red neuronal</h3>
-<table>
-<colgroup>
-<col style="width: 40%" />
-<col style="width: 59%" />
-</colgroup>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>perceptron_multicapa(arquitectura)</code></td>
-<td>Inicializa pesos/sesgos con Xavier</td>
-</tr>
-<tr>
-<td><code>forward(modelo, X)</code></td>
-<td>Propagacion hacia adelante</td>
-</tr>
-<tr>
-<td><code>entrenar_red(modelo, X, Y, epochs, lr)</code></td>
-<td>Entrena con backpropagation</td>
-</tr>
-<tr>
-<td><code>error_mse(y_true, y_pred)</code></td>
-<td>Error cuadratico medio</td>
-</tr>
-<tr>
-<td><code>hadamard(m1, m2)</code></td>
-<td>Producto elemento a elemento</td>
-</tr>
-</tbody>
-</table>
-<h3 id="ejemplo-minimo">Ejemplo minimo</h3>
-<pre class="mice"><code>var red = dl.perceptron_multicapa([2, 4, 1])   # 2 entradas, 4 ocultas, 1 salida
+max_lista(lista), min_lista(lista)
+```
+
+### Introspection
+
+```mice
+tipo(valor)              # Tipo del valor
+longitud(coleccion)      # Largo de lista/texto/dict
+```
+
+---
+
+## math.mice
+
+Trigonometria, logaritmos, redondeo y constantes.
+
+```
+importar "math.mice" como math
+```
+
+### Constantes
+
+```
+PI = 3.141592653589793
+E  = 2.718281828459045
+```
+
+### Redondeo y conversion
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `entero(x)` | Trunca a entero (hacia cero) |
+| `flotante(x)` | Convierte a flotante |
+| `piso(x)` | Parte entera inferior (floor) |
+| `techo(x)` | Parte entera superior (ceil) |
+| `redondear(x)` | Redondeo clasico |
+
+### Potencias y factorial
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `potencia_entera(base, exp)` | `base^exp` con exp entero (soporta negativos) |
+| `potencia(x, exponente)` | `x^y` con exponente real |
+| `factorial(n)` | `n!` recursivo |
+| `raiz(x)` | Raiz cuadrada (Newton-Raphson) |
+| `exp(x)` | `e^x` por Taylor (30 terminos) |
+
+### Logaritmos
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `log(x)` | Logaritmo natural |
+| `log10(x)` | Logaritmo base 10 |
+
+### Trigonometria
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `seno(x)` | Seno en radianes |
+| `coseno(x)` | Coseno en radianes |
+| `tangente(x)` | Tangente en radianes |
+| `arcotangente(x)` | Arco tangente (atan) |
+| `arcoseno(x)` | Arco seno (asin) |
+| `arcocoseno(x)` | Arco coseno (acos) |
+
+### Utilerias
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `normalizar_angulo(x)` | Normaliza angulo a `[-PI, PI]` |
+| `abs(x)` | Valor absoluto |
+
+---
+
+## matriz.mice
+
+Algebra lineal: matrices, determinante, inversa, multiplicacion.
+
+```
+importar "matriz.mice" como mat
+```
+
+### Creacion
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `ceros(filas, columnas)` | Matriz de ceros |
+| `unos(filas, columnas)` | Matriz de unos |
+| `identidad(n)` | Matriz identidad `n x n` |
+
+### Propiedades
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `filas(m)` | Numero de filas |
+| `columnas(m)` | Numero de columnas |
+| `dimensiones(m)` | `[filas, columnas]` |
+| `traza(m)` | Suma diagonal (cuadrada) |
+| `norma_frobenius(m)` | Norma de Frobenius |
+| `es_matriz_valida(m)` | Valida estructura |
+| `copia(m)` | Copia superficial |
+
+### Acceso
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `fila(m, n)` | Fila n-esima |
+| `columna(m, n)` | Columna n-esima |
+| `aplanar(m)` | Convierte a vector |
+
+### Operaciones
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `suma_matrices(m1, m2)` | Suma elemento a elemento |
+| `resta_matrices(m1, m2)` | Resta elemento a elemento |
+| `multiplicar(m1, m2)` | Multiplicacion matricial |
+| `escalar(m, valor)` | Multiplicacion por escalar |
+| `transpuesta(m)` | Transposicion |
+| `determinante(m)` | Determinante (Sarrus o LU) |
+| `gauss_jordan(m)` | Eliminacion con pivoteo |
+| `inversa(m)` | Matriz inversa |
+
+---
+
+## ml.mice
+
+Machine learning clasico: regresion lineal/logistica, K-Means, metricas.
+
+```
+importar "ml.mice" como ml
+```
+
+### Regresion lineal
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `regresion_lineal(X, Y)` | Pendiente e intercepcion por minimos cuadrados |
+| `predecir_lineal(x, modelo)` | Predice con modelo lineal |
+| `regresion_lineal_descenso(X, Y, lr, iter)` | Regresion por descenso de gradiente |
+| `regresion_lineal_matricial(X, Y)` | Minimos cuadrados via `(X^T X)^-1 X^T Y` |
+
+### Regresion logistica
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `sigmoid(z)` | Funcion sigmoide |
+| `sigmoid_derivada(z)` | Derivada de sigmoide |
+| `regresion_logistica(X, Y, lr, iter)` | Clasificacion binaria por gradiente |
+| `predecir_logistica(x, modelo)` | Predice clase (0/1) con umbral 0.5 |
+
+### Clustering
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `k_means(X, k, iteraciones)` | K-Means: agrupa en k clusters |
+| `distancia_euclidiana(p1, p2)` | Distancia entre dos puntos |
+
+### Metricas
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `mse(y_real, y_pred)` | Error cuadratico medio |
+| `r_cuadrado(y_real, y_pred)` | Coeficiente de determinacion |
+| `matriz_confusion(pred, reales)` | `{tp, tn, fp, fn}` |
+| `exactitud(pred, reales)` | Accuracy |
+| `precision(pred, reales)` | Precision |
+| `recall(pred, reales)` | Sensibilidad |
+| `f1_score(pred, reales)` | F1-score |
+
+### Preprocesamiento
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `dividir_datos(X, Y, proporcion_train)` | Divide en train/test |
+| `media(valores)` | Media aritmetica |
+| `varianza(valores)` | Varianza |
+| `desviacion_estandar(valores)` | Desviacion estandar |
+| `normalizar(valores)` | Z-score |
+
+---
+
+## dl.mice
+
+Deep learning: perceptron multicapa con retropropagacion.
+
+```
+importar "../modulos_std/dl.mice" como dl
+```
+
+### Activaciones
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `sigmoid(m)` | Sigmoide sobre matriz |
+| `sigmoid_derivada(m)` | Derivada de sigmoide |
+| `relu(m)` | ReLU sobre matriz |
+| `relu_derivada(m)` | Derivada de ReLU |
+| `softmax(m)` | Softmax por filas (con estabilidad numerica) |
+
+### Red neuronal
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `perceptron_multicapa(arquitectura)` | Inicializa pesos/sesgos con Xavier |
+| `forward(modelo, X)` | Propagacion hacia adelante |
+| `entrenar_red(modelo, X, Y, epochs, lr)` | Entrena con backpropagation |
+| `error_mse(y_true, y_pred)` | Error cuadratico medio |
+| `hadamard(m1, m2)` | Producto elemento a elemento |
+
+### Ejemplo minimo
+
+```mice
+var red = dl.perceptron_multicapa([2, 4, 1])   # 2 entradas, 4 ocultas, 1 salida
 dl.entrenar_red(red, X, Y, 1000, 0.1)
-var pred = dl.forward(red, X)</code></pre>
-<hr />
-<h2 id="grafico.mice">grafico.mice</h2>
-<p>Graficacion 2D: lineas, dispersion, histograma, exportar PNG.</p>
-<pre><code>importar &quot;grafico.mice&quot; como plt</code></pre>
-<h3 id="configuracion">Configuracion</h3>
-<table>
-<colgroup>
-<col style="width: 40%" />
-<col style="width: 59%" />
-</colgroup>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>estilo(nombre)</code></td>
-<td>“claro”, “oscuro”, “ocean”, “retro”</td>
-</tr>
-<tr>
-<td><code>marcadores(activo, tamano)</code></td>
-<td>Activa puntos y su tamano</td>
-</tr>
-<tr>
-<td><code>color_linea(r, g, b)</code></td>
-<td>Color RGB para lineas</td>
-</tr>
-<tr>
-<td><code>iniciar_grafico(xmin, xmax, ymin, ymax)</code></td>
-<td>Crea grafico con rejilla y ejes</td>
-</tr>
-<tr>
-<td><code>titulo(texto)</code></td>
-<td>Titulo del grafico</td>
-</tr>
-<tr>
-<td><code>etiquetas(xtext, ytext)</code></td>
-<td>Etiquetas de ejes</td>
-</tr>
-</tbody>
-</table>
-<h3 id="graficado">Graficado</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>lineas(x, ys)</code></td>
-<td>Grafica linea conectando puntos</td>
-</tr>
-<tr>
-<td><code>dispersion(x, ys)</code></td>
-<td>Grafico de dispersion</td>
-</tr>
-<tr>
-<td><code>histograma(datos, bins)</code></td>
-<td>Histograma</td>
-</tr>
-<tr>
-<td><code>pintar_puntos(xs, ys, r, g, b, tam)</code></td>
-<td>Dibuja puntos con color</td>
-</tr>
-<tr>
-<td><code>pintar_mapa(xs, ys, clases, c0, c1)</code></td>
-<td>Mapa de puntos por clase</td>
-</tr>
-<tr>
-<td><code>linea_sobre_grafico(xs, ys)</code></td>
-<td>Linea sobre grafico existente</td>
-</tr>
-<tr>
-<td><code>texto(x, y, str, r, g, b)</code></td>
-<td>Texto en posicion</td>
-</tr>
-</tbody>
-</table>
-<h3 id="salida">Salida</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>guardar(path)</code></td>
-<td>Exporta a PNG</td>
-</tr>
-<tr>
-<td><code>mostrar()</code></td>
-<td>Guarda y abre ventana</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="gui.mice">gui.mice</h2>
-<p>Ventanas y dialogos GTK. Calculadora interactiva y explorador de
-funciones.</p>
-<pre><code>importar &quot;gui.mice&quot; como gui</code></pre>
-<h3 id="dialogos">Dialogos</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>alerta(mensaje)</code></td>
-<td>Dialogo de alerta</td>
-</tr>
-<tr>
-<td><code>confirmar(mensaje)</code></td>
-<td>Dialogo Si/No</td>
-</tr>
-<tr>
-<td><code>pedir_texto(prompt, defecto)</code></td>
-<td>Entrada de texto</td>
-</tr>
-<tr>
-<td><code>pedir_numero(prompt, defecto)</code></td>
-<td>Entrada numerica validada</td>
-</tr>
-<tr>
-<td><code>abrir_archivo()</code></td>
-<td>Selector de archivo</td>
-</tr>
-<tr>
-<td><code>guardar_archivo_como(sugerido)</code></td>
-<td>Guardar como</td>
-</tr>
-</tbody>
-</table>
-<h3 id="mensajes">Mensajes</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>mensaje_exito(titulo, msg)</code></td>
-<td>Dialogo de exito</td>
-</tr>
-<tr>
-<td><code>mensaje_error(titulo, msg)</code></td>
-<td>Dialogo de error</td>
-</tr>
-<tr>
-<td><code>mensaje_info(titulo, msg)</code></td>
-<td>Dialogo informativo</td>
-</tr>
-</tbody>
-</table>
-<h3 id="aplicaciones">Aplicaciones</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>calculadora_ux()</code></td>
-<td>Calculadora interactiva</td>
-</tr>
-<tr>
-<td><code>calculadora_ux_tamano(w, h)</code></td>
-<td>Calculadora con tamano personalizado</td>
-</tr>
-<tr>
-<td><code>calculadora_ux_estilo(estilo)</code></td>
-<td>Calculadora con tema</td>
-</tr>
-<tr>
-<td><code>mostrar_imagen(ruta, titulo)</code></td>
-<td>Visor de imagenes</td>
-</tr>
-<tr>
-<td><code>explorar_math(mod_math)</code></td>
-<td>Explorador de funciones matematicas</td>
-</tr>
-</tbody>
-</table>
-<h3 id="temas">Temas</h3>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>estilo(nombre)</code></td>
-<td>Cambia tema visual</td>
-</tr>
-<tr>
-<td><code>estilo_actual()</code></td>
-<td>Tema actual</td>
-</tr>
-<tr>
-<td><code>estilos_disponibles()</code></td>
-<td>Lista de temas</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="archivo.mice">archivo.mice</h2>
-<p>Lectura y escritura de archivos, soporte CSV.</p>
-<pre><code>importar &quot;archivo.mice&quot; como archivo</code></pre>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>leer(ruta)</code></td>
-<td>Lee archivo completo</td>
-</tr>
-<tr>
-<td><code>escribir(ruta, contenido)</code></td>
-<td>Escribe contenido</td>
-</tr>
-<tr>
-<td><code>leer_lineas(ruta)</code></td>
-<td>Lee lineas como lista</td>
-</tr>
-<tr>
-<td><code>escribir_lineas(ruta, lineas)</code></td>
-<td>Escribe lista de lineas</td>
-</tr>
-<tr>
-<td><code>anexar(ruta, contenido)</code></td>
-<td>Anade al final</td>
-</tr>
-<tr>
-<td><code>existe(ruta)</code></td>
-<td>Verifica existencia</td>
-</tr>
-<tr>
-<td><code>eliminar(ruta)</code></td>
-<td>Elimina archivo</td>
-</tr>
-<tr>
-<td><code>tamano(ruta)</code></td>
-<td>Tamano en bytes</td>
-</tr>
-<tr>
-<td><code>leer_csv(ruta, delim)</code></td>
-<td>Lee CSV</td>
-</tr>
-<tr>
-<td><code>escribir_csv(ruta, datos, delim)</code></td>
-<td>Escribe CSV</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="lista.mice">lista.mice</h2>
-<p>Funciones auxiliares para listas.</p>
-<pre><code>importar &quot;lista.mice&quot; como lista</code></pre>
-<table>
-<thead>
-<tr>
-<th>Funcion</th>
-<th>Descripcion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>contiene(lista, elem)</code></td>
-<td>Busqueda</td>
-</tr>
-<tr>
-<td><code>contar_ocurrencias(lista, elem)</code></td>
-<td>Frecuencia</td>
-</tr>
-<tr>
-<td><code>indice_de(lista, elem)</code></td>
-<td>Posicion (-1 si no existe)</td>
-</tr>
-<tr>
-<td><code>sin_duplicados(lista)</code></td>
-<td>Unicos, preserva orden</td>
-</tr>
-<tr>
-<td><code>porcion(lista, inicio, fin)</code></td>
-<td>Sublista</td>
-</tr>
-<tr>
-<td><code>repetir(lista, n)</code></td>
-<td>Repite cada elemento n veces</td>
-</tr>
-<tr>
-<td><code>intercalar(lista1, lista2)</code></td>
-<td>Alterna elementos</td>
-</tr>
-<tr>
-<td><code>rellenar(lista, n, valor)</code></td>
-<td>Extiende hasta longitud n</td>
-</tr>
-<tr>
-<td><code>agrupar(lista, tamano)</code></td>
-<td>Particiona en grupos</td>
-</tr>
-<tr>
-<td><code>ordenar_asc(lista)</code></td>
-<td>Orden ascendente (burbuja)</td>
-</tr>
-<tr>
-<td><code>ordenar_desc(lista)</code></td>
-<td>Orden descendente (burbuja)</td>
-</tr>
-<tr>
-<td><code>pares(lista)</code></td>
-<td>Elementos en indices pares</td>
-</tr>
-<tr>
-<td><code>impares(lista)</code></td>
-<td>Elementos en indices impares</td>
-</tr>
-</tbody>
-</table>
-</main>
+var pred = dl.forward(red, X)
+```
 
-<script>
-(function() {
-    // Theme Management
-    const html = document.documentElement;
-    const themeBtn = document.getElementById('themeBtnSidebar');
-    
-    function setTheme(theme) {
-        if (theme === 'dark') {
-            html.setAttribute('data-theme', 'dark');
-        } else {
-            html.removeAttribute('data-theme');
-        }
-    }
+---
 
-    try {
-        const saved = localStorage.getItem('tema');
-        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            setTheme('dark');
-        }
-    } catch(e){}
+## grafico.mice
 
-    if (themeBtn) {
-        themeBtn.onclick = () => {
-            const current = html.getAttribute('data-theme');
-            const target = current === 'dark' ? 'light' : 'dark';
-            setTheme(target);
-            try { localStorage.setItem('tema', target); } catch(e){}
-        };
-    }
+Graficacion 2D: lineas, dispersion, histograma, exportar PNG.
 
-    // TOC & Sidebar
-    const headers = document.querySelectorAll('h2, h3, h4');
-    const tocLinks = document.getElementById('tocLinks');
-    const menuBtn = document.getElementById('menuBtn');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
+```
+importar "grafico.mice" como plt
+```
 
-    if (tocLinks && headers.length > 0) {
-        headers.forEach((h, i) => {
-            const text = h.textContent.trim();
-            const id = h.id || text.toLowerCase().replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g, '-').replace(/^-+|-+$/g, '');
-            h.id = id;
-            
-            const a = document.createElement('a');
-            a.href = '#' + id;
-            const lvl = h.tagName.toLowerCase();
-            const pad = lvl === 'h3' ? '1.5rem' : lvl === 'h4' ? '2.5rem' : '0.5rem';
-            a.style.paddingLeft = pad;
-            a.textContent = (lvl === 'h3' ? '  ' : lvl === 'h4' ? '    ' : '') + text;
-            a.onclick = closeMenu;
-            tocLinks.appendChild(a);
-        });
-    } else if (menuBtn) {
-        menuBtn.style.display = 'none';
-    }
+### Configuracion
 
-    function openMenu() { sidebar.classList.add('open'); overlay.classList.add('show'); }
-    function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+| Funcion | Descripcion |
+|---------|-------------|
+| `estilo(nombre)` | "claro", "oscuro", "ocean", "retro" |
+| `marcadores(activo, tamano)` | Activa puntos y su tamano |
+| `color_linea(r, g, b)` | Color RGB para lineas |
+| `iniciar_grafico(xmin, xmax, ymin, ymax)` | Crea grafico con rejilla y ejes |
+| `titulo(texto)` | Titulo del grafico |
+| `etiquetas(xtext, ytext)` | Etiquetas de ejes |
 
-    if (menuBtn) menuBtn.onclick = openMenu;
-    if (overlay) overlay.onclick = closeMenu;
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+### Graficado
 
-})();
-</script>
-</body>
-</html>
+| Funcion | Descripcion |
+|---------|-------------|
+| `lineas(x, ys)` | Grafica linea conectando puntos |
+| `dispersion(x, ys)` | Grafico de dispersion |
+| `histograma(datos, bins)` | Histograma |
+| `pintar_puntos(xs, ys, r, g, b, tam)` | Dibuja puntos con color |
+| `pintar_mapa(xs, ys, clases, c0, c1)` | Mapa de puntos por clase |
+| `linea_sobre_grafico(xs, ys)` | Linea sobre grafico existente |
+| `texto(x, y, str, r, g, b)` | Texto en posicion |
+
+### Salida
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `guardar(path)` | Exporta a PNG |
+| `mostrar()` | Guarda y abre ventana |
+
+---
+
+## gui.mice
+
+Ventanas y dialogos GTK. Calculadora interactiva y explorador de funciones.
+
+```
+importar "gui.mice" como gui
+```
+
+### Dialogos
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `alerta(mensaje)` | Dialogo de alerta |
+| `confirmar(mensaje)` | Dialogo Si/No |
+| `pedir_texto(prompt, defecto)` | Entrada de texto |
+| `pedir_numero(prompt, defecto)` | Entrada numerica validada |
+| `abrir_archivo()` | Selector de archivo |
+| `guardar_archivo_como(sugerido)` | Guardar como |
+
+### Mensajes
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `mensaje_exito(titulo, msg)` | Dialogo de exito |
+| `mensaje_error(titulo, msg)` | Dialogo de error |
+| `mensaje_info(titulo, msg)` | Dialogo informativo |
+
+### Aplicaciones
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `calculadora_ux()` | Calculadora interactiva |
+| `calculadora_ux_tamano(w, h)` | Calculadora con tamano personalizado |
+| `calculadora_ux_estilo(estilo)` | Calculadora con tema |
+| `mostrar_imagen(ruta, titulo)` | Visor de imagenes |
+| `explorar_math(mod_math)` | Explorador de funciones matematicas |
+
+### Temas
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `estilo(nombre)` | Cambia tema visual |
+| `estilo_actual()` | Tema actual |
+| `estilos_disponibles()` | Lista de temas |
+
+---
+
+## archivo.mice
+
+Lectura y escritura de archivos, soporte CSV.
+
+```
+importar "archivo.mice" como archivo
+```
+
+| Funcion | Descripcion |
+|---------|-------------|
+ | `leer_archivo(ruta)` | Lee archivo completo |
+ | `escribir(ruta, contenido)` | Escribe contenido |
+ | `leer_lineas(ruta)` | Lee lineas como lista |
+ | `escribir_lineas(ruta, lineas)` | Escribe lista de lineas |
+ | `anexar(ruta, contenido)` | Anade al final |
+ | `existe(ruta)` | Verifica existencia |
+ | `eliminar(ruta)` | Elimina archivo |
+ | `tamano(ruta)` | Tamano en bytes |
+ | `leer_csv(ruta, delim)` | Lee CSV |
+ | `escribir_csv(ruta, datos, delim)` | Escribe CSV |
+ | `leer_json(ruta)` | Lee archivo JSON a estructura |
+ | `escribir_json(ruta, datos)` | Escribe estructura como JSON |
+ | `cargar_numeros(ruta, delim, saltar_cabecera)` | CSV a lista de numeros (ML) |
+ | `cargar_dataset(ruta, col_target, delim, saltar_cabecera)` | CSV a {X, Y} (ML) |
+ | `cargar_matriz(ruta, delim, saltar_cabecera)` | CSV a matriz (DL) |
+ | `guardar_datos(ruta, datos, cabeceras, delim)` | Guarda datos numericos como CSV |
+
+---
+
+## lista.mice
+
+Funciones auxiliares para listas.
+
+```
+importar "lista.mice" como lista
+```
+
+| Funcion | Descripcion |
+|---------|-------------|
+| `contiene(lista, elem)` | Busqueda |
+| `contar_ocurrencias(lista, elem)` | Frecuencia |
+| `indice_de(lista, elem)` | Posicion (-1 si no existe) |
+| `sin_duplicados(lista)` | Unicos, preserva orden |
+| `porcion(lista, inicio, fin)` | Sublista |
+| `repetir(lista, n)` | Repite cada elemento n veces |
+| `intercalar(lista1, lista2)` | Alterna elementos |
+| `rellenar(lista, n, valor)` | Extiende hasta longitud n |
+| `agrupar(lista, tamano)` | Particiona en grupos |
+| `ordenar_asc(lista)` | Orden ascendente (burbuja) |
+| `ordenar_desc(lista)` | Orden descendente (burbuja) |
+| `pares(lista)` | Elementos en indices pares |
+| `impares(lista)` | Elementos en indices impares |

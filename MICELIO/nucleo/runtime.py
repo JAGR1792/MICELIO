@@ -2060,7 +2060,15 @@ def make_primitives() -> dict[str, Any]:
             os.makedirs(str(ruta), exist_ok=True)
         except Exception as e:
             raise MicelioRuntimeError(f"Error creando directorio: {e}")
-    
+
+    def _json_parse(texto: Any) -> Any:
+        """Parsea texto JSON a estructuras MICELIO."""
+        return json.loads(str(texto))
+
+    def _json_stringify(datos: Any) -> str:
+        """Convierte estructuras MICELIO a texto JSON."""
+        return json.dumps(datos, ensure_ascii=False, indent=2)
+
     return {
         # Conversiones base (requieren lógica Python compleja)
         '__a_numero': _a_numero,
@@ -2086,6 +2094,8 @@ def make_primitives() -> dict[str, Any]:
         '__archivo_tamano': _archivo_tamano,
         '__directorio_existe': _directorio_existe,
         '__directorio_crear': _directorio_crear,
+        '__json_parse': _json_parse,
+        '__json_stringify': _json_stringify,
     }
 
 

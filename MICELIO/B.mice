@@ -16,7 +16,13 @@ imp "Y (target): " + aTexto(ds["Y"])
 
 # Guardar datos procesados
 arc.guardar_datos("procesado.csv", ds["X"], ["edad", "ingreso"], ",")
-imp "Guardado exitoso"
+imp "Guardado CSV exitoso"
+
+# JSON
+var datos_usuario = {"nombre": "Ana", "edad": 30, "activo": verdadero, "notas": [9.5, 8.0, 10]}
+arc.escribir_json("usuario.json", datos_usuario)
+var leido = arc.leer_json("usuario.json")
+imp "JSON leido: " + aTexto(leido)
 
 # Cargar como matriz (para DL)
 var datos_matriz = arc.cargar_matriz("test_ml.csv", ",", verdadero)

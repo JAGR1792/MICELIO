@@ -358,16 +358,22 @@ importar "archivo.mice" como archivo
 
 | Funcion | Descripcion |
 |---------|-------------|
-| `leer(ruta)` | Lee archivo completo |
-| `escribir(ruta, contenido)` | Escribe contenido |
-| `leer_lineas(ruta)` | Lee lineas como lista |
-| `escribir_lineas(ruta, lineas)` | Escribe lista de lineas |
-| `anexar(ruta, contenido)` | Anade al final |
-| `existe(ruta)` | Verifica existencia |
-| `eliminar(ruta)` | Elimina archivo |
-| `tamano(ruta)` | Tamano en bytes |
-| `leer_csv(ruta, delim)` | Lee CSV |
-| `escribir_csv(ruta, datos, delim)` | Escribe CSV |
+ | `leer_archivo(ruta)` | Lee archivo completo |
+ | `escribir(ruta, contenido)` | Escribe contenido |
+ | `leer_lineas(ruta)` | Lee lineas como lista |
+ | `escribir_lineas(ruta, lineas)` | Escribe lista de lineas |
+ | `anexar(ruta, contenido)` | Anade al final |
+ | `existe(ruta)` | Verifica existencia |
+ | `eliminar(ruta)` | Elimina archivo |
+ | `tamano(ruta)` | Tamano en bytes |
+ | `leer_csv(ruta, delim)` | Lee CSV |
+ | `escribir_csv(ruta, datos, delim)` | Escribe CSV |
+ | `leer_json(ruta)` | Lee archivo JSON a estructura |
+ | `escribir_json(ruta, datos)` | Escribe estructura como JSON |
+ | `cargar_numeros(ruta, delim, saltar_cabecera)` | CSV a lista de numeros (ML) |
+ | `cargar_dataset(ruta, col_target, delim, saltar_cabecera)` | CSV a {X, Y} (ML) |
+ | `cargar_matriz(ruta, delim, saltar_cabecera)` | CSV a matriz (DL) |
+ | `guardar_datos(ruta, datos, cabeceras, delim)` | Guarda datos numericos como CSV |
 
 ---
 
