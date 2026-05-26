@@ -156,7 +156,7 @@
         .top a { font-size: 0.9rem; color: var(--fg-muted); padding: 0.5rem 1rem; border: 1px solid var(--border-light); border-radius: var(--radius-sm); text-decoration: none; }
         .top a:hover { background: var(--bg-surface); color: var(--accent-primary); }
         
-        .menu-btn { background: none; border: 1px solid var(--border-medium); color: var(--fg-main); font-size: 1.2rem; cursor: pointer; padding: 0.5rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .menu-btn { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1001; background: var(--bg-main); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-medium); color: var(--fg-main); font-size: 1.2rem; cursor: pointer; padding: 0.5rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: var(--shadow-sm); }
         .menu-btn:hover { background: var(--accent-primary); color: white; transform: rotate(5deg); }
         
         .sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100vh; z-index: 2000; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); border-left: 1px solid var(--border-medium); padding: 5rem 2rem 2rem; overflow-y: auto; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.2); }
@@ -185,9 +185,10 @@
   <button id="themeBtnSidebar">&#x25D0; Modo oscuro</button>
 </div>
 
+<button class="menu-btn" id="menuBtn">&#x2630;</button>
+
 <div class="top">
   <a href="../index.html">&larr; Inicio</a>
-  <button class="menu-btn" id="menuBtn">&#x2630;</button>
 </div>
 
 <main>

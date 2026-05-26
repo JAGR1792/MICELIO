@@ -185,9 +185,10 @@
   <button id="themeBtnSidebar">&#x25D0; Modo oscuro</button>
 </div>
 
+<button class="menu-btn" id="menuBtn">&#x2630;</button>
+
 <div class="top">
   <a href="../index.html">&larr; Inicio</a>
-  <button class="menu-btn" id="menuBtn">&#x2630;</button>
 </div>
 
 <main>
@@ -248,6 +249,20 @@ $body$
         });
     } else if (menuBtn) {
         menuBtn.style.display = 'none';
+    }
+
+    function openMenu() { sidebar.classList.add('open'); overlay.classList.add('show'); }
+    function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+
+    if (menuBtn) menuBtn.onclick = openMenu;
+    if (overlay) overlay.onclick = closeMenu;
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+})();
+</script>
+</body>
+</html>
+  menuBtn.style.display = 'none';
     }
 
     function openMenu() { sidebar.classList.add('open'); overlay.classList.add('show'); }
