@@ -1,10 +1,10 @@
 # ===================================================================
 # archivo.mice – Módulo de entrada/salida de archivos
-# Lectura y escritura de archivos
+# Lectura y escritura de archivos, carga de datos para ML/DL
 # ===================================================================
 
 # Lee contenido completo de un archivo
-funcion leer(ruta) {
+funcion leer_archivo(ruta) {
     regresa __archivo_leer(ruta)
 }
 
@@ -15,7 +15,7 @@ funcion escribir(ruta, contenido) {
 
 # Lee líneas de un archivo
 funcion leer_lineas(ruta) {
-    var contenido = leer(ruta)
+    var contenido = leer_archivo(ruta)
     var lineas = []
     var linea_actual = ""
     var i = 0
@@ -40,7 +40,7 @@ funcion escribir_lineas(ruta, lineas) {
     var contenido = ""
     var primera = verdadero
     para linea en lineas {
-        si (!primera) {
+        si (no primera) {
             contenido = contenido + "\n"
         }
         contenido = contenido + linea
@@ -51,7 +51,7 @@ funcion escribir_lineas(ruta, lineas) {
 
 # Añade contenido a un archivo
 funcion anexar(ruta, contenido) {
-    var contenido_actual = leer(ruta)
+    var contenido_actual = leer_archivo(ruta)
     escribir(ruta, contenido_actual + contenido)
 }
 
@@ -67,10 +67,10 @@ funcion eliminar(ruta) {
 
 # Obtiene tamaño de archivo en bytes
 funcion tamano(ruta) {
-    regresa __archivo_tamaño(ruta)
+    regresa __archivo_tamano(ruta)
 }
 
-# Lee un archivo CSV
+# Lee un archivo CSV como texto (devuelve lista de filas, cada fila es lista de strings)
 funcion leer_csv(ruta, delimitador) {
     var lineas = leer_lineas(ruta)
     var resultado = []
@@ -106,7 +106,7 @@ funcion escribir_csv(ruta, datos, delimitador) {
         var linea = ""
         var primera = verdadero
         para valor en fila {
-            si (!primera) {
+            si (no primera) {
                 linea = linea + delimitador
             }
             linea = linea + aTexto(valor)
@@ -115,5 +115,91 @@ funcion escribir_csv(ruta, datos, delimitador) {
         lineas.agregar(linea)
     }
     escribir_lineas(ruta, lineas)
+}
+
+# ===================================================================
+# Funciones de carga de datos para ML/DL
+# ===================================================================
+
+# Convierte una fila de strings a numeros
+funcion _fila_a_numeros(fila) {
+    var nums = []
+    para valor en fila {
+        nums.agregar(aNumero(valor))
+    }
+    regresa nums
+}
+
+# Carga CSV numerico: lee un archivo CSV y convierte todas las celdas a numeros
+# Parametros:
+#   ruta       - ruta del archivo
+#   delimitador - caracter separador (por defecto ",")
+#   saltar_cabecera - verdadero/falso (por defecto falso)
+# Devuelve: lista de filas, cada fila es una lista de numeros
+funcion cargar_numeros(ruta, delimitador, saltar_cabecera) {
+    var filas_texto = leer_csv(ruta, delimitador)
+    var numeros = []
+    var inicio = 0
+    si (saltar_cabecera) { inicio = 1 }
+    var i = inicio
+    mientras (i < filas_texto.longitud()) {
+        numeros.agregar(_fila_a_numeros(filas_texto[i]))
+        i = i + 1
+    }
+    regresa numeros
+}
+
+# Carga dataset para ML: separa features (X) y target (Y)
+# Parametros:
+#   ruta       - ruta del archivo
+#   col_target - indice de la columna objetivo (0-based)
+#   delimitador - caracter separador (por defecto ",")
+#   saltar_cabecera - verdadero/falso (por defecto verdadero)
+# Devuelve: {"X": [...], "Y": [...]}
+funcion cargar_dataset(ruta, col_target, delimitador, saltar_cabecera) {
+    var filas = cargar_numeros(ruta, delimitador, saltar_cabecera)
+    var X = []
+    var Y = []
+    para fila en filas {
+        var features = []
+        var i = 0
+        mientras (i < fila.longitud()) {
+            si (i == col_target) {
+                Y.agregar(fila[i])
+            } sino {
+                features.agregar(fila[i])
+            }
+            i = i + 1
+        }
+        X.agregar(features)
+    }
+    regresa {"X": X, "Y": Y}
+}
+
+# Carga matriz numerica (para DL): igual que cargar_numeros pero como alias semantico
+# Devuelve: lista de filas (matriz), cada fila es una lista de numeros
+funcion cargar_matriz(ruta, delimitador, saltar_cabecera) {
+    regresa cargar_numeros(ruta, delimitador, saltar_cabecera)
+}
+
+# Guarda datos numericos como CSV (util para exportar resultados de ML)
+# Parametros:
+#   ruta       - ruta del archivo
+#   datos      - lista de filas (cada fila es lista de numeros)
+#   cabecera   - lista de nombres de columna (opcional, nulo para omitir)
+#   delimitador - caracter separador (por defecto ",")
+funcion guardar_datos(ruta, datos, cabecera, delimitador) {
+    var filas_texto = []
+    si (cabecera != nulo) {
+        filas_texto.agregar(cabecera)
+    }
+    para fila en datos {
+        var fila_str = []
+        para valor en fila {
+            fila_str.agregar(aTexto(valor))
+        }
+        filas_texto.agregar(fila_str)
+    }
+    escribir_csv(ruta, filas_texto, delimitador)
 }
 

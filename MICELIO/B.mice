@@ -1,7 +1,23 @@
-funcion sumar2(a, b) { a + b }
-funcion saludar(n) { imp "hola " + n }
-funcion siempre_0() { 0 }
+importar "../modulos_std/archivo.mice" como arc
+importar "../modulos_std/ml.mice" como ml
 
-imp sumar2(3, 4)
-imp siempre_0()
-saludar("Ana")
+# Crear dataset de prueba
+var csv = "edad,ingreso,compro\n25,30000,0\n30,40000,0\n35,50000,1\n40,60000,1\n45,70000,1\n50,80000,1"
+arc.escribir("test_ml.csv", csv)
+
+# Cargar como numeros
+var nums = arc.cargar_numeros("test_ml.csv", ",", verdadero)
+imp "Matriz completa: " + aTexto(nums)
+
+# Cargar dataset separando X e Y
+var ds = arc.cargar_dataset("test_ml.csv", 2, ",", verdadero)
+imp "X (features): " + aTexto(ds["X"])
+imp "Y (target): " + aTexto(ds["Y"])
+
+# Guardar datos procesados
+arc.guardar_datos("procesado.csv", ds["X"], ["edad", "ingreso"], ",")
+imp "Guardado exitoso"
+
+# Cargar como matriz (para DL)
+var datos_matriz = arc.cargar_matriz("test_ml.csv", ",", verdadero)
+imp "Matriz para DL: " + aTexto(datos_matriz)

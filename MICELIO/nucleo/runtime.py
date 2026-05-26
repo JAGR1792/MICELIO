@@ -2083,7 +2083,7 @@ def make_primitives() -> dict[str, Any]:
         '__archivo_anexar': _archivo_anexar,
         '__archivo_existe': _archivo_existe,
         '__archivo_eliminar': _archivo_eliminar,
-        '__archivo_tamaño': _archivo_tamano,
+        '__archivo_tamano': _archivo_tamano,
         '__directorio_existe': _directorio_existe,
         '__directorio_crear': _directorio_crear,
     }
