@@ -803,6 +803,13 @@ class EvalVisitor(MicelioVisitor):
                     result.extend(val)
                 else:
                     raise MicelioRuntimeError(f"... solo funciona con listas, no con {type(val).__name__}")
+            elif isinstance(item, MicelioParser.RangeListItemContext):
+                start = self.visit(item.expr(0))
+                end = self.visit(item.expr(1))
+                if not isinstance(start, (int, float)) or not isinstance(end, (int, float)):
+                    raise MicelioRuntimeError(".. solo funciona con números")
+                step = 1 if start <= end else -1
+                result.extend(range(int(start), int(end) + step, step))
             else:
                 result.append(self.visit(item.expr()))
         return result

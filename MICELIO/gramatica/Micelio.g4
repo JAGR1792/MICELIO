@@ -80,6 +80,7 @@ expr
 
 listItem : expr                                                        #normalListItem
          | ELLIPSIS expr                                               #spreadListItem
+         | expr RANGE expr                                             #rangeListItem
          ;
 
 postfixExpr
@@ -143,6 +144,7 @@ NO : 'no' ;
 IN : 'in' ;
 PIPE : '|>' ;
 DOTMUL : '.*' ;
+RANGE : '..' ;
 ELLIPSIS : '...' ;
 INC_OP : '++' ;
 DEC_OP : '--' ;

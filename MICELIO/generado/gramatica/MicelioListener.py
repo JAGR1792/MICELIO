@@ -377,6 +377,15 @@ class MicelioListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MicelioParser#rangeListItem.
+    def enterRangeListItem(self, ctx:MicelioParser.RangeListItemContext):
+        pass
+
+    # Exit a parse tree produced by MicelioParser#rangeListItem.
+    def exitRangeListItem(self, ctx:MicelioParser.RangeListItemContext):
+        pass
+
+
     # Enter a parse tree produced by MicelioParser#postfixExprNode.
     def enterPostfixExprNode(self, ctx:MicelioParser.PostfixExprNodeContext):
         pass

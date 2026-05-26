@@ -214,6 +214,11 @@ class MicelioVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MicelioParser#rangeListItem.
+    def visitRangeListItem(self, ctx:MicelioParser.RangeListItemContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MicelioParser#postfixExprNode.
     def visitPostfixExprNode(self, ctx:MicelioParser.PostfixExprNodeContext):
         return self.visitChildren(ctx)

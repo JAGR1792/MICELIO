@@ -1,6 +1,11 @@
-var a = [1, 2, 3]
-var b = [0, ...a, 10]
+var r = [1..10]
+imp r
 
-para i en b{
-    imp i
-}
+var primos = filter(funcion (x) { regresa x % 2 != 0 }, [1..20])
+imp primos
+
+var descendente = [10..5]
+imp descendente
+
+var combinado = [1, 2, 5..8, 10]
+imp combinado
