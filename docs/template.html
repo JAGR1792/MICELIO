@@ -245,7 +245,7 @@ $body$
     if (tocLinks && headers.length > 0) {
         headers.forEach((h, i) => {
             const text = h.textContent.trim();
-            const id = h.id || text.toLowerCase().replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g, '-').replace(/^-+|-+$/g, '');
+            const id = h.id || text.toLowerCase().replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g, '-').replace(/^-+|-+$$/g, '');
             h.id = id;
             
             const a = document.createElement('a');
