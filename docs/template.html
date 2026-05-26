@@ -272,17 +272,3 @@ $body$
 </script>
 </body>
 </html>
-  menuBtn.style.display = 'none';
-    }
-
-    function openMenu() { sidebar.classList.add('open'); overlay.classList.add('show'); }
-    function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
-
-    if (menuBtn) menuBtn.onclick = openMenu;
-    if (overlay) overlay.onclick = closeMenu;
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
-
-})();
-</script>
-</body>
-</html>

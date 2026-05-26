@@ -1,11 +1,7 @@
-var r = [1..10]
-imp r
+funcion sumar2(a, b) { a + b }
+funcion saludar(n) { imp "hola " + n }
+funcion siempre_0() { 0 }
 
-var primos = filter(funcion (x) { regresa x % 2 != 0 }, [1..20])
-imp primos
-
-var descendente = [10..5]
-imp descendente
-
-var combinado = [1, 2, 5..8, 10]
-imp combinado
+imp sumar2(3, 4)
+imp siempre_0()
+saludar("Ana")
