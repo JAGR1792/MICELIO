@@ -42,7 +42,7 @@
             },
             flowchart: {
                 htmlLabels: true,
-                curve: 'basis',
+                curve: 'linear',
                 useMaxWidth: true
             }
         });
@@ -124,9 +124,18 @@
         }
 
         /* FUERZA TEXTO OSCURO EN MERMAID SIEMPRE */
-        .mermaid *, .mermaid text, .mermaid tspan {
+        .mermaid text, .mermaid tspan {
             color: #1e293b !important;
             fill: #1e293b !important;
+            font-family: var(--font-body) !important;
+        }
+        .mermaid .edgePath path {
+            stroke: #475569 !important;
+            stroke-width: 1.5px !important;
+        }
+        .mermaid .marker {
+            fill: #475569 !important;
+            stroke: #475569 !important;
         }
         .mermaid .edgeLabel, .mermaid .edgeLabel span, .mermaid .label, .mermaid .label span {
             color: #1e293b !important;
@@ -134,11 +143,17 @@
             padding: 2px 4px !important;
             border-radius: 4px !important;
             font-weight: 500 !important;
+            font-size: 11px !important;
         }
         .mermaid .node rect, .mermaid .node circle, .mermaid .node polygon, .mermaid .node path {
             fill: #ffffff !important;
-            stroke: #cbd5e1 !important;
-            stroke-width: 1px !important;
+            stroke: #94a3b8 !important;
+            stroke-width: 1.2px !important;
+        }
+        .mermaid .cluster rect {
+            fill: #f8fafc !important;
+            stroke: #e2e8f0 !important;
+            stroke-style: dashed !important;
         }
         .mermaid .sectionTitle {
             fill: #0f172a !important;
@@ -575,11 +590,11 @@
             border-radius: var(--radius-sm);
             margin-bottom: 0.4rem;
             transition: all 0.2s ease;
-            border-left: 2px solid transparent;
+            border-left: 3px solid transparent;
         }
 
         .sidebar a:hover {
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(16, 185, 129, 0.15);
             color: var(--accent-primary);
             transform: translateX(8px);
             border-left-color: var(--accent-primary);
