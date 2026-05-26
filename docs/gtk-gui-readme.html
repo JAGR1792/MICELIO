@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GTK En Micelio (GUI Embebida) -- MICELIO</title>
+    <title>Documentacion -- MICELIO</title>
 
     <!-- MathJax (LaTeX formulas) -->
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -11,31 +11,41 @@
     <!-- Mermaid (diagrams) -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
+        // Mermaid configuration using a fixed neutral palette for absolute legibility
         mermaid.initialize({
             startOnLoad: true,
             theme: 'base',
             themeVariables: {
+                /* General */
                 fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
                 fontSize: '14px',
                 background: '#ffffff',
                 mainBkg: '#ffffff',
-                nodeBorder: '#cbd5e1',
-                clusterBkg: '#f8fafc',
-                clusterBorder: '#e2e8f0',
-                textColor: '#1e293b',
+                
+                /* Nodes */
+                nodeBorder: '#94a3b8',
                 nodeTextColor: '#1e293b',
-                lineColor: '#64748b',
+                
+                /* Clusters (subgraphs) */
+                clusterBkg: '#f8fafc',
+                clusterBorder: '#cbd5e1',
+                
+                /* Lines & Markers */
+                lineColor: '#475569',
                 tertiaryColor: '#f1f5f9',
+                
+                /* Edge Labels */
                 edgeLabelBackground: '#ffffff',
-                labelTextColor: '#334155',
+                labelTextColor: '#1e293b',
+                
+                /* Primary elements */
                 primaryColor: '#f1f5f9',
                 primaryTextColor: '#0f172a',
                 primaryBorderColor: '#94a3b8'
             },
             flowchart: {
                 htmlLabels: true,
-                curve: 'linear',
-                useMaxWidth: true
+                curve: 'linear'
             }
         });
     </script>
@@ -156,7 +166,7 @@
         .top a { font-size: 0.9rem; color: var(--fg-muted); padding: 0.5rem 1rem; border: 1px solid var(--border-light); border-radius: var(--radius-sm); text-decoration: none; }
         .top a:hover { background: var(--bg-surface); color: var(--accent-primary); }
         
-        .menu-btn { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1001; background: var(--bg-main); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-medium); color: var(--fg-main); font-size: 1.2rem; cursor: pointer; padding: 0.5rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: var(--shadow-sm); }
+        .menu-btn { background: none; border: 1px solid var(--border-medium); color: var(--fg-main); font-size: 1.2rem; cursor: pointer; padding: 0.5rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
         .menu-btn:hover { background: var(--accent-primary); color: white; transform: rotate(5deg); }
         
         .sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100vh; z-index: 2000; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); border-left: 1px solid var(--border-medium); padding: 5rem 2rem 2rem; overflow-y: auto; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.2); }
@@ -179,6 +189,16 @@
 <body>
 <div class="overlay" id="overlay"></div>
 <div class="sidebar" id="sidebar">
+  <h3>Navegacion</h3>
+  <a href="../index.html">&#x2190; Inicio (Deep Learning)</a>
+  <a href="lenguaje.html">Lenguaje MICELIO</a>
+  <a href="modulos.html">Modulos std</a>
+  <a href="estructura-proyecto.html">Estructura del proyecto</a>
+  <a href="runtime.html">Runtime interno</a>
+  <a href="DOCUMENTACION.html">Documentacion tecnica</a>
+  <a href="vscode-extension.html">Extension VS Code</a>
+  <a href="gtk-gui-readme.html">Interfaz GTK</a>
+  <hr style="margin:1.5rem 0; opacity:0.1">
   <h3>Indice</h3>
   <div id="tocLinks"></div>
   <hr style="margin:1.5rem 0; opacity:0.1">
