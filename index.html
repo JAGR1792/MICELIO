@@ -646,6 +646,43 @@
             h1 { font-size: 2.8rem; }
             .subtitle { max-width: 100%; }
             .two-columns { grid-template-columns: 1fr; }
+            h2 { font-size: 1.6rem; margin-top: 3rem; }
+            h3 { font-size: 1.3rem; }
+            .sidebar { width: 100%; right: -100%; }
+            .sidebar.open { right: 0; }
+        }
+        @media (max-width: 480px) {
+            main { padding: 1.5rem 1rem; }
+            h1 { font-size: 2rem; letter-spacing: -1px; }
+            h2 { font-size: 1.3rem; margin-top: 2rem; padding-bottom: 0.5rem; }
+            h2::after { width: 50px; }
+            h3 { font-size: 1.1rem; }
+            h4 { font-size: 1rem; }
+            pre { padding: 2.5rem 1rem 1rem; font-size: 0.8rem; }
+            pre::before { left: 10px; top: 10px; }
+            pre::before { width: 6px; height: 6px; box-shadow: 12px 0 0 #ffbd2e, 24px 0 0 #27c93f; }
+            table { display: block; overflow-x: auto; }
+            th, td { padding: 0.5rem; font-size: 0.8rem; white-space: nowrap; }
+            code { font-size: 0.8em; }
+            .menu-btn { width: 40px; height: 40px; font-size: 1.1rem; top: 1rem; right: 1rem; border-radius: 10px; }
+            .toggle-btn { width: 40px; height: 40px; font-size: 1rem; top: 1rem; right: 3.2rem; }
+            .sidebar { padding: 4rem 1rem 1rem; }
+            .sidebar a { font-size: 0.85rem; padding: 0.5rem 0.8rem; }
+            ul, ol { margin-left: 1rem; }
+            li { font-size: 0.9rem; }
+            blockquote { padding: 0.8rem 1rem; }
+            .result-box { padding: 1rem; }
+            .result-box .value { font-size: 1.8rem; }
+            .img-container { margin: 1.5rem 0; }
+            .img-container img { max-width: 100%; height: auto; }
+            .mermaid-container { padding: 2.5rem 1rem 1.5rem; margin: 2rem 0; }
+            .mermaid-container::after { font-size: 0.55rem; top: 0.8rem; left: 1rem; }
+            .info-note { padding: 1rem; margin: 1rem 0; }
+            .info-note .title { font-size: 0.8rem; }
+            img { max-width: 100%; height: auto; }
+            iframe { max-width: 100%; }
+            body { font-size: 0.9rem; }
+            .subtitle { font-size: 1rem; }
         }
     </style>
 </head>
