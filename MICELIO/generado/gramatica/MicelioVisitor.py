@@ -1,4 +1,4 @@
-# Generated from /home/antonio/Documents/MICELIO/MICELIO/gramatica/Micelio.g4 by ANTLR 4.13.2
+# Generated from gramatica/Micelio.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .MicelioParser import MicelioParser
@@ -291,6 +291,26 @@ class MicelioVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by MicelioParser#exprList.
     def visitExprList(self, ctx:MicelioParser.ExprListContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#positionalArg.
+    def visitPositionalArg(self, ctx:MicelioParser.PositionalArgContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#keywordArg.
+    def visitKeywordArg(self, ctx:MicelioParser.KeywordArgContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#callArgList.
+    def visitCallArgList(self, ctx:MicelioParser.CallArgListContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MicelioParser#ident.
+    def visitIdent(self, ctx:MicelioParser.IdentContext):
         return self.visitChildren(ctx)
 
 

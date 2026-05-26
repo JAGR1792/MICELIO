@@ -278,11 +278,25 @@ class EvalVisitor(MicelioVisitor):
             return value
         raise MicelioRuntimeError(f"'{value}' no es invocable")
 
-    def _call_callable(self, callee, args):
+    def _extract_call_args(self, call_suffix_ctx):
+        """Extrae args posicionales y kwargs de un CallSuffixContext."""
+        args = []
+        kwargs = {}
+        call_arg_list = call_suffix_ctx.callArgList()
+        if call_arg_list is not None:
+            for call_arg_ctx in call_arg_list.callArg():
+                if isinstance(call_arg_ctx, MicelioParser.KeywordArgContext):
+                    name = call_arg_ctx.ident().getText()
+                    value = self.visit(call_arg_ctx.expr())
+                    kwargs[name] = value
+                else:
+                    args.append(self.visit(call_arg_ctx.expr()))
+        return args, kwargs
+
+    def _call_callable(self, callee, args, kwargs=None):
         fn = self._resolve_callable(callee)
         if isinstance(fn, FunctionValue):
-            # Pasar args, kwargs vacío, y la función para evaluar
-            return fn.call(args, {}, self._eval_in_env)
+            return fn.call(args, kwargs or {}, self._eval_in_env)
         return fn(*args)
 
     def _decode_string_literal(self, raw: str) -> str:
@@ -858,10 +872,8 @@ class EvalVisitor(MicelioVisitor):
             return value[index]
 
         if isinstance(suffix_ctx, MicelioParser.CallSuffixContext):
-            args = []
-            if suffix_ctx.exprList() is not None:
-                args = [self.visit(e) for e in suffix_ctx.exprList().expr()]
-            return self._call_callable(value, args)
+            args, kwargs = self._extract_call_args(suffix_ctx)
+            return self._call_callable(value, args, kwargs)
 
         if isinstance(suffix_ctx, MicelioParser.MemberSuffixContext):
             member = suffix_ctx.ID().getText()
@@ -1032,13 +1044,11 @@ class EvalVisitor(MicelioVisitor):
                     callee = self._apply_postfix_suffix(callee, suffix_ctx)
 
                 call_suffix = suffixes[-1]
-                args = []
-                if call_suffix.exprList() is not None:
-                    args = [self.visit(e) for e in call_suffix.exprList().expr()]
+                args, kwargs = self._extract_call_args(call_suffix)
                 if not args:
-                    return self._call_callable(callee, [left_value])
+                    return self._call_callable(callee, [left_value], kwargs)
                 pipe_args = [args[0], left_value] + args[1:]
-                return self._call_callable(callee, pipe_args)
+                return self._call_callable(callee, pipe_args, kwargs)
 
         callee = self.visit(right_ctx)
         return self._call_callable(callee, [left_value])

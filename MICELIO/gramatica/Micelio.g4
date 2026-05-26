@@ -101,12 +101,26 @@ primary
 
 postfixSuffix
     : '[' expr ']'                                                    #indexSuffix
-    | '(' exprList? ')'                                               #callSuffix
+    | '(' callArgList? ')'                                            #callSuffix
     | '.' ID                                                          #memberSuffix
     ;
 
 keyValue : expr ':' expr ;
 exprList : expr (',' expr)* ;
+callArg : expr                                                        #positionalArg
+        | ident '=' expr                                              #keywordArg
+        ;
+callArgList : callArg (',' callArg)* ;
+
+ident : ID
+      | Y | O | NO | SI | SINO_SI | SINO | EN
+      | ROMPER | CONTINUAR | LEER | IMP | REGRESA
+      | VAR | CONST | FUNCION | MATRIZ | SET | DICT
+      | SEGUN | CASO | DEFECTO
+      | PARA | HASTA | INC | MIENTRAS
+      | IMPORTAR | COMO
+      | PIPE | IN | NULL
+      ;
 
 literal : NUMBER | STRING | BOOL | NULL ;
 
