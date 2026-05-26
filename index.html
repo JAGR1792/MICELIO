@@ -11,41 +11,29 @@
     <!-- Mermaid (diagrams) -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'base',
-            themeVariables: {
-                fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
-                fontSize: '14px',
-                
-                /* Colores de fondo y nodos */
-                background: '#ffffff',
-                mainBkg: '#ffffff',
-                nodeBorder: '#cbd5e1',
-                clusterBkg: '#f8fafc',
-                clusterBorder: '#e2e8f0',
-                
-                /* Texto y Líneas */
-                textColor: '#1e293b',
-                nodeTextColor: '#1e293b',
-                lineColor: '#64748b',
-                tertiaryColor: '#f1f5f9',
-                
-                /* Etiquetas de flechas */
-                edgeLabelBackground: '#ffffff',
-                labelTextColor: '#334155',
-                
-                /* Primarios (para estados o énfasis) */
-                primaryColor: '#f1f5f9',
-                primaryTextColor: '#0f172a',
-                primaryBorderColor: '#94a3b8'
-            },
-            flowchart: {
-                htmlLabels: true,
-                curve: 'linear',
-                useMaxWidth: true
-            }
-        });
+        try {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'base',
+                themeVariables: {
+                    background: '#f8f1eb',
+                    mainBkg: '#f4ece4',
+                    nodeBorder: '#c76b4a',
+                    clusterBkg: '#f4ece4',
+                    clusterBorder: '#c76b4a',
+                    textColor: '#2c1810',
+                    nodeTextColor: '#2c1810',
+                    lineColor: '#c76b4a',
+                    tertiaryColor: '#f8f1eb',
+                    edgeLabelBackground: '#fffcf8',
+                    labelTextColor: '#2c1810',
+                    primaryColor: '#f4ece4',
+                    primaryTextColor: '#2c1810',
+                    primaryBorderColor: '#c76b4a',
+                    fontFamily: 'system-ui, sans-serif'
+                }
+            });
+        } catch(e) {}
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,43 +109,6 @@
 
             --body-bg-gradient-1: rgba(52, 211, 153, 0.08);
             --body-bg-gradient-2: rgba(167, 139, 250, 0.06);
-        }
-
-        /* FUERZA TEXTO OSCURO EN MERMAID SIEMPRE */
-        .mermaid text, .mermaid tspan {
-            color: #1e293b !important;
-            fill: #1e293b !important;
-            font-family: var(--font-body) !important;
-        }
-        .mermaid .edgePath path {
-            stroke: #475569 !important;
-            stroke-width: 1.5px !important;
-        }
-        .mermaid .marker {
-            fill: #475569 !important;
-            stroke: #475569 !important;
-        }
-        .mermaid .edgeLabel, .mermaid .edgeLabel span, .mermaid .label, .mermaid .label span {
-            color: #1e293b !important;
-            background-color: rgba(255, 255, 255, 0.95) !important;
-            padding: 2px 4px !important;
-            border-radius: 4px !important;
-            font-weight: 500 !important;
-            font-size: 11px !important;
-        }
-        .mermaid .node rect, .mermaid .node circle, .mermaid .node polygon, .mermaid .node path {
-            fill: #ffffff !important;
-            stroke: #94a3b8 !important;
-            stroke-width: 1.2px !important;
-        }
-        .mermaid .cluster rect {
-            fill: #f8fafc !important;
-            stroke: #e2e8f0 !important;
-            stroke-style: dashed !important;
-        }
-        .mermaid .sectionTitle {
-            fill: #0f172a !important;
-            font-weight: 700 !important;
         }
 
         .mermaid-container {
@@ -1877,6 +1828,55 @@ flowchart LR
     const menuBtn = document.getElementById('menuBtn');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
+    const tocLinks = document.getElementById('tocLinks');
+    const headers = document.querySelectorAll('h2');
+
+    // Generate TOC links from h2 elements
+    if (tocLinks && headers.length > 0) {
+        tocLinks.innerHTML = '';
+        headers.forEach((h2, i) => {
+            const text = h2.textContent.trim();
+            const id = h2.id || text.toLowerCase()
+                .replace(/[^a-z0-9\u00f1\u00e1-\u00fa]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            h2.id = id;
+
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = text;
+            a.onclick = () => {
+                if (window.innerWidth <= 1024) closeMenu();
+            };
+            tocLinks.appendChild(a);
+        });
+    }
+
+    // Sidebar toggle logic
+    function openMenu() {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+    }
+
+    function closeMenu() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+    }
+
+    if (menuBtn && sidebar && overlay) {
+        menuBtn.onclick = () => {
+            sidebar.classList.contains('open') ? closeMenu() : openMenu();
+        };
+        overlay.onclick = closeMenu;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMenu();
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
+verlay = document.getElementById('overlay');
     const tocLinks = document.getElementById('tocLinks');
     const headers = document.querySelectorAll('h2');
 

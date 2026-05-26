@@ -11,31 +11,41 @@
     <!-- Mermaid (diagrams) -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
+        // Mermaid configuration using a fixed neutral palette for absolute legibility
         mermaid.initialize({
             startOnLoad: true,
             theme: 'base',
             themeVariables: {
+                /* General */
                 fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
                 fontSize: '14px',
                 background: '#ffffff',
                 mainBkg: '#ffffff',
-                nodeBorder: '#cbd5e1',
-                clusterBkg: '#f8fafc',
-                clusterBorder: '#e2e8f0',
-                textColor: '#1e293b',
+                
+                /* Nodes */
+                nodeBorder: '#94a3b8',
                 nodeTextColor: '#1e293b',
-                lineColor: '#64748b',
+                
+                /* Clusters (subgraphs) */
+                clusterBkg: '#f8fafc',
+                clusterBorder: '#cbd5e1',
+                
+                /* Lines & Markers */
+                lineColor: '#475569',
                 tertiaryColor: '#f1f5f9',
+                
+                /* Edge Labels */
                 edgeLabelBackground: '#ffffff',
-                labelTextColor: '#334155',
+                labelTextColor: '#1e293b',
+                
+                /* Primary elements */
                 primaryColor: '#f1f5f9',
                 primaryTextColor: '#0f172a',
                 primaryBorderColor: '#94a3b8'
             },
             flowchart: {
                 htmlLabels: true,
-                curve: 'linear',
-                useMaxWidth: true
+                curve: 'linear'
             }
         });
     </script>
