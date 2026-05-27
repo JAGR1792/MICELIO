@@ -124,6 +124,50 @@ function extractFunctionsFromFile(filePath) {
   }
 }
 
+function parseFunctionSignatures(filePath) {
+  if (!fs.existsSync(filePath)) return [];
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const lines = content.split('\n');
+    const functions = [];
+    let pendingDoc = [];
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim();
+      if (trimmed.startsWith('#')) {
+        pendingDoc.push(trimmed.replace(/^#\s*/, ''));
+        continue;
+      }
+      const fnMatch = trimmed.match(/^funcion\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([^)]*)\)/);
+      if (fnMatch) {
+        const params = fnMatch[2].split(',').map(p => p.trim()).filter(p => p.length > 0);
+        functions.push({
+          name: fnMatch[1],
+          params: params,
+          doc: pendingDoc.join('\n').trim() || 'Función del módulo'
+        });
+        pendingDoc = [];
+      } else if (!trimmed.startsWith('#')) {
+        pendingDoc = [];
+      }
+    }
+    return functions;
+  } catch (e) {
+    return [];
+  }
+}
+
+const moduleSignaturesCache = {};
+
+function getModuleFunctionInfo(alias, funcName, document) {
+  const imports = getImportedModules(document);
+  if (!imports[alias]) return null;
+  const fullPath = resolveModulePath(imports[alias], document);
+  if (!moduleSignaturesCache[fullPath]) {
+    moduleSignaturesCache[fullPath] = parseFunctionSignatures(fullPath);
+  }
+  return moduleSignaturesCache[fullPath].find(f => f.name === funcName) || null;
+}
+
 function extractLocalSymbols(document) {
   const symbols = [];
   for (let i = 0; i < document.lineCount; i++) {
@@ -187,10 +231,13 @@ class MicelioCompletionProvider {
       const imports = getImportedModules(document);
       if (alias in imports) {
         const fullPath = resolveModulePath(imports[alias], document);
-        const functions = extractFunctionsFromFile(fullPath);
-        functions.forEach(name => {
-          const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Function);
-          item.detail = `Función/constante de ${alias}`;
+        if (!moduleSignaturesCache[fullPath]) {
+          moduleSignaturesCache[fullPath] = parseFunctionSignatures(fullPath);
+        }
+        moduleSignaturesCache[fullPath].forEach(fn => {
+          const item = new vscode.CompletionItem(fn.name, vscode.CompletionItemKind.Function);
+          item.detail = `${alias}.${fn.name}(${fn.params.join(', ')})`;
+          item.documentation = fn.doc;
           items.push(item);
         });
         return items;
@@ -228,7 +275,8 @@ class MicelioCompletionProvider {
     // 5. Funciones de DL/ml/matriz (comunes)
     DL_FUNCTIONS.forEach(name => {
       const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Function);
-      item.detail = 'Función de ML/DL/Matriz';
+      item.detail = `Función de dl / mat / ml.mice`;
+      item.documentation = 'Disponible al importar dl.mice, matriz.mice o ml.mice';
       items.push(item);
     });
 
@@ -240,7 +288,7 @@ class MicelioCompletionProvider {
 
 class MicelioHoverProvider {
   provideHover(document, position) {
-    const range = document.getWordRangeAtPosition(position, /[A-Za-z_][A-Za-z0-9_]*/);
+    const range = document.getWordRangeAtPosition(position, /[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?/);
     if (!range) return null;
     const word = document.getText(range);
 
@@ -262,6 +310,27 @@ class MicelioHoverProvider {
       });
     }
 
+    // Función de módulo importado: alias.funcion
+    const parts = word.split('.');
+    if (parts.length === 2) {
+      const [alias, funcName] = parts;
+      const imports = getImportedModules(document);
+      if (imports[alias]) {
+        const fullPath = resolveModulePath(imports[alias], document);
+        if (!moduleSignaturesCache[fullPath]) {
+          moduleSignaturesCache[fullPath] = parseFunctionSignatures(fullPath);
+        }
+        const modFunc = moduleSignaturesCache[fullPath].find(f => f.name === funcName);
+        if (modFunc) {
+          const params = modFunc.params.map(p => `\`${p}\``).join(', ');
+          return new vscode.Hover({
+            language: 'micelio',
+            value: `**${alias}.${funcName}(${modFunc.params.join(', ')})** — Función de **${alias}**\n\n${modFunc.doc}\n\n**Parámetros:** ${params}`
+          });
+        }
+      }
+    }
+
     // Símbolo local
     const localSymbols = extractLocalSymbols(document);
     const sym = localSymbols.find(s => s.name === word);
@@ -281,29 +350,48 @@ class MicelioSignatureProvider {
     const lineText = document.lineAt(position.line).text;
     const beforeCursor = lineText.slice(0, position.character);
 
-    const callMatch = beforeCursor.match(/([A-Za-z_][A-Za-z0-9_]*)\s*\([^)]*$/);
+    const callMatch = beforeCursor.match(/([A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?)\s*\([^)]*$/);
     if (!callMatch) return null;
 
     const funcName = callMatch[1];
-    const info = BUILTINS[funcName];
-    if (!info) return null;
+    const parts = funcName.split('.');
+    let params = null;
+    let doc = '';
+
+    if (parts.length === 2) {
+      // Función de módulo: alias.funcion(
+      const [alias, fn] = parts;
+      const modFunc = getModuleFunctionInfo(alias, fn, document);
+      if (modFunc) {
+        params = modFunc.params;
+        doc = modFunc.doc;
+      }
+    } else {
+      // Función builtin
+      const info = BUILTINS[funcName];
+      if (info) {
+        params = info.params;
+        doc = info.doc;
+      }
+    }
+
+    if (!params) return null;
 
     const sig = new vscode.SignatureHelp();
     const signature = new vscode.SignatureInformation(
-      `${funcName}(${info.params.join(', ')})`,
-      info.doc
+      `${funcName}(${params.join(', ')})`,
+      doc
     );
-    signature.parameters = info.params.map(p =>
+    signature.parameters = params.map(p =>
       new vscode.ParameterInformation(p)
     );
     sig.signatures = [signature];
     sig.activeSignature = 0;
 
-    // Calcular índice del parámetro activo según las comas
     const argsPart = beforeCursor.slice(beforeCursor.indexOf('(') + 1);
     sig.activeParameter = (argsPart.match(/,/g) || []).length;
-    if (sig.activeParameter >= info.params.length) {
-      sig.activeParameter = info.params.length - 1;
+    if (sig.activeParameter >= params.length) {
+      sig.activeParameter = params.length - 1;
     }
 
     return sig;
