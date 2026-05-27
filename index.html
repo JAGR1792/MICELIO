@@ -1827,132 +1827,313 @@ flowchart LR
     <!-- ================================================================ -->
     <section id="ml-teoria">
         <hr>
-        <h2>15. Teor&iacute;a de Machine Learning (ml.mice)</h2>
-        <p>Esta secci&oacute;n explica los fundamentos te&oacute;ricos de los algoritmos implementados en <code>ml.mice</code>: regresi&oacute;n lineal, regresi&oacute;n log&iacute;stica, K-Means y m&eacute;tricas de evaluaci&oacute;n.</p>
+        <h2>15. Machine Learning en MICELIO puro (ml.mice)</h2>
+        <p>Esta secci&oacute;n muestra el c&oacute;digo real de <code>ml.mice</code> y explica c&oacute;mo funciona cada algoritmo dentro del lenguaje. Todo est&aacute; implementado con las estructuras nativas de MICELIO: listas, diccionarios, <code>mientras</code>, <code>para</code> y recursi&oacute;n.</p>
 
-        <h3>15.1 Regresi&oacute;n Lineal</h3>
-        <p>La regresi&oacute;n lineal modela la relaci&oacute;n entre una variable dependiente <em>y</em> y una o m&aacute;s variables independientes <em>X</em> como una recta:</p>
-        <div class="math-block">\[ y = Xw + b \]</div>
-        <p>Donde <em>w</em> son los pesos (pendientes) y <em>b</em> el sesgo (intercepci&oacute;n). El objetivo es encontrar <em>w</em> y <em>b</em> que minimicen el error cuadr&aacute;tico medio (MSE).</p>
-
-        <h4>M&iacute;nimos cuadrados ordinarios</h4>
-        <p>Soluci&oacute;n anal&iacute;tica cerrada:</p>
-        <div class="math-block">\[ w = (X^T X)^{-1} X^T y \]</div>
-        <p>Se calcula directamente con operaciones matriciales sin iteraci&oacute;n. Implementado en <code>ml.regresion_lineal(X, Y)</code>.</p>
-
-        <h4>Descenso de gradiente</h4>
-        <p>Alternativa iterativa para conjuntos grandes donde la inversa matricial es costosa. El gradiente del error MSE con respecto a los pesos es:</p>
-        <div class="math-block">\[ \frac{\partial MSE}{\partial w} = \frac{2}{n} X^T (\hat{y} - y) \]</div>
-        <p>Se actualizan los pesos en direcci&oacute;n contraria al gradiente: <code>ml.regresion_lineal_descenso(X, Y, lr, iter)</code>.</p>
-
-        <h4>Regresi&oacute;n matricial</h4>
-        <p>Implementaci&oacute;n usando la matriz aumentada <em>[X, 1]</em> y la f&oacute;rmula de m&iacute;nimos cuadrados con sesgo incluido. Se utiliza la multiplicaci&oacute;n, transpuesta e inversa de <code>matriz.mice</code>. <code>ml.regresion_lineal_matricial(X, Y)</code>.</p>
-
-        <div class="result-box">
-            <div class="label">Ejemplo: predecir salario seg&uacute;n a&ntilde;os de experiencia</div>
-            <div class="value">y = 2.5x + 30</div>
-            <div class="label">Para x=8 a&ntilde;os: salario = 50 mil</div>
+        <h3>15.1 Regresi&oacute;n Lineal (m&iacute;nimos cuadrados)</h3>
+        <p>La versi&oacute;n m&aacute;s simple usa sumatorias directas. No necesita matrices ni c&aacute;lculo diferencial:</p>
+        <pre><code>funcion regresion_lineal(X, Y) {
+    var n = X.longitud()
+    var suma_xy = 0
+    var suma_x2 = 0
+    var suma_x = 0
+    var suma_y = 0
+    var i = 0
+    mientras (i < n) {
+        suma_xy = suma_xy + (X[i] * Y[i])
+        suma_x2 = suma_x2 + (X[i] * X[i])
+        suma_x = suma_x + X[i]
+        suma_y = suma_y + Y[i]
+        i = i + 1
+    }
+    var m = (n * suma_xy - suma_x * suma_y) / (n * suma_x2 - suma_x * suma_x)
+    var b = (suma_y - m * suma_x) / n
+    regresa {"pendiente": m, "intercepcion": b}
+}</code></pre>
+        <p><strong>C&oacute;mo funciona en MICELIO:</strong></p>
+        <ul>
+            <li>Un solo <code>mientras</code> recorre los datos acumulando las cuatro sumatorias necesarias: &Sigma;xy, &Sigma;x&sup2;, &Sigma;x, &Sigma;y</li>
+            <li>Al final se aplican las f&oacute;rmulas cerradas de m&iacute;nimos cuadrados. Todo con aritm&eacute;tica b&aacute;sica (+, -, *, /)</li>
+            <li>Devuelve un diccionario con <code>pendiente</code> e <code>intercepcion</code> &mdash; la forma natural de agrupar resultados en MICELIO</li>
+        </ul>
+        <div class="info-note">
+            <span class="title">Did&aacute;ctica</span>
+            Esta implementaci&oacute;n usa solo lenguaje MICELIO b&aacute;sico: variables, <code>mientras</code>, aritm&eacute;tica y diccionarios. No hay matrices, no hay funciones externas.
         </div>
 
+        <h4>Regresi&oacute;n Lineal por Descenso de Gradiente</h4>
+        <p>Alternativa iterativa que muestra c&oacute;mo se entrena un modelo paso a paso:</p>
+        <pre><code>funcion regresion_lineal_descenso(X, Y, lr, iter) {
+    var m = 0.0
+    var b = 0.0
+    var n = X.longitud()
+    para epoca en rango(iter) {
+        var dm = 0
+        var db = 0
+        var i = 0
+        mientras (i < n) {
+            var pred = m * X[i] + b
+            var error = pred - Y[i]
+            dm = dm + (error * X[i])
+            db = db + error
+            i = i + 1
+        }
+        m = m - lr * (2 * dm / n)
+        b = b - lr * (2 * db / n)
+    }
+    regresa {"pendiente": m, "intercepcion": b}
+}</code></pre>
+        <ul>
+            <li>Dos bucles anidados: <code>para</code> recorre las &eacute;pocas, <code>mientras</code> recorre los datos en cada &eacute;poca</li>
+            <li>Calcula la derivada del MSE con respecto a <em>m</em> y <em>b</em>: solo aritm&eacute;tica simple</li>
+            <li>Actualiza los pesos restando el gradiente multiplicado por la tasa de aprendizaje <code>lr</code></li>
+            <li>Muestra el ciclo cl&aacute;sico de entrenamiento: predecir &rarr; medir error &rarr; ajustar</li>
+        </ul>
+
+        <h4>Regresi&oacute;n Matricial</h4>
+        <p>Usa <code>matriz.mice</code> para resolver con la f&oacute;rmula completa: aumenta X con una columna de 1s, transpone, multiplica e invierte:</p>
+        <pre><code>funcion regresion_lineal_matricial(X, Y) {
+    # Aumenta X con columna de 1s para el sesgo
+    var X_aum = []
+    para fila en X {
+        var fila_aum = copia(fila)
+        fila_aum.agregar(1)
+        X_aum.agregar(fila_aum)
+    }
+    var Xt = mat.transpuesta(X_aum)
+    var XtX = mat.multiplicar(Xt, X_aum)
+    var XtX_inv = mat.inversa(XtX)
+    var XtY = mat.multiplicar(Xt, [Y])
+    var w = mat.multiplicar(XtX_inv, XtY)
+    regresa w
+}</code></pre>
+        <ul>
+            <li>Usa las operaciones matriciales de <code>matriz.mice</code>: <code>transpuesta</code>, <code>multiplicar</code>, <code>inversa</code></li>
+            <li>Demuestra composici&oacute;n de m&oacute;dulos: <code>ml.mice</code> importa y usa funciones de <code>matriz.mice</code></li>
+        </ul>
+
         <h3>15.2 Regresi&oacute;n Log&iacute;stica</h3>
-        <p>A pesar del nombre, es un algoritmo de <strong>clasificaci&oacute;n binaria</strong>. Modela la probabilidad de que un ejemplo pertenezca a la clase positiva:</p>
-        <div class="math-block">\[ P(y=1 | x) = \sigma(w^T x + b) \]</div>
-        <p>Donde <em>&sigma;</em> es la funci&oacute;n sigmoide:</p>
-        <div class="math-block">\[ \sigma(z) = \frac{1}{1 + e^{-z}} \]</div>
+        <p>Clasificador binario que usa la funci&oacute;n sigmoide para convertir una combinaci&oacute;n lineal en una probabilidad entre 0 y 1:</p>
+        <pre><code>funcion sigmoid(z) {
+    regresa 1.0 / (1.0 + exp(-z))
+}
 
-        <h4>Frontera de decisi&oacute;n</h4>
-        <p>Si <em>P(y=1) &ge; 0.5</em> se predice clase 1, si no clase 0. La frontera es lineal: <em>w^T x + b = 0</em>.</p>
-
-        <h4>Entrenamiento</h4>
-        <p>Se usa descenso de gradiente para minimizar la entrop&iacute;a cruzada (cross-entropy). El gradiente tiene la misma forma que en regresi&oacute;n lineal:</p>
-        <div class="math-block">\[ \frac{\partial J}{\partial w} = X^T (\sigma(Xw + b) - y) \]</div>
-        <p>Implementado en <code>ml.regresion_logistica(X, Y, lr, iter)</code>. La predicci&oacute;n se hace con <code>ml.predecir_logistica(modelo, X, umbral)</code>.</p>
-
-        <div class="result-box">
-            <div class="label">Ejemplo binario: &iquest;Aprueba o no?</div>
-            <div class="value">Sigmoide: cuanto m&aacute;s lejos de 0.5, m&aacute;s seguridad</div>
+funcion regresion_logistica(X, Y, lr, iter) {
+    var pesos = []
+    para i en rango(X[0].longitud()) {
+        pesos.agregar(0.0)
+    }
+    var sesgo = 0.0
+    para epoca en rango(iter) {
+        var i = 0
+        mientras (i < X.longitud()) {
+            var z = sesgo
+            var j = 0
+            mientras (j < pesos.longitud()) {
+                z = z + pesos[j] * X[i][j]
+                j = j + 1
+            }
+            var pred = sigmoid(z)
+            var error = pred - Y[i]
+            sesgo = sesgo - lr * error
+            var j2 = 0
+            mientras (j2 < pesos.longitud()) {
+                pesos[j2] = pesos[j2] - lr * error * X[i][j2]
+                j2 = j2 + 1
+            }
+            i = i + 1
+        }
+    }
+    regresa {"pesos": pesos, "sesgo": sesgo}
+}</code></pre>
+        <p><strong>C&oacute;mo funciona en MICELIO:</strong></p>
+        <ul>
+            <li>Usa <code>exp()</code> de <code>builtins.mice</code> (serie de Taylor de 6 t&eacute;rminos) para calcular la sigmoide</li>
+            <li>Tres bucles anidados: &eacute;pocas &rarr; ejemplos &rarr; caracter&iacute;sticas</li>
+            <li>El gradiente se calcula con una aritm&eacute;tica simple: <code>error * X[i][j]</code></li>
+            <li>Los pesos se actualizan in-place dentro de la lista, mostrando mutabilidad de listas en MICELIO</li>
+            <li>La sigmoide es una funci&oacute;n pura: recibe un n&uacute;mero, devuelve un n&uacute;mero</li>
+        </ul>
+        <div class="info-note">
+            <span class="title">Ejemplo binario</span>
+            Con lr=0.01 y 500 &eacute;pocas, separa dos clases linealmente separables. Si los datos no son separables linealmente, la frontera de decisi&oacute;n ser&aacute; la recta que minimice el error.
         </div>
 
         <h3>15.3 K-Means Clustering</h3>
-        <p>Algoritmo de agrupamiento no supervisado. Divide los datos en <em>k</em> grupos, donde cada punto pertenece al grupo con el centroide m&aacute;s cercano.</p>
+        <p>Algoritmo de agrupamiento no supervisado. Agrupa datos en <em>k</em> clusters seg&uacute;n su cercan&iacute;a:</p>
+        <pre><code>funcion k_means(X, k, iteraciones) {
+    var n = X.longitud()
+    var dim = X[0].longitud()
 
-        <h4>Algoritmo</h4>
-        <ol>
-            <li><strong>Inicializaci&oacute;n</strong>: Elegir <em>k</em> centroides iniciales aleatoriamente entre los datos</li>
-            <li><strong>Asignaci&oacute;n</strong>: Cada punto se asigna al centroide m&aacute;s cercano (distancia euclidiana)</li>
-            <li><strong>Actualizaci&oacute;n</strong>: Cada centroide se recalcula como el promedio de los puntos asignados</li>
-            <li><strong>Repetir</strong>: Pasos 2-3 hasta convergencia o n&uacute;mero m&aacute;ximo de iteraciones</li>
-        </ol>
+    # 1. Elegir k centroides aleatorios (Fisher-Yates parcial)
+    var indices = []
+    para i en rango(n) { indices.agregar(i) }
+    para i en rango(k) {
+        var r = i + aEntero(aleatorio() * (n - i))
+        var tmp = indices[i]
+        indices[i] = indices[r]
+        indices[r] = tmp
+    }
+    var centroides = []
+    para i en rango(k) { centroides.agregar(X[indices[i]]) }
 
-        <h4>Distancia euclidiana</h4>
-        <div class="math-block">\[ d(p, q) = \sqrt{\sum_{i=1}^{n} (p_i - q_i)^2} \]</div>
-        <p>Usada para medir similitud entre puntos y centroides. Implementada en <code>ml.distancia_euclidiana(p1, p2)</code>.</p>
+    var iter = 0
+    mientras (iter &lt; iteraciones) {
 
-        <h4>K-Means en ml.mice</h4>
-        <pre><code>var resultado = ml.k_means(X, k, iteraciones)
-# resultado contiene centroides y asignaciones</code></pre>
-        <p>El n&uacute;mero de clusters <em>k</em> se define previamente. El algoritmo converge a un &oacute;ptimo local.</p>
+        # 2. Asignar cada punto al centroide mas cercano
+        var asignaciones = []
+        para punto en X {
+            var dist_min = 999999
+            var indice_cercano = 0
+            para j en rango(k) {
+                var dist = distancia_euclidiana(punto, centroides[j])
+                si (dist &lt; dist_min) {
+                    dist_min = dist; indice_cercano = j
+                }
+            }
+            asignaciones.agregar(indice_cercano)
+        }
 
-        <div class="info-note">
-            <span class="title">Nota</span>
-            K-Means requiere que <em>k</em> se defina de antemano. No hay una &uacute;nica respuesta correcta; se usa el "m&eacute;todo del codo" (elbow method) para elegir <em>k</em>.
-        </div>
-
-        <h3>15.4 M&eacute;tricas de evaluaci&oacute;n</h3>
-
-        <h4>MSE (Mean Squared Error)</h4>
-        <p>Error cuadr&aacute;tico medio para regresi&oacute;n. Penaliza errores grandes por elevar al cuadrado.</p>
-        <div class="math-block">\[ MSE = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 \]</div>
-
-        <h4>R&sup2; (Coeficiente de determinaci&oacute;n)</h4>
-        <p>Qu&eacute; tan bien se ajusta el modelo a los datos. 1 es perfecto, 0 es tan bueno como predecir siempre la media.</p>
-        <div class="math-block">\[ R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2} \]</div>
-
-        <h4>Matriz de confusi&oacute;n</h4>
-        <p>Para clasificaci&oacute;n binaria, compara predicciones contra valores reales:</p>
-        <table>
-            <tr><th></th><th>Real +</th><th>Real &minus;</th></tr>
-            <tr><td><strong>Pred +</strong></td><td>TP (verdaderos positivos)</td><td>FP (falsos positivos)</td></tr>
-            <tr><td><strong>Pred &minus;</strong></td><td>FN (falsos negativos)</td><td>TN (verdaderos negativos)</td></tr>
-        </table>
-
-        <h4>Derivadas de la matriz de confusi&oacute;n</h4>
+        # 3. Recalcular centroides como promedio de sus puntos
+        var nuevos = []
+        var conteos = []
+        para i en rango(k) {
+            var suma = []
+            para d en rango(dim) { suma.agregar(0) }
+            nuevos.agregar(suma)
+            conteos.agregar(0)
+        }
+        para i en rango(n) {
+            var cid = asignaciones[i]
+            para d en rango(dim) { nuevos[cid][d] = nuevos[cid][d] + X[i][d] }
+            conteos[cid] = conteos[cid] + 1
+        }
+        para i en rango(k) {
+            si (conteos[i] &gt; 0) {
+                para d en rango(dim) { centroides[i][d] = nuevos[i][d] / conteos[i] }
+            }
+        }
+        iter = iter + 1
+    }
+    regresa {"centroides": centroides, "asignaciones": asignaciones}
+}</code></pre>
+        <p><strong>C&oacute;mo funciona en MICELIO:</strong></p>
         <ul>
-            <li><strong>Exactitud (Accuracy)</strong>: (TP + TN) / (TP + TN + FP + FN) &mdash; proporci&oacute;n de aciertos total</li>
-            <li><strong>Precisi&oacute;n (Precision)</strong>: TP / (TP + FP) &mdash; de lo que predije positivo, cu&aacute;nto acert&eacute;</li>
-            <li><strong>Recall (Sensibilidad)</strong>: TP / (TP + FN) &mdash; de lo que era positivo, cu&aacute;nto captur&eacute;</li>
-            <li><strong>F1-Score</strong>: 2 &times; (Precision &times; Recall) / (Precision + Recall) &mdash; media arm&oacute;nica de ambas</li>
+            <li><strong>Inicializaci&oacute;n</strong>: usa <code>aleatorio()</code> (LCG en <code>builtins.mice</code>) con Fisher-Yates parcial para elegir centroides distintos</li>
+            <li><strong>Asignaci&oacute;n</strong>: <code>para punto en X</code> recorre los datos; dentro, <code>para j en rango(k)</code> calcula distancias con <code>distancia_euclidiana()</code></li>
+            <li><strong>Actualizaci&oacute;n</strong>: tres <code>para</code> secuenciales: uno para inicializar acumuladores, otro para sumar puntos por cluster, otro para promediar</li>
+            <li>Usa <code>para punto en X</code> (iteraci&oacute;n sobre lista) y <code>para i en rango(n)</code> (iteraci&oacute;n indexada) seg&uacute;n convenga</li>
+            <li>Devuelve diccionario con dos listas: centroides y asignaciones por punto</li>
         </ul>
 
         <div class="result-box">
-            <div class="label">F1 perfecto = 1.0 (TP &uacute;nicamente, sin FP ni FN)</div>
-            <div class="label">F1 de 0.8+ se considera excelente en problemas desbalanceados</div>
+            <div class="label">Distancia Euclidiana en MICELIO</div>
         </div>
+        <pre><code>funcion distancia_euclidiana(p1, p2) {
+    si (tipo(p1) == "numero" y tipo(p2) == "numero") {
+        regresa abs(p1 - p2)
+    }
+    var suma = 0
+    para i en rango(p1.longitud()) {
+        var diff = p1[i] - p2[i]
+        suma = suma + (diff * diff)
+    }
+    regresa math.raiz(suma)
+}</code></pre>
+        <ul>
+            <li>Usa <code>tipo()</code> para detectar si los datos son escalares o vectores &mdash; una sola funci&oacute;n sirve para ambos casos</li>
+            <li>Usa <code>math.raiz()</code> implementada con Newton-Raphson en <code>math.mice</code></li>
+            <li>El cuadrado de la diferencia se calcula con aritm&eacute;tica b&aacute;sica: <code>diff * diff</code></li>
+        </ul>
 
-        <h3>15.5 Uso combinado: preprocesamiento + modelo</h3>
-        <p>Flujo t&iacute;pico de ML con MICELIO:</p>
-        <pre><code>importar "ml.mice" como ml
-importar "archivo.mice" como arc
+        <h3>15.4 M&eacute;tricas de evaluaci&oacute;n</h3>
+        <p>Todas implementadas con <code>mientras</code> y aritm&eacute;tica b&aacute;sica.</p>
 
-# 1. Cargar datos desde CSV
-var ds = arc.cargar_dataset("datos.csv", col_target=2, ",", verdadero)
+        <h4>Matriz de confusi&oacute;n</h4>
+        <pre><code>funcion matriz_confusion(predichos, reales) {
+    var tp = 0; var tn = 0; var fp = 0; var fn = 0
+    var i = 0
+    mientras (i &lt; predichos.longitud()) {
+        si (predichos[i] == 1 y reales[i] == 1) { tp = tp + 1 }
+        sino_si (predichos[i] == 0 y reales[i] == 0) { tn = tn + 1 }
+        sino_si (predichos[i] == 1 y reales[i] == 0) { fp = fp + 1 }
+        sino { fn = fn + 1 }
+        i = i + 1
+    }
+    regresa {"tp": tp, "tn": tn, "fp": fp, "fn": fn}
+}</code></pre>
+        <ul>
+            <li>Un solo <code>mientras</code> con condicionales anidados (<code>si</code>/<code>sino_si</code>/<code>sino</code>)</li>
+            <li>Usa <code>y</code> (AND l&oacute;gico de MICELIO) para combinar condiciones</li>
+            <li>Devuelve un diccionario con las cuatro casillas de la matriz</li>
+        </ul>
 
-# 2. Dividir en entrenamiento y prueba (80/20)
-var split = ml.dividir_datos(ds["X"], ds["Y"], 0.8)
-var X_train = split["X_train"]
-var Y_train = split["Y_train"]
-var X_test  = split["X_test"]
-var Y_test  = split["Y_test"]
+        <h4>MSE, R&sup2;, F1 y derivados</h4>
+        <pre><code>funcion mse(y_real, y_pred) {
+    var suma_error = 0
+    var n = y_real.longitud()
+    para i en rango(n) {
+        var diff = y_real[i] - y_pred[i]
+        suma_error = suma_error + (diff * diff)
+    }
+    regresa suma_error / n
+}
 
-# 3. Normalizar
-var X_norm = ml.normalizar(X_train)
+funcion precision(predichos, reales) {
+    var conf = matriz_confusion(predichos, reales)
+    si (conf["tp"] + conf["fp"] == 0) { regresa 0 }
+    regresa conf["tp"] / (conf["tp"] + conf["fp"])
+}
 
-# 4. Entrenar modelo
-var modelo = ml.regresion_lineal(X_norm, Y_train)
+funcion f1_score(predichos, reales) {
+    var p = precision(predichos, reales)
+    var r = recall(predichos, reales)
+    si (p + r == 0) { regresa 0 }
+    regresa 2 * (p * r) / (p + r)
+}</code></pre>
+        <ul>
+            <li>Composici&oacute;n de funciones: <code>precision</code> llama a <code>matriz_confusion</code>, <code>f1_score</code> llama a <code>precision</code> y <code>recall</code></li>
+            <li>Todas las funciones son puras: reciben listas, devuelven n&uacute;meros o diccionarios</li>
+            <li>Manejo de casos borde: divisi&oacute;n por cero se protege con <code>si (denominador == 0)</code></li>
+        </ul>
 
-# 5. Evaluar
-var pred = ml.predecir_lineal(modelo, X_test)
-imp "R^2: " + aTexto(ml.r_cuadrado(Y_test, pred))</code></pre>
+        <h3>15.5 Preprocesamiento</h3>
+        <pre><code>funcion normalizar(valores) {
+    var m = media(valores)
+    var de = desviacion_estandar(valores)
+    var result = []
+    para v en valores {
+        si (de == 0) { result.agregar(0) }
+        sino { result.agregar((v - m) / de) }
+    }
+    regresa result
+}
+
+funcion dividir_datos(X, Y, proporcion_train) {
+    var n = X.longitud()
+    var indice_split = n * proporcion_train
+    var X_train = []; var X_test = []; var Y_train = []; var Y_test = []
+    para i en rango(n) {
+        si (i &lt; indice_split) {
+            X_train.agregar(X[i]); Y_train.agregar(Y[i])
+        } sino {
+            X_test.agregar(X[i]); Y_test.agregar(Y[i])
+        }
+    }
+    regresa {"X_train": X_train, "X_test": X_test,
+             "Y_train": Y_train, "Y_test": Y_test}
+}</code></pre>
+        <ul>
+            <li><code>media</code> usa <code>suma()</code> + <code>longitud()</code> &mdash; builtins de MICELIO</li>
+            <li><code>desviacion_estandar</code> importa <code>math.raiz</code> de <code>math.mice</code></li>
+            <li><code>dividir_datos</code> usa <code>longitud()</code> para c&aacute;lculo de proporci&oacute;n, luego <code>para</code> para poblar cuatro listas</li>
+        </ul>
+
+        <div class="result-box">
+            <div class="label">Todo el ML de MICELIO usa solo:</div>
+            <div class="value">listas, diccionarios, mientras, para, si/sino, aritm&eacute;tica b&aacute;sica</div>
+            <div class="label">Sin numpy, sin scikit-learn, sin dependencias externas</div>
+        </div>
     </section>
 
     <!-- ================================================================ -->
