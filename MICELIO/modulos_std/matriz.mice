@@ -7,9 +7,6 @@ importar "math.mice" como math
 
 # Crea una matriz de ceros
 funcion ceros(filas, columnas) {
-    si (__mat_ceros != nulo) {
-        regresa __mat_ceros(filas, columnas)
-    }
     var m = []
     var i = 0
     mientras (i < filas) {
@@ -79,9 +76,6 @@ funcion transpuesta(m) {
     si (longitud(m) == 0) {
         regresa []
     }
-    si (__mat_transpuesta != nulo) {
-        regresa __mat_transpuesta(m)
-    }
     var f = filas(m)
     var c = columnas(m)
     var result = []
@@ -125,9 +119,6 @@ funcion multiplicar(m1, m2) {
 
 # Multiplica matriz por escalar
 funcion escalar(m, valor) {
-    si (__mat_escalar != nulo) {
-        regresa __mat_escalar(m, valor)
-    }
     var result = []
     var i = 0
     mientras (i < filas(m)) {

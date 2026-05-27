@@ -240,9 +240,6 @@ funcion minimo(a, b) {
 
 # Exponencial (e^x) por serie de Taylor (desenrollado, 6 terminos)
 funcion exp(x) {
-    si (__exp_nativo != nulo) {
-        regresa __exp_nativo(x)
-    }
     var neg = falso
     si (x < 0) {
         x = -x

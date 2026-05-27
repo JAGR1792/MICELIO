@@ -15,9 +15,6 @@ funcion hadamard(m1, m2) {
 # ─── Activaciones ────────────────────────────────────────────────────
 
 funcion sigmoid(m) {
-    si (__sigmoide != nulo) {
-        regresa __sigmoide(m)
-    }
     var r = []
     para fila en m {
         var nf = []
@@ -29,9 +26,6 @@ funcion sigmoid(m) {
     regresa r
 }
 funcion sigmoid_derivada(m) {
-    si (__sigmoide_derivada != nulo) {
-        regresa __sigmoide_derivada(m)
-    }
     var r = []
     para fila en m {
         var nf = []
@@ -44,9 +38,6 @@ funcion sigmoid_derivada(m) {
 }
 
 funcion relu(m) {
-    si (__relu != nulo) {
-        regresa __relu(m)
-    }
     var r = []
     para fila en m {
         var nf = []
@@ -58,9 +49,6 @@ funcion relu(m) {
     regresa r
 }
 funcion relu_derivada(m) {
-    si (__relu_derivada != nulo) {
-        regresa __relu_derivada(m)
-    }
     var r = []
     para fila en m {
         var nf = []
@@ -73,9 +61,6 @@ funcion relu_derivada(m) {
 }
 
 funcion softmax(m) {
-    si (__softmax != nulo) {
-        regresa __softmax(m)
-    }
     var r = []
     para fila en m {
         var max_val = max_lista(fila)
@@ -123,13 +108,10 @@ funcion forward(modelo, X) {
     var actual = X
     para capa en modelo["capas"] {
         var Z = mat.multiplicar(actual, capa["W"])
+        # Sumar b (broadcasting con + nativo)
         var bias_mat = []
-        si (__repfilas != nulo) {
-            bias_mat = __repfilas(capa["b"], mat.filas(Z))
-        } sino {
-            para fila_z en Z {
-                bias_mat.agregar(capa["b"][0])
-            }
+        para fila_z en Z {
+            bias_mat.agregar(capa["b"][0])
         }
         Z = Z + bias_mat
         
@@ -158,15 +140,11 @@ funcion entrenar_red(modelo, X, Y, epochs, lr) {
             
             var dW = mat.multiplicar(mat.transpuesta(A_prev), delta)
             var db = mat.ceros(1, mat.columnas(delta))
-            si (__sumafilas != nulo) {
-                db = [__sumafilas(delta)]
-            } sino {
-                para fila_d en delta {
-                    var c_idx = 0
-                    mientras (c_idx < fila_d.longitud()) {
-                        db[0][c_idx] = db[0][c_idx] + fila_d[c_idx]
-                        c_idx = c_idx + 1
-                    }
+            para fila_d en delta {
+                var c_idx = 0
+                mientras (c_idx < fila_d.longitud()) {
+                    db[0][c_idx] = db[0][c_idx] + fila_d[c_idx]
+                    c_idx = c_idx + 1
                 }
             }
             
@@ -195,9 +173,6 @@ funcion entrenar_red(modelo, X, Y, epochs, lr) {
 }
 
 funcion error_mse(y_true, y_pred) {
-    si (__mse != nulo) {
-        regresa __mse(y_true, y_pred)
-    }
     var f = mat.filas(y_true)
     var c = mat.columnas(y_true)
     var s = 0
