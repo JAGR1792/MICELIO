@@ -86,14 +86,11 @@ funcion perceptron_multicapa(arquitectura) {
         var n_in = conf["in"]
         var n_out = conf["out"]
         var W = mat.ceros(n_in, n_out)
-        var i = 0
-        mientras (i < n_in) {
-            var j = 0
-            mientras (j < n_out) {
-                W[i][j] = (aleatorio() * 2 - 1) * math.raiz(6 / (n_in + n_out))
-                j = j + 1
+        var factor = math.raiz(6 / (n_in + n_out))
+        para i en rango(n_in) {
+            para j en rango(n_out) {
+                W[i][j] = (aleatorio() * 2 - 1) * factor
             }
-            i = i + 1
         }
         var b = mat.ceros(1, n_out)
         capas.agregar({"W": W, "b": b, "act": conf["act"]})
@@ -126,6 +123,8 @@ funcion forward(modelo, X) {
 }
 
 funcion entrenar_red(modelo, X, Y, epochs, lr) {
+    var capas = modelo["capas"]
+    var n_capas = capas.longitud()
     para e en rango(epochs) {
         var fwd = forward(modelo, X)
         var pred = fwd["salida"]
@@ -133,24 +132,24 @@ funcion entrenar_red(modelo, X, Y, epochs, lr) {
         
         var delta = mat.resta_matrices(pred, Y)
         
-        var i = modelo["capas"].longitud() - 1
+        var i = n_capas - 1
         mientras (i >= 0) {
-            var capa = modelo["capas"][i]
+            var capa = capas[i]
             var A_prev = activaciones[i]
             
             var dW = mat.multiplicar(mat.transpuesta(A_prev), delta)
-            var db = mat.ceros(1, mat.columnas(delta))
+            var cols_delta = mat.columnas(delta)
+            var db = mat.ceros(1, cols_delta)
+            var db_fila = db[0]
             para fila_d en delta {
-                var c_idx = 0
-                mientras (c_idx < fila_d.longitud()) {
-                    db[0][c_idx] = db[0][c_idx] + fila_d[c_idx]
-                    c_idx = c_idx + 1
+                para c_idx en rango(cols_delta) {
+                    db_fila[c_idx] = db_fila[c_idx] + fila_d[c_idx]
                 }
             }
             
             si (i > 0) {
                 var error_oculto = mat.multiplicar(delta, mat.transpuesta(capa["W"]))
-                var act_prev = modelo["capas"][i-1]["act"]
+                var act_prev = capas[i-1]["act"]
                 si (act_prev == "relu") {
                     delta = hadamard(error_oculto, relu_derivada(activaciones[i]))
                 } sino_si (act_prev == "sigmoid") {
@@ -176,15 +175,13 @@ funcion error_mse(y_true, y_pred) {
     var f = mat.filas(y_true)
     var c = mat.columnas(y_true)
     var s = 0
-    var i = 0
-    mientras (i < f) {
-        var j = 0
-        mientras (j < c) {
-            var d = y_true[i][j] - y_pred[i][j]
+    para i en rango(f) {
+        var fila_t = y_true[i]
+        var fila_p = y_pred[i]
+        para j en rango(c) {
+            var d = fila_t[j] - fila_p[j]
             s = s + (d * d)
-            j = j + 1
         }
-        i = i + 1
     }
     regresa s / (f * c)
 }
