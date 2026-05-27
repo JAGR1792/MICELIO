@@ -636,6 +636,183 @@
             line-height: 1.7;
         }
 
+        /* === Trace / Step-by-step styles (5.1 & 5.2) === */
+        :root {
+            --c-in: #2563eb;
+            --c-w: #d97706;
+            --c-b: #7c3aed;
+            --c-p: #16a34a;
+            --c-e: #dc2626;
+        }
+        [data-theme="dark"] {
+            --c-in: #60a5fa;
+            --c-w: #fbbf24;
+            --c-b: #a78bfa;
+            --c-p: #4ade80;
+            --c-e: #f87171;
+        }
+        .trace-bar {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            padding: 1.5rem 2rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            margin: 2rem 0;
+            justify-content: center;
+        }
+        .trace-bar-item { text-align: center; }
+        .trace-bar-item .tb-l { font-size: .6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--fg-light); }
+        .trace-bar-item .tb-v { font-size: 1.3rem; font-weight: 800; font-family: var(--font-display); color: var(--accent-primary); }
+        .trace-bar-item .tb-v.w { color: var(--c-w); }
+        .trace-bar-item .tb-v.b { color: var(--c-b); }
+        .epoch-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .example-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all .3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .example-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        .example-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .example-card.c1::before { background: #3b82f6; }
+        .example-card.c2::before { background: #f59e0b; }
+        .example-card.c3::before { background: #8b5cf6; }
+        .example-card.c4::before { background: #10b981; }
+        .ex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: .75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .ex-row .ex-id { font-family: var(--font-display); font-weight: 700; font-size: 1rem; }
+        .ex-row .ex-ins { font-family: var(--font-mono); color: var(--c-in); font-weight: 600; font-size: .85rem; }
+        .ex-row .ex-tgt {
+            padding: .15rem .6rem;
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .ex-tgt.t0 { background: rgba(239,68,68,.12); color: var(--c-e); }
+        .ex-tgt.t1 { background: rgba(34,197,94,.12); color: var(--c-p); }
+        .ex-code {
+            font-family: var(--font-mono);
+            font-size: .82rem;
+            line-height: 1.9;
+            padding: .75rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius-sm);
+            margin-bottom: .75rem;
+        }
+        .ex-code .i { color: var(--c-in); font-weight: 600; }
+        .ex-code .w { color: var(--c-w); font-weight: 600; }
+        .ex-code .b { color: var(--c-b); font-weight: 600; }
+        .ex-code .p { color: var(--c-p); font-weight: 600; }
+        .ex-code .e { color: var(--c-e); font-weight: 600; }
+        .ex-code .n { color: var(--fg-muted); }
+        .ex-delta {
+            font-family: var(--font-mono);
+            font-size: .78rem;
+            line-height: 1.8;
+            color: var(--fg-muted);
+        }
+        .ex-delta .w { color: var(--c-w); }
+        .ex-delta .b { color: var(--c-b); }
+        .ex-delta .p { color: var(--c-p); }
+        .arch-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            font-family: var(--font-display);
+            font-weight: 700;
+            margin: 1.5rem 0;
+            font-size: 1.1rem;
+            flex-wrap: wrap;
+        }
+        .arch-line .an {
+            padding: .25rem .75rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+        .arch-line .an.act { background: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
+        .dim-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .75rem;
+            padding: 2rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .dim-block {
+            text-align: center;
+            padding: .75rem 1.25rem;
+            background: var(--bg-main);
+            border: 2px solid var(--border-medium);
+            border-radius: var(--radius-sm);
+            min-width: 70px;
+        }
+        .dim-block .ds { font-size: 1.4rem; font-weight: 800; font-family: var(--font-display); color: var(--accent-primary); }
+        .dim-block .do { font-size: .6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-light); margin-top: .25rem; }
+        .dim-arrow { font-size: 1.3rem; color: var(--fg-light); }
+        .bp-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--bg-surface);
+            border-left: 4px solid var(--accent-highlight);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 1.5rem 0;
+        }
+        .bp-step { display: flex; gap: 1rem; }
+        .bp-step .bi { font-family: var(--font-display); font-weight: 800; color: var(--accent-highlight); min-width: 1.5rem; font-size: 1.1rem; }
+        .sm-box {
+            padding: 1.25rem;
+            background: var(--bg-main);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            margin: 1rem 0;
+            font-family: var(--font-mono);
+            font-size: .82rem;
+            line-height: 2;
+        }
+        .sm-box .i { color: var(--c-in); }
+        .sm-box .p { color: var(--c-p); }
+        .sm-box .e { color: var(--c-e); }
+        .sm-box .n { color: var(--fg-muted); }
+        @media (max-width: 700px) {
+            .epoch-grid { grid-template-columns: 1fr; }
+            .dim-flow { flex-direction: column; }
+            .dim-arrow { transform: rotate(90deg); }
+        }
+
         @media (max-width: 1024px) {
             aside { display: none; }
             main {
@@ -1089,6 +1266,12 @@ flowchart TD
         <p>El par&aacute;metro <code>modelo</code> se modifica <strong>in-place</strong>: los pesos se actualizan directamente sobre la estructura del modelo, no se retorna un nuevo modelo.</p>
 
         <h3>5.1 Ejemplo paso a paso: Perceptr&oacute;n AND</h3>
+
+        <div class="img-container">
+            <img src="docs/img/and_puntos.png" alt="Compuerta AND: 4 puntos en 2D con recta de decision" loading="lazy">
+            <div class="caption">Problema AND generado con <code>grafico.mice</code>. Los puntos rojos son clase 0, el punto verde es clase 1. La recta azul separa ambas regiones.</div>
+        </div>
+
         <p>La compuerta AND es el problema m&aacute;s simple para ver c&oacute;mo aprende una neurona. Usamos una sola neurona con sigmoide:</p>
         <pre class="mice"><code>importar "ml.mice" como ml
 
@@ -1099,47 +1282,98 @@ var modelo = ml.regresion_logistica(X, Y, 0.1, 200)
 imp modelo["pesos"]
 imp modelo["sesgo"]</code></pre>
 
-        <p><strong>Paso a paso de lo que ocurre dentro de la funci&oacute;n:</strong></p>
-
-        <div class="info-note">
-            <span class="title">Iteraci&oacute;n 1 (primera &eacute;poca, primer ejemplo)</span>
+        <div class="trace-bar">
+            <div class="trace-bar-item">
+                <div class="tb-l">Pesos iniciales</div>
+                <div class="tb-v w">[0.0, 0.0]</div>
+            </div>
+            <div class="trace-bar-item">
+                <div class="tb-l">Sesgo inicial</div>
+                <div class="tb-v b">0.0</div>
+            </div>
+            <div class="trace-bar-item">
+                <div class="tb-l">Tasa aprendizaje</div>
+                <div class="tb-v">0.1</div>
+            </div>
         </div>
-        <ol>
-            <li><strong>Inicializaci&oacute;n</strong>: los pesos empiezan en <code>[0.0, 0.0]</code> y el sesgo en <code>0.0</code></li>
-            <li><strong>Primer ejemplo</strong>: X[0] = <code>[0, 0]</code>, Y[0] = <code>0</code>
-                <br>z = sesgo + w<sub>0</sub>&middot;0 + w<sub>1</sub>&middot;0 = 0
-                <br>pred = sigmoid(0) = 0.5
-                <br>error = 0.5 &minus; 0 = 0.5
-                <br>Actualizaci&oacute;n: w<sub>0</sub> = 0 &minus; 0.1&middot;0.5&middot;0 = 0
-                <br>w<sub>1</sub> = 0 &minus; 0.1&middot;0.5&middot;0 = 0
-                <br>sesgo = 0 &minus; 0.1&middot;0.5 = &minus;0.05
-            </li>
-            <li><strong>Segundo ejemplo</strong>: X[1] = <code>[0, 1]</code>, Y[1] = <code>0</code>
-                <br>z = &minus;0.05 + 0&middot;0 + 0&middot;1 = &minus;0.05
-                <br>pred = sigmoid(&minus;0.05) = 0.4875
-                <br>error = 0.4875 &minus; 0 = 0.4875
-                <br>w<sub>0</sub> = 0 &minus; 0.1&middot;0.4875&middot;0 = 0
-                <br>w<sub>1</sub> = 0 &minus; 0.1&middot;0.4875&middot;1 = &minus;0.0488
-                <br>sesgo = &minus;0.05 &minus; 0.1&middot;0.4875 = &minus;0.0988
-            </li>
-            <li><strong>Tercer ejemplo</strong>: X[2] = <code>[1, 0]</code>, Y[2] = <code>0</code>
-                <br>z = &minus;0.0988 + 0&middot;1 + (&minus;0.0488)&middot;0 = &minus;0.0988
-                <br>pred = sigmoid(&minus;0.0988) = 0.4753
-                <br>error = 0.4753 &minus; 0 = 0.4753
-                <br>w<sub>0</sub> = 0 &minus; 0.1&middot;0.4753&middot;1 = &minus;0.0475
-                <br>w<sub>1</sub> = &minus;0.0488 &minus; 0.1&middot;0.4753&middot;0 = &minus;0.0488
-                <br>sesgo = &minus;0.0988 &minus; 0.1&middot;0.4753 = &minus;0.1463
-            </li>
-            <li><strong>Cuarto ejemplo</strong>: X[3] = <code>[1, 1]</code>, Y[3] = <code>1</code>
-                <br>z = &minus;0.1463 + (&minus;0.0475)&middot;1 + (&minus;0.0488)&middot;1 = &minus;0.2426
-                <br>pred = sigmoid(&minus;0.2426) = 0.4396
-                <br>error = 0.4396 &minus; 1 = &minus;0.5604
-                <br>w<sub>0</sub> = &minus;0.0475 &minus; 0.1&middot;(&minus;0.5604)&middot;1 = 0.0085
-                <br>w<sub>1</sub> = &minus;0.0488 &minus; 0.1&middot;(&minus;0.5604)&middot;1 = 0.0072
-                <br>sesgo = &minus;0.1463 &minus; 0.1&middot;(&minus;0.5604) = &minus;0.0902
-            </li>
-        </ol>
-        <p>Esto se repite durante 200 &eacute;pocas. Los pesos se ajustan gradualmente: <strong>w<sub>0</sub></strong> y <strong>w<sub>1</sub></strong> crecen hacia valores positivos (porque cuando ambos son 1, la salida debe ser 1), mientras el sesgo se mantiene negativo (para inclinar la sigmoide hacia 0 cuando las entradas son bajas).</p>
+
+        <p><strong>&Eacute;poca 1 &mdash; ejemplo por ejemplo:</strong> cada tarjeta muestra el c&aacute;lculo completo para cada uno de los 4 ejemplos de entrenamiento.</p>
+
+        <div class="epoch-grid">
+            <div class="example-card c1">
+                <div class="ex-row">
+                    <span class="ex-id">Ej. 1</span>
+                    <span class="ex-ins">X = [0, 0]</span>
+                    <span class="ex-tgt t0">Y = 0</span>
+                </div>
+                <div class="ex-code">
+                    z = <span class="b">0</span> + <span class="w">0</span>&middot;0 + <span class="w">0</span>&middot;0 = <span class="n">0</span><br>
+                    &sigma;(z) = sigmoid(0) = <span class="p">0.5</span><br>
+                    error = <span class="p">0.5</span> &minus; 0 = <span class="e">0.5</span>
+                </div>
+                <div class="ex-delta">
+                    w&#8320; = 0 &minus; 0.1&middot;<span class="e">0.5</span>&middot;0 = <span class="n">0</span><br>
+                    w&#8321; = 0 &minus; 0.1&middot;<span class="e">0.5</span>&middot;0 = <span class="n">0</span><br>
+                    b = 0 &minus; 0.1&middot;<span class="e">0.5</span> = <span class="b">&minus;0.05</span>
+                </div>
+            </div>
+
+            <div class="example-card c2">
+                <div class="ex-row">
+                    <span class="ex-id">Ej. 2</span>
+                    <span class="ex-ins">X = [0, 1]</span>
+                    <span class="ex-tgt t0">Y = 0</span>
+                </div>
+                <div class="ex-code">
+                    z = <span class="b">&minus;0.05</span> + <span class="w">0</span>&middot;0 + <span class="w">0</span>&middot;1 = <span class="n">&minus;0.05</span><br>
+                    &sigma;(z) = sigmoid(&minus;0.05) = <span class="p">0.4875</span><br>
+                    error = <span class="p">0.4875</span> &minus; 0 = <span class="e">0.4875</span>
+                </div>
+                <div class="ex-delta">
+                    w&#8320; = 0 &minus; 0.1&middot;<span class="e">0.4875</span>&middot;0 = <span class="n">0</span><br>
+                    w&#8321; = 0 &minus; 0.1&middot;<span class="e">0.4875</span>&middot;1 = <span class="w">&minus;0.0488</span><br>
+                    b = <span class="b">&minus;0.05</span> &minus; 0.1&middot;<span class="e">0.4875</span> = <span class="b">&minus;0.0988</span>
+                </div>
+            </div>
+
+            <div class="example-card c3">
+                <div class="ex-row">
+                    <span class="ex-id">Ej. 3</span>
+                    <span class="ex-ins">X = [1, 0]</span>
+                    <span class="ex-tgt t0">Y = 0</span>
+                </div>
+                <div class="ex-code">
+                    z = <span class="b">&minus;0.0988</span> + <span class="w">0</span>&middot;1 + <span class="w">&minus;0.0488</span>&middot;0 = <span class="n">&minus;0.0988</span><br>
+                    &sigma;(z) = sigmoid(&minus;0.0988) = <span class="p">0.4753</span><br>
+                    error = <span class="p">0.4753</span> &minus; 0 = <span class="e">0.4753</span>
+                </div>
+                <div class="ex-delta">
+                    w&#8320; = 0 &minus; 0.1&middot;<span class="e">0.4753</span>&middot;1 = <span class="w">&minus;0.0475</span><br>
+                    w&#8321; = <span class="w">&minus;0.0488</span> &minus; 0.1&middot;<span class="e">0.4753</span>&middot;0 = <span class="w">&minus;0.0488</span><br>
+                    b = <span class="b">&minus;0.0988</span> &minus; 0.1&middot;<span class="e">0.4753</span> = <span class="b">&minus;0.1463</span>
+                </div>
+            </div>
+
+            <div class="example-card c4">
+                <div class="ex-row">
+                    <span class="ex-id">Ej. 4</span>
+                    <span class="ex-ins">X = [1, 1]</span>
+                    <span class="ex-tgt t1">Y = 1</span>
+                </div>
+                <div class="ex-code">
+                    z = <span class="b">&minus;0.1463</span> + <span class="w">&minus;0.0475</span>&middot;1 + <span class="w">&minus;0.0488</span>&middot;1 = <span class="n">&minus;0.2426</span><br>
+                    &sigma;(z) = sigmoid(&minus;0.2426) = <span class="p">0.4396</span><br>
+                    error = <span class="p">0.4396</span> &minus; 1 = <span class="e">&minus;0.5604</span>
+                </div>
+                <div class="ex-delta">
+                    w&#8320; = <span class="w">&minus;0.0475</span> &minus; 0.1&middot;<span class="e">&minus;0.5604</span>&middot;1 = <span class="w">0.0085</span><br>
+                    w&#8321; = <span class="w">&minus;0.0488</span> &minus; 0.1&middot;<span class="e">&minus;0.5604</span>&middot;1 = <span class="w">0.0072</span><br>
+                    b = <span class="b">&minus;0.1463</span> &minus; 0.1&middot;<span class="e">&minus;0.5604</span> = <span class="b">&minus;0.0902</span>
+                </div>
+            </div>
+        </div>
+
+        <p>Esto se repite durante 200 &eacute;pocas. Los pesos se ajustan gradualmente: <strong>w&#8320;</strong> y <strong>w&#8321;</strong> crecen hacia valores positivos (porque cuando ambos son 1, la salida debe ser 1), mientras el sesgo se mantiene negativo (para inclinar la sigmoide hacia 0 cuando las entradas son bajas).</p>
 
         <div class="result-box">
             <div class="label">Despu&eacute;s de 200 &eacute;pocas:</div>
@@ -1149,45 +1383,90 @@ imp modelo["sesgo"]</code></pre>
         </div>
 
         <h3>5.2 Paso a paso: XOR con capa oculta</h3>
-        <p>El problema XOR no es linealmente separable, as&iacute; que necesitamos una red con una capa oculta. La arquitectura es <code>[2, 4, 2]</code>: 2 entradas, 4 neuronas ocultas (ReLU), 2 salidas (softmax).</p>
 
-        <p><strong>Flujo de datos en el forward pass (primera &eacute;poca):</strong></p>
-
-        <div class="info-note">
-            <span class="title">Dimensiones paso a paso</span>
+        <div class="img-container">
+            <img src="docs/img/xor_puntos.png" alt="XOR: 4 puntos en 2D no separables linealmente" loading="lazy">
+            <div class="caption">Problema XOR generado con <code>grafico.mice</code>. Los puntos rojos (0,0) y (1,1) son clase 0; los verdes (0,1) y (1,0) son clase 1. Una sola recta no puede separarlos.</div>
         </div>
-        <ol>
-            <li><strong>Entrada X</strong>: matriz de 4&times;2 (4 ejemplos, 2 caracter&iacute;sticas)
-                <br><code>[ [0,0], [0,1], [1,0], [1,1] ]</code></li>
-            <li><strong>Capa oculta</strong>: W<sub>h</sub> es 2&times;4 (2 entradas &rarr; 4 neuronas), b<sub>h</sub> es 1&times;4
-                <br>Z = X &middot; W<sub>h</sub> + b<sub>h</sub> = [4&times;2] &middot; [2&times;4] + [1&times;4] = <strong>[4&times;4]</strong>
-                <br>A = relu(Z) &rarr; activaciones de 4 neuronas para cada uno de los 4 ejemplos</li>
-            <li><strong>Capa de salida</strong>: W<sub>o</sub> es 4&times;2, b<sub>o</sub> es 1&times;2
-                <br>Z = A &middot; W<sub>o</sub> + b<sub>o</sub> = [4&times;4] &middot; [4&times;2] + [1&times;2] = <strong>[4&times;2]</strong>
-                <br>salida = softmax(Z) &rarr; probabilidades por clase para cada ejemplo</li>
-        </ol>
 
-        <p><strong>Qu&eacute; hace la softmax:</strong> toma un vector de 2 n&uacute;meros reales (los "puntajes" de cada clase) y los convierte en probabilidades que suman 1.</p>
-        <pre><code># Para el ejemplo (0,0), los puntajes Z podrian ser:
-Z = [-1.2, 0.8]
-exps = [exp(-1.2), exp(0.8)] = [0.30, 2.23]
-suma = 0.30 + 2.23 = 2.53
-softmax = [0.30/2.53, 2.23/2.53] = [0.12, 0.88]
-# La red predice clase 1 con 88% de confianza</code></pre>
+        <p>El problema XOR no es linealmente separable, as&iacute; que necesitamos una red con una capa oculta.</p>
+
+        <div class="arch-line">
+            <span class="an act">2</span>
+            <span>&rarr;</span>
+            <span class="an act">4</span>
+            <span>&rarr;</span>
+            <span class="an act">2</span>
+            <span style="color:var(--fg-light);font-size:.85rem;font-weight:400;margin-left:1rem;">entradas &rarr; oculta (ReLU) &rarr; salida (softmax)</span>
+        </div>
+
+        <div class="dim-flow">
+            <div class="dim-block">
+                <div class="do">entrada</div>
+                <div class="ds">4&times;2</div>
+            </div>
+            <div class="dim-arrow">&rarr;</div>
+            <div class="dim-block" style="border-color:var(--accent-secondary);">
+                <div class="do">W<sub>h</sub> &middot; X + b<sub>h</sub></div>
+                <div class="ds" style="color:var(--accent-secondary);">[2&times;4]</div>
+            </div>
+            <div class="dim-arrow">&rarr;</div>
+            <div class="dim-block">
+                <div class="do">oculta (ReLU)</div>
+                <div class="ds">4&times;4</div>
+            </div>
+            <div class="dim-arrow">&rarr;</div>
+            <div class="dim-block" style="border-color:var(--accent-secondary);">
+                <div class="do">W<sub>o</sub> &middot; A + b<sub>o</sub></div>
+                <div class="ds" style="color:var(--accent-secondary);">[4&times;2]</div>
+            </div>
+            <div class="dim-arrow">&rarr;</div>
+            <div class="dim-block" style="border-color:var(--accent-highlight);">
+                <div class="do">softmax</div>
+                <div class="ds" style="color:var(--accent-highlight);">4&times;2</div>
+            </div>
+        </div>
+
+        <p><strong>Qu&eacute; hace la softmax:</strong> toma un vector de 2 n&uacute;meros reales (los &laquo;puntajes&raquo; de cada clase) y los convierte en probabilidades que suman 1.</p>
+
+        <div class="sm-box">
+            <span class="n"># Para el ejemplo (0,0), los puntajes Z podr&iacute;an ser:</span><br>
+            Z = [<span class="i">&minus;1.2</span>, <span class="i">0.8</span>]<br>
+            exp(Z) = [exp(<span class="i">&minus;1.2</span>), exp(<span class="i">0.8</span>)] = [<span class="i">0.30</span>, <span class="i">2.23</span>]<br>
+            suma = <span class="i">0.30</span> + <span class="i">2.23</span> = <span class="p">2.53</span><br>
+            softmax(Z) = [<span class="i">0.30</span>/<span class="p">2.53</span>, <span class="i">2.23</span>/<span class="p">2.53</span>] = [<span class="e">0.12</span>, <span class="p">0.88</span>]<br>
+            <span class="n"># La red predice clase 1 con 88 % de confianza</span>
+        </div>
 
         <p><strong>Flujo del backpropagation (c&oacute;mo se ajustan los pesos):</strong></p>
-        <ol>
-            <li>Se compara <code>salida</code> vs <code>Y</code> (one-hot: <code>[1,0]</code> para clase 0, <code>[0,1]</code> para clase 1)</li>
-            <li>Se calcula <code>delta = salida &minus; Y</code> &mdash; el error en la &uacute;ltima capa
-                <br>Si la salida es <code>[0.12, 0.88]</code> y la clase real es 0 (<code>[1, 0]</code>):
-                <br>delta = [0.12 &minus; 1, 0.88 &minus; 0] = <strong>[&minus;0.88, 0.88]</strong></li>
-            <li>dW<sub>o</sub> = A<sub>h</sub><sup>T</sup> &middot; delta &rarr; gradiente para la capa de salida
-                <br>W<sub>o</sub> = W<sub>o</sub> &minus; lr &middot; dW<sub>o</sub> &rarr; pesos actualizados</li>
-            <li>El error se propaga hacia atr&aacute;s: error<sub>oculto</sub> = delta &middot; W<sub>o</sub><sup>T</sup>
-                <br>delta<sub>oculta</sub> = error<sub>oculto</sub> * relu_derivada(A<sub>h</sub>)</li>
-            <li>dW<sub>h</sub> = X<sup>T</sup> &middot; delta<sub>oculta</sub>
-                <br>W<sub>h</sub> = W<sub>h</sub> &minus; lr &middot; dW<sub>h</sub></li>
-        </ol>
+
+        <div class="bp-steps">
+            <div class="bp-step">
+                <div class="bi">1</div>
+                <div>Se compara la <strong>salida</strong> con <strong>Y</strong> codificado en one-hot: clase 0 = <code>[1, 0]</code>, clase 1 = <code>[0, 1]</code></div>
+            </div>
+            <div class="bp-step">
+                <div class="bi">2</div>
+                <div>Se calcula <strong>&delta; = salida &minus; Y</strong>, el error en la &uacute;ltima capa
+                    <br>Si la salida es <code>[0.12, 0.88]</code> y la clase real es 0 (<code>[1, 0]</code>):
+                    <br><strong>&delta; = [0.12 &minus; 1, 0.88 &minus; 0] = [&minus;0.88, 0.88]</strong></div>
+            </div>
+            <div class="bp-step">
+                <div class="bi">3</div>
+                <div>dW<sub>o</sub> = A<sub>h</sub><sup>T</sup> &middot; &delta; &rarr; gradiente para la capa de salida
+                    <br>W<sub>o</sub> = W<sub>o</sub> &minus; lr &middot; dW<sub>o</sub></div>
+            </div>
+            <div class="bp-step">
+                <div class="bi">4</div>
+                <div>El error se propaga hacia atr&aacute;s: error<sub>oculto</sub> = &delta; &middot; W<sub>o</sub><sup>T</sup>
+                    <br>&delta;<sub>oculta</sub> = error<sub>oculto</sub> &middot; relu'(A<sub>h</sub>)</div>
+            </div>
+            <div class="bp-step">
+                <div class="bi">5</div>
+                <div>dW<sub>h</sub> = X<sup>T</sup> &middot; &delta;<sub>oculta</sub>
+                    <br>W<sub>h</sub> = W<sub>h</sub> &minus; lr &middot; dW<sub>h</sub></div>
+            </div>
+        </div>
 
         <div class="result-box">
             <div class="label">Despu&eacute;s de ~500 &eacute;pocas la red deber&iacute;a producir:</div>
@@ -1195,12 +1474,12 @@ softmax = [0.30/2.53, 2.23/2.53] = [0.12, 0.88]
             <div class="value">(0,1) &rarr; [~0.01, 0.99] &rarr; clase 1</div>
             <div class="value">(1,0) &rarr; [~0.01, 0.99] &rarr; clase 1</div>
             <div class="value">(1,1) &rarr; [~0.99, 0.01] &rarr; clase 0</div>
-            <div class="label">Cada valor alto (~0.99) indica 99% de confianza en la predicci&oacute;n</div>
+            <div class="label">Cada valor alto (~0.99) indica 99 % de confianza en la predicci&oacute;n</div>
         </div>
 
         <div class="info-note">
             <span class="title">Dato clave</span>
-            La capa oculta con ReLU transforma el espacio de entrada: los 4 puntos (0,0), (0,1), (1,0), (1,1) que no eran separables con una recta, se "reposicionan" en un espacio de 4 dimensiones donde s&iacute; son separables. La capa de salida aprende una recta en ese nuevo espacio. Ese es el poder de las capas ocultas.
+            La capa oculta con ReLU transforma el espacio de entrada: los 4 puntos (0,0), (0,1), (1,0), (1,1) que no eran separables con una recta, se &laquo;reposicionan&raquo; en un espacio de 4 dimensiones donde s&iacute; son separables. La capa de salida aprende una recta en ese nuevo espacio. Ese es el poder de las capas ocultas.
         </div>
     </section>
 
