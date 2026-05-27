@@ -636,181 +636,246 @@
             line-height: 1.7;
         }
 
-        /* === Trace / Step-by-step styles (5.1 & 5.2) === */
+        /* === Traza computacional (secciones 5.1 y 5.2) === */
         :root {
-            --c-in: #2563eb;
-            --c-w: #d97706;
-            --c-b: #7c3aed;
-            --c-p: #16a34a;
-            --c-e: #dc2626;
+            --crv: #2563eb;   --crv-d: #1d4ed8;
+            --cwg: #d97706;   --cwg-d: #b45309;
+            --cbs: #7c3aed;   --cbs-d: #6d28d9;
+            --cpd: #16a34a;   --cpd-d: #15803d;
+            --cer: #dc2626;   --cer-d: #b91c1c;
         }
         [data-theme="dark"] {
-            --c-in: #60a5fa;
-            --c-w: #fbbf24;
-            --c-b: #a78bfa;
-            --c-p: #4ade80;
-            --c-e: #f87171;
+            --crv: #60a5fa;   --crv-d: #93c5fd;
+            --cwg: #fbbf24;   --cwg-d: #fcd34d;
+            --cbs: #a78bfa;   --cbs-d: #c4b5fd;
+            --cpd: #4ade80;   --cpd-d: #86efac;
+            --cer: #f87171;   --cer-d: #fca5a5;
         }
-        .trace-bar {
+
+        .init-bar {
             display: flex;
-            gap: 2rem;
+            gap: 2.5rem;
+            margin: 2rem 0 1.5rem;
+            padding: 0 0 1rem;
+            border-bottom: 1px solid var(--border-light);
             flex-wrap: wrap;
-            padding: 1.5rem 2rem;
-            background: var(--bg-surface);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-light);
-            margin: 2rem 0;
-            justify-content: center;
         }
-        .trace-bar-item { text-align: center; }
-        .trace-bar-item .tb-l { font-size: .6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--fg-light); }
-        .trace-bar-item .tb-v { font-size: 1.3rem; font-weight: 800; font-family: var(--font-display); color: var(--accent-primary); }
-        .trace-bar-item .tb-v.w { color: var(--c-w); }
-        .trace-bar-item .tb-v.b { color: var(--c-b); }
-        .epoch-grid {
+        .init-bar-item { }
+        .init-bar-item .ib-l {
+            display: block;
+            font-size: .625rem;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--fg-light);
+            margin-bottom: .1rem;
+        }
+        .init-bar-item .ib-v {
+            font-family: var(--font-mono);
+            font-size: .95rem;
+            font-weight: 500;
+            color: var(--fg-main);
+        }
+        .init-bar-item .ib-v.ibw { color: var(--cwg); }
+        .init-bar-item .ib-v.ibb { color: var(--cbs); }
+
+        .notebook-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin: 2rem 0;
+            gap: 1rem;
+            margin: 1.5rem 0;
         }
-        .example-card {
-            background: var(--bg-main);
+        .notebook-card {
             border: 1px solid var(--border-light);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            transition: all .3s ease;
-            position: relative;
-            overflow: hidden;
+            border-radius: 4px;
+            padding: .875rem 1rem;
+            background: var(--bg-main);
         }
-        .example-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-3px);
-        }
-        .example-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-        }
-        .example-card.c1::before { background: #3b82f6; }
-        .example-card.c2::before { background: #f59e0b; }
-        .example-card.c3::before { background: #8b5cf6; }
-        .example-card.c4::before { background: #10b981; }
-        .ex-row {
+        .notebook-card .nc-hd {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: .75rem;
+            align-items: baseline;
+            margin-bottom: .625rem;
+            padding-bottom: .5rem;
             border-bottom: 1px solid var(--border-light);
         }
-        .ex-row .ex-id { font-family: var(--font-display); font-weight: 700; font-size: 1rem; }
-        .ex-row .ex-ins { font-family: var(--font-mono); color: var(--c-in); font-weight: 600; font-size: .85rem; }
-        .ex-row .ex-tgt {
-            padding: .15rem .6rem;
-            border-radius: 20px;
-            font-size: .7rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .ex-tgt.t0 { background: rgba(239,68,68,.12); color: var(--c-e); }
-        .ex-tgt.t1 { background: rgba(34,197,94,.12); color: var(--c-p); }
-        .ex-code {
+        .notebook-card .nc-hd .nc-ref {
             font-family: var(--font-mono);
-            font-size: .82rem;
-            line-height: 1.9;
-            padding: .75rem;
-            background: var(--bg-surface);
-            border-radius: var(--radius-sm);
-            margin-bottom: .75rem;
+            font-size: .65rem;
+            font-weight: 600;
+            letter-spacing: .02em;
+            color: var(--fg-light);
         }
-        .ex-code .i { color: var(--c-in); font-weight: 600; }
-        .ex-code .w { color: var(--c-w); font-weight: 600; }
-        .ex-code .b { color: var(--c-b); font-weight: 600; }
-        .ex-code .p { color: var(--c-p); font-weight: 600; }
-        .ex-code .e { color: var(--c-e); font-weight: 600; }
-        .ex-code .n { color: var(--fg-muted); }
-        .ex-delta {
+        .notebook-card .nc-hd .nc-xy {
+            font-family: var(--font-mono);
+            font-size: .8rem;
+            font-weight: 500;
+            color: var(--crv);
+        }
+        .notebook-card .nc-hd .nc-tgt {
+            font-family: var(--font-mono);
+            font-size: .7rem;
+            font-weight: 600;
+            padding: .08rem .45rem;
+            border-radius: 3px;
+        }
+        .nc-tgt.t0 { background: color-mix(in srgb, var(--cer) 15%, transparent); color: var(--cer); }
+        .nc-tgt.t1 { background: color-mix(in srgb, var(--cpd) 15%, transparent); color: var(--cpd); }
+
+        .nc-eq {
             font-family: var(--font-mono);
             font-size: .78rem;
-            line-height: 1.8;
+            line-height: 1.85;
+            padding: .625rem;
+            background: var(--bg-surface);
+            border-radius: 3px;
+            margin-bottom: .5rem;
+            tab-size: 2;
+        }
+        .nc-eq .iv { color: var(--crv); font-weight: 500; }
+        .nc-eq .wv { color: var(--cwg); font-weight: 500; }
+        .nc-eq .bv { color: var(--cbs); font-weight: 500; }
+        .nc-eq .pv { color: var(--cpd); font-weight: 500; }
+        .nc-eq .ev { color: var(--cer); font-weight: 500; }
+        .nc-eq .nv { color: var(--fg-muted); }
+
+        .nc-up {
+            font-family: var(--font-mono);
+            font-size: .73rem;
+            line-height: 1.75;
             color: var(--fg-muted);
         }
-        .ex-delta .w { color: var(--c-w); }
-        .ex-delta .b { color: var(--c-b); }
-        .ex-delta .p { color: var(--c-p); }
-        .arch-line {
+        .nc-up .wv { color: var(--cwg); }
+        .nc-up .bv { color: var(--cbs); }
+        .nc-up .pv { color: var(--cpd); }
+
+        .arch-bar {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: .5rem;
             font-family: var(--font-display);
-            font-weight: 700;
+            font-weight: 600;
             margin: 1.5rem 0;
-            font-size: 1.1rem;
+            font-size: 1rem;
             flex-wrap: wrap;
         }
-        .arch-line .an {
-            padding: .25rem .75rem;
+        .arch-bar .ab {
+            padding: .2rem .6rem;
             background: var(--bg-surface);
-            border-radius: var(--radius-sm);
+            border-radius: 4px;
             border: 1px solid var(--border-light);
         }
-        .arch-line .an.act { background: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
+        .arch-bar .ab.on {
+            background: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+            border-color: color-mix(in srgb, var(--accent-primary) 30%, transparent);
+        }
+        .arch-bar .ab-label {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: .8rem;
+            color: var(--fg-light);
+        }
+
         .dim-flow {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: .75rem;
-            padding: 2rem;
+            gap: .625rem;
+            padding: 1.25rem;
             background: var(--bg-surface);
-            border-radius: var(--radius);
+            border-radius: 6px;
             border: 1px solid var(--border-light);
-            margin: 2rem 0;
+            margin: 1.5rem 0;
             flex-wrap: wrap;
         }
-        .dim-block {
+        .dim-node {
             text-align: center;
-            padding: .75rem 1.25rem;
-            background: var(--bg-main);
-            border: 2px solid var(--border-medium);
-            border-radius: var(--radius-sm);
-            min-width: 70px;
+            min-width: 64px;
         }
-        .dim-block .ds { font-size: 1.4rem; font-weight: 800; font-family: var(--font-display); color: var(--accent-primary); }
-        .dim-block .do { font-size: .6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-light); margin-top: .25rem; }
-        .dim-arrow { font-size: 1.3rem; color: var(--fg-light); }
-        .bp-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1.5rem;
+        .dim-node .dn-sz {
+            display: block;
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--fg-main);
+            line-height: 1.2;
+        }
+        .dim-node .dn-op {
+            font-size: .55rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--fg-light);
+        }
+        .dim-arrow {
+            font-size: 1.1rem;
+            color: var(--fg-light);
+            font-weight: 300;
+            user-select: none;
+        }
+
+        .sm-box {
+            padding: 1rem;
             background: var(--bg-surface);
-            border-left: 4px solid var(--accent-highlight);
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            border-radius: 4px;
+            margin: 1.25rem 0;
+            font-family: var(--font-mono);
+            font-size: .78rem;
+            line-height: 1.9;
+        }
+        .sm-box .iv { color: var(--crv); }
+        .sm-box .pv { color: var(--cpd); }
+        .sm-box .ev { color: var(--cer); }
+        .sm-box .nv { color: var(--fg-muted); }
+
+        .bp-flow {
             margin: 1.5rem 0;
         }
-        .bp-step { display: flex; gap: 1rem; }
-        .bp-step .bi { font-family: var(--font-display); font-weight: 800; color: var(--accent-highlight); min-width: 1.5rem; font-size: 1.1rem; }
-        .sm-box {
-            padding: 1.25rem;
-            background: var(--bg-main);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-sm);
-            margin: 1rem 0;
-            font-family: var(--font-mono);
-            font-size: .82rem;
-            line-height: 2;
+        .bp-step {
+            display: flex;
+            gap: .75rem;
+            padding: .625rem 0;
+            border-bottom: 1px solid var(--border-light);
         }
-        .sm-box .i { color: var(--c-in); }
-        .sm-box .p { color: var(--c-p); }
-        .sm-box .e { color: var(--c-e); }
-        .sm-box .n { color: var(--fg-muted); }
+        .bp-step:last-child { border-bottom: none; }
+        .bp-step .bp-n {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: .75rem;
+            color: var(--fg-light);
+            min-width: 1.25rem;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .bp-step .bp-t {
+            font-size: .92rem;
+            line-height: 1.55;
+            color: var(--fg-main);
+        }
+        .bp-step .bp-t code {
+            font-size: .82em;
+        }
+
+        .key-note {
+            margin: 2rem 0;
+            padding: 1rem 1.25rem;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            background: var(--bg-surface);
+        }
+        .key-note .kn-hd {
+            display: block;
+            font-size: .6rem;
+            font-weight: 600;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--fg-light);
+            margin-bottom: .35rem;
+        }
+
         @media (max-width: 700px) {
-            .epoch-grid { grid-template-columns: 1fr; }
-            .dim-flow { flex-direction: column; }
-            .dim-arrow { transform: rotate(90deg); }
+            .notebook-grid { grid-template-columns: 1fr; }
+            .dim-flow { gap: .375rem; }
         }
 
         @media (max-width: 1024px) {
@@ -1269,7 +1334,7 @@ flowchart TD
 
         <div class="img-container">
             <img src="docs/img/and_puntos.png" alt="Compuerta AND: 4 puntos en 2D con recta de decision" loading="lazy">
-            <div class="caption">Problema AND generado con <code>grafico.mice</code>. Los puntos rojos son clase 0, el punto verde es clase 1. La recta azul separa ambas regiones.</div>
+            <div class="caption">Problema AND generado con <code>grafico.mice</code> (estilo <em>retro</em>). Los puntos rojos son clase 0, el punto verde es clase 1. La recta de decisi&oacute;n separa ambas regiones.</div>
         </div>
 
         <p>La compuerta AND es el problema m&aacute;s simple para ver c&oacute;mo aprende una neurona. Usamos una sola neurona con sigmoide:</p>
@@ -1282,93 +1347,93 @@ var modelo = ml.regresion_logistica(X, Y, 0.1, 200)
 imp modelo["pesos"]
 imp modelo["sesgo"]</code></pre>
 
-        <div class="trace-bar">
-            <div class="trace-bar-item">
-                <div class="tb-l">Pesos iniciales</div>
-                <div class="tb-v w">[0.0, 0.0]</div>
+        <div class="init-bar">
+            <div class="init-bar-item">
+                <div class="ib-l">Pesos iniciales</div>
+                <div class="ib-v ibw">[0.0, 0.0]</div>
             </div>
-            <div class="trace-bar-item">
-                <div class="tb-l">Sesgo inicial</div>
-                <div class="tb-v b">0.0</div>
+            <div class="init-bar-item">
+                <div class="ib-l">Sesgo inicial</div>
+                <div class="ib-v ibb">0.0</div>
             </div>
-            <div class="trace-bar-item">
-                <div class="tb-l">Tasa aprendizaje</div>
-                <div class="tb-v">0.1</div>
+            <div class="init-bar-item">
+                <div class="ib-l">Tasa aprendizaje</div>
+                <div class="ib-v">0.1</div>
             </div>
         </div>
 
         <p><strong>&Eacute;poca 1 &mdash; ejemplo por ejemplo:</strong> cada tarjeta muestra el c&aacute;lculo completo para cada uno de los 4 ejemplos de entrenamiento.</p>
 
-        <div class="epoch-grid">
-            <div class="example-card c1">
-                <div class="ex-row">
-                    <span class="ex-id">Ej. 1</span>
-                    <span class="ex-ins">X = [0, 0]</span>
-                    <span class="ex-tgt t0">Y = 0</span>
+        <div class="notebook-grid">
+            <div class="notebook-card">
+                <div class="nc-hd">
+                    <span class="nc-ref">Ej. 1</span>
+                    <span class="nc-xy">X = [0, 0]</span>
+                    <span class="nc-tgt t0">Y = 0</span>
                 </div>
-                <div class="ex-code">
-                    z = <span class="b">0</span> + <span class="w">0</span>&middot;0 + <span class="w">0</span>&middot;0 = <span class="n">0</span><br>
-                    &sigma;(z) = sigmoid(0) = <span class="p">0.5</span><br>
-                    error = <span class="p">0.5</span> &minus; 0 = <span class="e">0.5</span>
+                <div class="nc-eq">
+                    z = <span class="bv">0</span> + <span class="wv">0</span>&middot;0 + <span class="wv">0</span>&middot;0 = <span class="nv">0</span><br>
+                    &sigma;(z) = sigmoid(0) = <span class="pv">0.5</span><br>
+                    error = <span class="pv">0.5</span> &minus; 0 = <span class="ev">0.5</span>
                 </div>
-                <div class="ex-delta">
-                    w&#8320; = 0 &minus; 0.1&middot;<span class="e">0.5</span>&middot;0 = <span class="n">0</span><br>
-                    w&#8321; = 0 &minus; 0.1&middot;<span class="e">0.5</span>&middot;0 = <span class="n">0</span><br>
-                    b = 0 &minus; 0.1&middot;<span class="e">0.5</span> = <span class="b">&minus;0.05</span>
-                </div>
-            </div>
-
-            <div class="example-card c2">
-                <div class="ex-row">
-                    <span class="ex-id">Ej. 2</span>
-                    <span class="ex-ins">X = [0, 1]</span>
-                    <span class="ex-tgt t0">Y = 0</span>
-                </div>
-                <div class="ex-code">
-                    z = <span class="b">&minus;0.05</span> + <span class="w">0</span>&middot;0 + <span class="w">0</span>&middot;1 = <span class="n">&minus;0.05</span><br>
-                    &sigma;(z) = sigmoid(&minus;0.05) = <span class="p">0.4875</span><br>
-                    error = <span class="p">0.4875</span> &minus; 0 = <span class="e">0.4875</span>
-                </div>
-                <div class="ex-delta">
-                    w&#8320; = 0 &minus; 0.1&middot;<span class="e">0.4875</span>&middot;0 = <span class="n">0</span><br>
-                    w&#8321; = 0 &minus; 0.1&middot;<span class="e">0.4875</span>&middot;1 = <span class="w">&minus;0.0488</span><br>
-                    b = <span class="b">&minus;0.05</span> &minus; 0.1&middot;<span class="e">0.4875</span> = <span class="b">&minus;0.0988</span>
+                <div class="nc-up">
+                    w&#8320; = 0 &minus; 0.1&middot;<span class="ev">0.5</span>&middot;0 = <span class="nv">0</span><br>
+                    w&#8321; = 0 &minus; 0.1&middot;<span class="ev">0.5</span>&middot;0 = <span class="nv">0</span><br>
+                    b = 0 &minus; 0.1&middot;<span class="ev">0.5</span> = <span class="bv">&minus;0.05</span>
                 </div>
             </div>
 
-            <div class="example-card c3">
-                <div class="ex-row">
-                    <span class="ex-id">Ej. 3</span>
-                    <span class="ex-ins">X = [1, 0]</span>
-                    <span class="ex-tgt t0">Y = 0</span>
+            <div class="notebook-card">
+                <div class="nc-hd">
+                    <span class="nc-ref">Ej. 2</span>
+                    <span class="nc-xy">X = [0, 1]</span>
+                    <span class="nc-tgt t0">Y = 0</span>
                 </div>
-                <div class="ex-code">
-                    z = <span class="b">&minus;0.0988</span> + <span class="w">0</span>&middot;1 + <span class="w">&minus;0.0488</span>&middot;0 = <span class="n">&minus;0.0988</span><br>
-                    &sigma;(z) = sigmoid(&minus;0.0988) = <span class="p">0.4753</span><br>
-                    error = <span class="p">0.4753</span> &minus; 0 = <span class="e">0.4753</span>
+                <div class="nc-eq">
+                    z = <span class="bv">&minus;0.05</span> + <span class="wv">0</span>&middot;0 + <span class="wv">0</span>&middot;1 = <span class="nv">&minus;0.05</span><br>
+                    &sigma;(z) = sigmoid(&minus;0.05) = <span class="pv">0.4875</span><br>
+                    error = <span class="pv">0.4875</span> &minus; 0 = <span class="ev">0.4875</span>
                 </div>
-                <div class="ex-delta">
-                    w&#8320; = 0 &minus; 0.1&middot;<span class="e">0.4753</span>&middot;1 = <span class="w">&minus;0.0475</span><br>
-                    w&#8321; = <span class="w">&minus;0.0488</span> &minus; 0.1&middot;<span class="e">0.4753</span>&middot;0 = <span class="w">&minus;0.0488</span><br>
-                    b = <span class="b">&minus;0.0988</span> &minus; 0.1&middot;<span class="e">0.4753</span> = <span class="b">&minus;0.1463</span>
+                <div class="nc-up">
+                    w&#8320; = 0 &minus; 0.1&middot;<span class="ev">0.4875</span>&middot;0 = <span class="nv">0</span><br>
+                    w&#8321; = 0 &minus; 0.1&middot;<span class="ev">0.4875</span>&middot;1 = <span class="wv">&minus;0.0488</span><br>
+                    b = <span class="bv">&minus;0.05</span> &minus; 0.1&middot;<span class="ev">0.4875</span> = <span class="bv">&minus;0.0988</span>
                 </div>
             </div>
 
-            <div class="example-card c4">
-                <div class="ex-row">
-                    <span class="ex-id">Ej. 4</span>
-                    <span class="ex-ins">X = [1, 1]</span>
-                    <span class="ex-tgt t1">Y = 1</span>
+            <div class="notebook-card">
+                <div class="nc-hd">
+                    <span class="nc-ref">Ej. 3</span>
+                    <span class="nc-xy">X = [1, 0]</span>
+                    <span class="nc-tgt t0">Y = 0</span>
                 </div>
-                <div class="ex-code">
-                    z = <span class="b">&minus;0.1463</span> + <span class="w">&minus;0.0475</span>&middot;1 + <span class="w">&minus;0.0488</span>&middot;1 = <span class="n">&minus;0.2426</span><br>
-                    &sigma;(z) = sigmoid(&minus;0.2426) = <span class="p">0.4396</span><br>
-                    error = <span class="p">0.4396</span> &minus; 1 = <span class="e">&minus;0.5604</span>
+                <div class="nc-eq">
+                    z = <span class="bv">&minus;0.0988</span> + <span class="wv">0</span>&middot;1 + <span class="wv">&minus;0.0488</span>&middot;0 = <span class="nv">&minus;0.0988</span><br>
+                    &sigma;(z) = sigmoid(&minus;0.0988) = <span class="pv">0.4753</span><br>
+                    error = <span class="pv">0.4753</span> &minus; 0 = <span class="ev">0.4753</span>
                 </div>
-                <div class="ex-delta">
-                    w&#8320; = <span class="w">&minus;0.0475</span> &minus; 0.1&middot;<span class="e">&minus;0.5604</span>&middot;1 = <span class="w">0.0085</span><br>
-                    w&#8321; = <span class="w">&minus;0.0488</span> &minus; 0.1&middot;<span class="e">&minus;0.5604</span>&middot;1 = <span class="w">0.0072</span><br>
-                    b = <span class="b">&minus;0.1463</span> &minus; 0.1&middot;<span class="e">&minus;0.5604</span> = <span class="b">&minus;0.0902</span>
+                <div class="nc-up">
+                    w&#8320; = 0 &minus; 0.1&middot;<span class="ev">0.4753</span>&middot;1 = <span class="wv">&minus;0.0475</span><br>
+                    w&#8321; = <span class="wv">&minus;0.0488</span> &minus; 0.1&middot;<span class="ev">0.4753</span>&middot;0 = <span class="wv">&minus;0.0488</span><br>
+                    b = <span class="bv">&minus;0.0988</span> &minus; 0.1&middot;<span class="ev">0.4753</span> = <span class="bv">&minus;0.1463</span>
+                </div>
+            </div>
+
+            <div class="notebook-card">
+                <div class="nc-hd">
+                    <span class="nc-ref">Ej. 4</span>
+                    <span class="nc-xy">X = [1, 1]</span>
+                    <span class="nc-tgt t1">Y = 1</span>
+                </div>
+                <div class="nc-eq">
+                    z = <span class="bv">&minus;0.1463</span> + <span class="wv">&minus;0.0475</span>&middot;1 + <span class="wv">&minus;0.0488</span>&middot;1 = <span class="nv">&minus;0.2426</span><br>
+                    &sigma;(z) = sigmoid(&minus;0.2426) = <span class="pv">0.4396</span><br>
+                    error = <span class="pv">0.4396</span> &minus; 1 = <span class="ev">&minus;0.5604</span>
+                </div>
+                <div class="nc-up">
+                    w&#8320; = <span class="wv">&minus;0.0475</span> &minus; 0.1&middot;<span class="ev">&minus;0.5604</span>&middot;1 = <span class="wv">0.0085</span><br>
+                    w&#8321; = <span class="wv">&minus;0.0488</span> &minus; 0.1&middot;<span class="ev">&minus;0.5604</span>&middot;1 = <span class="wv">0.0072</span><br>
+                    b = <span class="bv">&minus;0.1463</span> &minus; 0.1&middot;<span class="ev">&minus;0.5604</span> = <span class="bv">&minus;0.0902</span>
                 </div>
             </div>
         </div>
@@ -1386,83 +1451,83 @@ imp modelo["sesgo"]</code></pre>
 
         <div class="img-container">
             <img src="docs/img/xor_puntos.png" alt="XOR: 4 puntos en 2D no separables linealmente" loading="lazy">
-            <div class="caption">Problema XOR generado con <code>grafico.mice</code>. Los puntos rojos (0,0) y (1,1) son clase 0; los verdes (0,1) y (1,0) son clase 1. Una sola recta no puede separarlos.</div>
+            <div class="caption">Problema XOR generado con <code>grafico.mice</code> (estilo <em>ocean</em>). Los puntos verdeazulados (0,0) y (1,1) son clase 0; los coral (0,1) y (1,0) son clase 1. Una sola recta no puede separarlos.</div>
         </div>
 
         <p>El problema XOR no es linealmente separable, as&iacute; que necesitamos una red con una capa oculta.</p>
 
-        <div class="arch-line">
-            <span class="an act">2</span>
+        <div class="arch-bar">
+            <span class="ab on">2</span>
             <span>&rarr;</span>
-            <span class="an act">4</span>
+            <span class="ab on">4</span>
             <span>&rarr;</span>
-            <span class="an act">2</span>
-            <span style="color:var(--fg-light);font-size:.85rem;font-weight:400;margin-left:1rem;">entradas &rarr; oculta (ReLU) &rarr; salida (softmax)</span>
+            <span class="ab on">2</span>
+            <span class="ab-label">entradas &rarr; oculta (ReLU) &rarr; salida (softmax)</span>
         </div>
 
         <div class="dim-flow">
-            <div class="dim-block">
-                <div class="do">entrada</div>
-                <div class="ds">4&times;2</div>
+            <div class="dim-node">
+                <div class="dn-op">entrada</div>
+                <div class="dn-sz">4&times;2</div>
             </div>
             <div class="dim-arrow">&rarr;</div>
-            <div class="dim-block" style="border-color:var(--accent-secondary);">
-                <div class="do">W<sub>h</sub> &middot; X + b<sub>h</sub></div>
-                <div class="ds" style="color:var(--accent-secondary);">[2&times;4]</div>
+            <div class="dim-node">
+                <div class="dn-op">W<sub>h</sub> &middot; X + b<sub>h</sub></div>
+                <div class="dn-sz">[2&times;4]</div>
             </div>
             <div class="dim-arrow">&rarr;</div>
-            <div class="dim-block">
-                <div class="do">oculta (ReLU)</div>
-                <div class="ds">4&times;4</div>
+            <div class="dim-node">
+                <div class="dn-op">oculta (ReLU)</div>
+                <div class="dn-sz">4&times;4</div>
             </div>
             <div class="dim-arrow">&rarr;</div>
-            <div class="dim-block" style="border-color:var(--accent-secondary);">
-                <div class="do">W<sub>o</sub> &middot; A + b<sub>o</sub></div>
-                <div class="ds" style="color:var(--accent-secondary);">[4&times;2]</div>
+            <div class="dim-node">
+                <div class="dn-op">W<sub>o</sub> &middot; A + b<sub>o</sub></div>
+                <div class="dn-sz">[4&times;2]</div>
             </div>
             <div class="dim-arrow">&rarr;</div>
-            <div class="dim-block" style="border-color:var(--accent-highlight);">
-                <div class="do">softmax</div>
-                <div class="ds" style="color:var(--accent-highlight);">4&times;2</div>
+            <div class="dim-node">
+                <div class="dn-op">softmax</div>
+                <div class="dn-sz">4&times;2</div>
             </div>
         </div>
 
         <p><strong>Qu&eacute; hace la softmax:</strong> toma un vector de 2 n&uacute;meros reales (los &laquo;puntajes&raquo; de cada clase) y los convierte en probabilidades que suman 1.</p>
 
         <div class="sm-box">
-            <span class="n"># Para el ejemplo (0,0), los puntajes Z podr&iacute;an ser:</span><br>
-            Z = [<span class="i">&minus;1.2</span>, <span class="i">0.8</span>]<br>
-            exp(Z) = [exp(<span class="i">&minus;1.2</span>), exp(<span class="i">0.8</span>)] = [<span class="i">0.30</span>, <span class="i">2.23</span>]<br>
-            suma = <span class="i">0.30</span> + <span class="i">2.23</span> = <span class="p">2.53</span><br>
-            softmax(Z) = [<span class="i">0.30</span>/<span class="p">2.53</span>, <span class="i">2.23</span>/<span class="p">2.53</span>] = [<span class="e">0.12</span>, <span class="p">0.88</span>]<br>
-            <span class="n"># La red predice clase 1 con 88 % de confianza</span>
+            <span class="nv"># Para el ejemplo (0,0), los puntajes Z podr&iacute;an ser:</span><br>
+            Z = [<span class="iv">&minus;1.2</span>, <span class="iv">0.8</span>]<br>
+            exp(Z) = [exp(<span class="iv">&minus;1.2</span>), exp(<span class="iv">0.8</span>)] = [<span class="iv">0.30</span>, <span class="iv">2.23</span>]<br>
+            suma = <span class="iv">0.30</span> + <span class="iv">2.23</span> = <span class="pv">2.53</span><br>
+            softmax(Z) = [<span class="iv">0.30</span>/<span class="pv">2.53</span>, <span class="iv">2.23</span>/<span class="pv">2.53</span>] = [<span class="ev">0.12</span>, <span class="pv">0.88</span>]<br>
+            <span class="nv"># La red predice clase 1 con 88 % de confianza</span>
         </div>
 
         <p><strong>Flujo del backpropagation (c&oacute;mo se ajustan los pesos):</strong></p>
 
-        <div class="bp-steps">
+        <div class="bp-flow">
             <div class="bp-step">
-                <div class="bi">1</div>
+                <div class="bp-n">1</div>
                 <div>Se compara la <strong>salida</strong> con <strong>Y</strong> codificado en one-hot: clase 0 = <code>[1, 0]</code>, clase 1 = <code>[0, 1]</code></div>
             </div>
             <div class="bp-step">
-                <div class="bi">2</div>
+                <div class="bp-n">2</div>
                 <div>Se calcula <strong>&delta; = salida &minus; Y</strong>, el error en la &uacute;ltima capa
                     <br>Si la salida es <code>[0.12, 0.88]</code> y la clase real es 0 (<code>[1, 0]</code>):
                     <br><strong>&delta; = [0.12 &minus; 1, 0.88 &minus; 0] = [&minus;0.88, 0.88]</strong></div>
             </div>
             <div class="bp-step">
-                <div class="bi">3</div>
+                <div class="bp-n">3</div>
                 <div>dW<sub>o</sub> = A<sub>h</sub><sup>T</sup> &middot; &delta; &rarr; gradiente para la capa de salida
                     <br>W<sub>o</sub> = W<sub>o</sub> &minus; lr &middot; dW<sub>o</sub></div>
             </div>
             <div class="bp-step">
-                <div class="bi">4</div>
+                <div class="bp-n">4</div>
                 <div>El error se propaga hacia atr&aacute;s: error<sub>oculto</sub> = &delta; &middot; W<sub>o</sub><sup>T</sup>
                     <br>&delta;<sub>oculta</sub> = error<sub>oculto</sub> &middot; relu'(A<sub>h</sub>)</div>
             </div>
             <div class="bp-step">
-                <div class="bi">5</div>
+                <div class="bp-n">5</div>
                 <div>dW<sub>h</sub> = X<sup>T</sup> &middot; &delta;<sub>oculta</sub>
                     <br>W<sub>h</sub> = W<sub>h</sub> &minus; lr &middot; dW<sub>h</sub></div>
             </div>
@@ -1477,8 +1542,8 @@ imp modelo["sesgo"]</code></pre>
             <div class="label">Cada valor alto (~0.99) indica 99 % de confianza en la predicci&oacute;n</div>
         </div>
 
-        <div class="info-note">
-            <span class="title">Dato clave</span>
+        <div class="key-note">
+            <span class="kn-hd">Dato clave</span>
             La capa oculta con ReLU transforma el espacio de entrada: los 4 puntos (0,0), (0,1), (1,0), (1,1) que no eran separables con una recta, se &laquo;reposicionan&raquo; en un espacio de 4 dimensiones donde s&iacute; son separables. La capa de salida aprende una recta en ese nuevo espacio. Ese es el poder de las capas ocultas.
         </div>
     </section>
