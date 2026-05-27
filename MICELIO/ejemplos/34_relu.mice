@@ -1,0 +1,58 @@
+importar "../modulos_std/grafico.mice" como g
+
+funcion relu(x) {
+    si (x > 0) { regresa x }
+    regresa 0
+}
+
+funcion relu_derivada(x) {
+    si (x > 0) { regresa 1 }
+    regresa 0
+}
+
+imp "=== ReLU (Rectified Linear Unit) ==="
+imp "f(x) = max(0, x)"
+imp "Rango: [0, +inf)"
+imp ""
+
+imp "Tabla de valores:"
+var xs = [-5, -2, -1, 0, 0.5, 1, 3, 10]
+var i = 0
+mientras (i < xs.longitud()) {
+    var x = xs[i]
+    imp "  x=" + aTexto(x) + "  relu=" + aTexto(relu(x))
+    i = i + 1
+}
+
+imp ""
+imp "Graficando ReLU..."
+
+var gx = []
+var gy = []
+var dgx = []
+var dgy = []
+i = 0
+mientras (i < 200) {
+    var x = -5 + (i * 15 / 199)
+    gx.agregar(x)
+    gy.agregar(relu(x))
+    dgx.agregar(x)
+    dgy.agregar(relu_derivada(x))
+    i = i + 1
+}
+
+g.estilo("claro")
+g.iniciar_grafico(-5, 10, -0.5, 10.5)
+g.titulo("ReLU y su derivada")
+g.etiquetas("x", "f(x)")
+
+g.color_linea(220, 160, 30)
+g.linea_sobre_grafico(gx, gy)
+g.texto(400, 70, "ReLU", 220, 160, 30)
+
+g.color_linea(100, 180, 100)
+g.linea_sobre_grafico(dgx, dgy)
+g.texto(500, 150, "Derivada", 100, 180, 100)
+
+g.guardar("ejemplos/graficos/relu.png")
+imp "Guardado: graficos/relu.png"

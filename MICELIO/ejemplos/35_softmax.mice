@@ -1,0 +1,66 @@
+importar "../modulos_std/dl.mice" como dl
+
+funcion softmax_manual(vector) {
+    var max = vector[0]
+    var i = 1
+    mientras (i < vector.longitud()) {
+        si (vector[i] > max) { max = vector[i] }
+        i = i + 1
+    }
+    var exps = []
+    var suma = 0
+    i = 0
+    mientras (i < vector.longitud()) {
+        var e = exp(vector[i] - max)
+        exps.agregar(e)
+        suma = suma + e
+        i = i + 1
+    }
+    var probs = []
+    i = 0
+    mientras (i < exps.longitud()) {
+        probs.agregar(exps[i] / suma)
+        i = i + 1
+    }
+    regresa probs
+}
+
+imp "=== SOFTMAX ==="
+imp "Convierte logits (puntajes) en probabilidades que suman 1"
+imp ""
+
+var casos = [
+    [[-1.2, 0.8], "logits tipicos"],
+    [[2.0, 1.0, 0.1], "3 clases"],
+    [[5.0, 5.0, 5.0], "todos iguales"],
+    [[-10, -10, 20], "una clase domina"],
+    [[0.1, 0.2, 0.3, 0.4], "4 clases similares"]
+]
+
+var c = 0
+mientras (c < casos.longitud()) {
+    var logits = casos[c][0]
+    var desc = casos[c][1]
+    var probs = softmax_manual(logits)
+    var suma = 0
+    var i = 0
+    mientras (i < probs.longitud()) {
+        suma = suma + probs[i]
+        i = i + 1
+    }
+    imp "Caso: " + desc
+    imp "  Logits:      " + aTexto(logits)
+    imp "  Probabilidades: " + aTexto(probs)
+    imp "  Suma: " + aTexto(suma)
+    imp ""
+    c = c + 1
+}
+
+imp "=== Softmax con dl.mice ==="
+var matriz_logits = [[-1.2, 0.8], [3.0, -1.0], [0.0, 0.0]]
+imp "Entrada (3 ejemplos, 2 clases c/u):"
+imp "  " + aTexto(matriz_logits)
+imp ""
+var probas = dl.softmax(matriz_logits)
+imp "Salida (probabilidades que suman 1 por fila):"
+imp "  " + aTexto(probas)

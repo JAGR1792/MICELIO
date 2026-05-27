@@ -1,0 +1,66 @@
+importar "../modulos_std/grafico.mice" como g
+
+funcion sigmoide(x) {
+    regresa 1 / (1 + exp(-x))
+}
+
+funcion sigmoide_derivada(x) {
+    var s = sigmoide(x)
+    regresa s * (1 - s)
+}
+
+imp "=== SIGMOIDE ==="
+imp "f(x) = 1 / (1 + e^(-x))"
+imp "Rango: (0, 1)"
+imp ""
+
+imp "Tabla de valores:"
+var xs = [-5, -3, -1, 0, 1, 3, 5]
+var i = 0
+mientras (i < xs.longitud()) {
+    var x = xs[i]
+    imp "  x=" + aTexto(x) + "  sigmoid=" + aTexto(sigmoide(x)) + "  derivada=" + aTexto(sigmoide_derivada(x))
+    i = i + 1
+}
+
+imp ""
+imp "Graficando sigmoide..."
+
+var pts = []
+var dpts = []
+i = 0
+mientras (i < 200) {
+    var x = -8 + (i * 16 / 199)
+    pts.agregar([x, sigmoide(x)])
+    dpts.agregar([x, sigmoide_derivada(x)])
+    i = i + 1
+}
+
+var gx = []
+var gy = []
+var dgx = []
+var dgy = []
+i = 0
+mientras (i < pts.longitud()) {
+    gx.agregar(pts[i][0])
+    gy.agregar(pts[i][1])
+    dgx.agregar(dpts[i][0])
+    dgy.agregar(dpts[i][1])
+    i = i + 1
+}
+
+g.estilo("claro")
+g.iniciar_grafico(-8, 8, -0.2, 1.2)
+g.titulo("Sigmoide y su derivada")
+g.etiquetas("x", "f(x)")
+
+g.color_linea(46, 130, 200)
+g.linea_sobre_grafico(gx, gy)
+g.texto(50, 70, "Sigmoide", 46, 130, 200)
+
+g.color_linea(200, 80, 80)
+g.linea_sobre_grafico(dgx, dgy)
+g.texto(400, 70, "Derivada", 200, 80, 80)
+
+g.guardar("ejemplos/graficos/sigmoid.png")
+imp "Guardado: graficos/sigmoid.png"

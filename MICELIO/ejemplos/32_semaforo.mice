@@ -1,0 +1,24 @@
+importar "../modulos_std/dl.mice" como dl
+importar "../modulos_std/math.mice" como math
+
+# Datos: semaforo → accion
+# verde (1) → pasar (1)
+# rojo  (0) → no pasar (0)
+var X = [[1], [0]]
+var Y = [[1], [0]]
+
+var arq = [{"in": 1, "out": 1, "act": "sigmoid"}]
+var modelo = dl.perceptron_multicapa(arq)
+
+dl.entrenar_red(modelo, X, Y, 1000, 0.2)
+
+imp "Semaforo verde (1):"
+var res = dl.forward(modelo, [[1]])
+imp "  Pasar:   " + aTexto(res["salida"][0][0])
+imp "  Esperado: 1.0"
+
+imp ""
+imp "Semaforo rojo (0):"
+res = dl.forward(modelo, [[0]])
+imp "  No pasar: " + aTexto(res["salida"][0][0])
+imp "  Esperado: 0.0"

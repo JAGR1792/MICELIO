@@ -1,0 +1,56 @@
+# Comparar arquitecturas de red en XOR
+importar "../modulos_std/dl.mice" como dl
+importar "../modulos_std/matriz.mice" como mat
+importar "../modulos_std/grafico.mice" como g
+
+var X = [[0,0], [0,1], [1,0], [1,1]]
+var Y = [[1,0], [0,1], [0,1], [1,0]]
+
+funcion probar_arq(arq, epocas, lr, nombre) {
+    imp "Entrenando: " + nombre
+    var modelo = dl.perceptron_multicapa(arq)
+    var errs = []
+    var ep = 0
+    mientras (ep < epocas) {
+        dl.entrenar_red(modelo, X, Y, 100, lr)
+        var fwd = dl.forward(modelo, X)
+        var err = dl.error_mse(Y, fwd["salida"])
+        errs.agregar([ep + 100, err])
+        imp "  epoca " + aTexto(ep + 100) + " error=" + aTexto(err)
+        ep = ep + 100
+    }
+    var fwd = dl.forward(modelo, X)
+    regresa {"errs": errs, "pred": fwd["salida"], "nombre": nombre}
+}
+
+imp "=== Comparando arquitecturas en XOR ==="
+imp ""
+var r1 = probar_arq([{"in":2, "out":2, "act":"softmax"}], 300, 0.2, "1 capa (softmax)")
+var r2 = probar_arq([{"in":2, "out":4, "act":"relu"}, {"in":4, "out":2, "act":"softmax"}], 300, 0.2, "2 capas: 4")
+var r3 = probar_arq([{"in":2, "out":16, "act":"relu"}, {"in":16, "out":2, "act":"softmax"}], 300, 0.2, "2 capas: 16")
+var r4 = probar_arq([{"in":2, "out":8, "act":"relu"}, {"in":8, "out":8, "act":"relu"}, {"in":8, "out":2, "act":"softmax"}], 300, 0.2, "3 capas: 8+8")
+
+imp ""
+imp "=== Graficando ==="
+g.estilo("claro")
+g.iniciar_grafico(0, 500, 0, 0.8)
+g.titulo("Comparacion de arquitecturas en XOR")
+g.etiquetas("Epoca", "Error (MSE)")
+funcion xs(e) { var r = []; para v en e { r.agregar(v[0]) }; regresa r }
+funcion ys(e) { var r = []; para v en e { r.agregar(v[1]) }; regresa r }
+g.color_linea(180, 60, 60); g.linea_sobre_grafico(xs(r1["errs"]), ys(r1["errs"]))
+g.color_linea(60, 130, 200); g.linea_sobre_grafico(xs(r2["errs"]), ys(r2["errs"]))
+g.color_linea(60, 180, 80); g.linea_sobre_grafico(xs(r3["errs"]), ys(r3["errs"]))
+g.color_linea(200, 160, 40); g.linea_sobre_grafico(xs(r4["errs"]), ys(r4["errs"]))
+g.guardar("ejemplos/graficos/comparar_arquitecturas.png")
+imp "Guardado: graficos/comparar_arquitecturas.png"
+
+imp ""
+imp "=== Predicciones finales ==="
+var rs = [r1, r2, r3, r4]
+var ns = ["Lineal", "4 ocultas", "16 ocultas", "8+8 ocultas"]
+var i = 0
+mientras (i < 4) {
+    imp ns[i] + ": " + aTexto(rs[i]["pred"])
+    i = i + 1
+}

@@ -1,0 +1,127 @@
+# Visualizacion de metricas: MSE, MAE, RMSE, R2, accuracy, F1
+importar "../modulos_std/ml.mice" como ml
+importar "../modulos_std/grafico.mice" como g
+importar "../modulos_std/math.mice" como math
+
+# Generar datos de prueba: reales vs predicciones
+var real = [3, -0.5, 2, 7, 4.2, 5, 6, 8, 1, 9]
+var pred = [2.8, -0.3, 1.8, 7.1, 4.0, 5.2, 5.8, 7.5, 1.5, 8.8]
+
+funcion mse(real, pred) {
+    var suma = 0
+    var n = real.longitud()
+    para i en rango(n) {
+        var dif = real[i] - pred[i]
+        suma = suma + dif * dif
+    }
+    regresa suma / n
+}
+
+funcion mae(real, pred) {
+    var suma = 0
+    var n = real.longitud()
+    para i en rango(n) {
+        suma = suma + math.abs(real[i] - pred[i])
+    }
+    regresa suma / n
+}
+
+funcion rmse(real, pred) {
+    regresa math.raiz(mse(real, pred))
+}
+
+funcion r2(real, pred) {
+    var media = 0
+    para v en real { media = media + v }
+    media = media / real.longitud()
+    var ss_res = 0
+    var ss_tot = 0
+    para i en rango(real.longitud()) {
+        var dif = real[i] - pred[i]
+        ss_res = ss_res + dif * dif
+        var dif2 = real[i] - media
+        ss_tot = ss_tot + dif2 * dif2
+    }
+    regresa 1 - ss_res / ss_tot
+}
+
+funcion exactitud(real_cls, pred_cls) {
+    var ok = 0
+    para i en rango(real_cls.longitud()) {
+        si (real_cls[i] == pred_cls[i]) { ok = ok + 1 }
+    }
+    regresa ok / real_cls.longitud()
+}
+
+funcion f1_score(real_cls, pred_cls) {
+    var VP = 0; var FP = 0; var VN = 0; var FN = 0
+    para i en rango(real_cls.longitud()) {
+        si (real_cls[i] == 1 y pred_cls[i] == 1) { VP = VP + 1 }
+        si (real_cls[i] == 0 y pred_cls[i] == 1) { FP = FP + 1 }
+        si (real_cls[i] == 0 y pred_cls[i] == 0) { VN = VN + 1 }
+        si (real_cls[i] == 1 y pred_cls[i] == 0) { FN = FN + 1 }
+    }
+    var precision = VP / (VP + FP)
+    var recall = VP / (VP + FN)
+    regresa 2 * precision * recall / (precision + recall)
+}
+
+imp "=== Metricas de regresion ==="
+imp "MSE:  " + aTexto(mse(real, pred))
+imp "MAE:  " + aTexto(mae(real, pred))
+imp "RMSE: " + aTexto(rmse(real, pred))
+imp "R^2:  " + aTexto(r2(real, pred))
+
+imp ""
+imp "=== Metricas de clasificacion ==="
+var real_cls = [1, 0, 1, 1, 0, 1, 0, 0, 1, 0]
+var pred_cls = [1, 0, 1, 0, 0, 1, 0, 1, 1, 0]
+imp "Real:      " + aTexto(real_cls)
+imp "Predicho:  " + aTexto(pred_cls)
+imp "Accuracy:  " + aTexto(exactitud(real_cls, pred_cls))
+imp "F1-score:  " + aTexto(f1_score(real_cls, pred_cls))
+
+# Grafico: real vs predicho
+imp ""
+imp "=== Graficando real vs prediccion ==="
+var xs = []
+para i en rango(real.longitud()) { xs.agregar(i) }
+
+g.estilo("retro")
+g.iniciar_grafico(-0.5, real.longitud() - 0.5, -1, 10)
+g.titulo("Valores reales vs predicciones")
+g.etiquetas("Muestra", "Valor")
+g.pintar_puntos(xs, real, 100, 60, 60, 7)
+g.pintar_puntos(xs, pred, 60, 100, 180, 7)
+g.guardar("ejemplos/graficos/metricas_reales_vs_pred.png")
+imp "Guardado: graficos/metricas_reales_vs_pred.png"
+
+# Grafico: barras de error
+imp ""
+imp "=== Graficando errores individuales ==="
+var errores = []
+para i en rango(real.longitud()) {
+    errores.agregar(math.abs(real[i] - pred[i]))
+}
+g.estilo("ocean")
+g.iniciar_grafico(-0.5, real.longitud() - 0.5, 0, 1.5)
+g.titulo("Error absoluto por muestra")
+g.etiquetas("Muestra", "Error")
+g.pintar_puntos(xs, errores, 200, 80, 50, 7)
+g.guardar("ejemplos/graficos/metricas_errores.png")
+imp "Guardado: graficos/metricas_errores.png"
+
+imp ""
+imp "=== Demostracion con ml.mice ==="
+var X_ventas = [1, 2, 3, 4, 5]
+var Y_ventas = [30, 50, 70, 90, 110]
+var modelo_reg = ml.regresion_lineal(X_ventas, Y_ventas)
+imp "Regresion lineal (ventas vs anuncios):"
+imp "  Pendiente: " + aTexto(modelo_reg["pendiente"])
+imp "  Sesgo: " + aTexto(modelo_reg["intercepcion"])
+var Y_pred_reg = []
+para x en X_ventas {
+    Y_pred_reg.agregar(ml.predecir_lineal(x, modelo_reg))
+}
+imp "  MSE: " + aTexto(mse(Y_ventas, Y_pred_reg))
+imp "  R^2: " + aTexto(r2(Y_ventas, Y_pred_reg))

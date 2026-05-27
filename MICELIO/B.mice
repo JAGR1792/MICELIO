@@ -1,23 +1,13 @@
-importar "archivo.mice" como archivo
-importar "math.mice" como math
-importar "grafico.mice" como g
+importar "dl.mice" como dl 
 
-var xs = []
-var senos = []
+var compra = [[0], [1]]
+var recomp = [[1],[0]]
 
-var i = 0
-mientras (i < 100){
-    var x = (i / 100.0) * 2 * math.PI
-    xs.agregar(x)
-    senos.agregar(math.seno(x))
-    i = i + 1
-}
+var arq = [{"in": 1, "out": 1, "act": "sigmoid"}]
+var decision = dl.perceptron_multicapa(arq)
 
-datos = []
+dl.entrenar_red(decision, compra, recomp, 1000, 0.1)
 
-i = 0
-mientras (i<xs.longitud()){
+var res = dl.forward(decision, [[1]])
 
-    datos.agregar([xs[i], senos[i]])
-    i = i + 1
-}
+imp "Compra: " + res["salida"]

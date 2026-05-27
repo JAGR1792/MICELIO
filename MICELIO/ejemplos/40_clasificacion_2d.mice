@@ -1,0 +1,97 @@
+# Clasificacion 2D con frontera de decision visible
+importar "../modulos_std/dl.mice" como dl
+importar "../modulos_std/matriz.mice" como mat
+importar "../modulos_std/grafico.mice" como g
+importar "../modulos_std/math.mice" como math
+
+# Generar datos en 2D: dos circulos concentricos
+var X = []
+var Y = []
+var clases = 2
+var n_por_clase = 25
+var semilla = 42
+funcion circulo(cx, cy, radio, n) {
+    var pts = []
+    var i = 0
+    mientras (i < n) {
+        var angulo = 6.28318 * i / n
+        var r = radio + (aleatorio() * 0.3 - 0.15) * radio
+        pts.agregar([cx + math.coseno(angulo) * r, cy + math.seno(angulo) * r])
+        i = i + 1
+    }
+    regresa pts
+}
+
+var c1 = circulo(3, 3, 1.5, n_por_clase)
+var c2 = circulo(3, 3, 3.0, n_por_clase)
+
+para p en c1 { X.agregar(p); Y.agregar([1, 0]) }
+para p en c2 { X.agregar(p); Y.agregar([0, 1]) }
+
+imp "=== Clasificacion 2D: circulos concentricos ==="
+imp "Datos: " + aTexto(X.longitud()) + " puntos, 2 clases"
+
+# Entrenar red
+var arq = [{"in":2, "out":8, "act":"relu"}, {"in":8, "out":2, "act":"softmax"}]
+var modelo = dl.perceptron_multicapa(arq)
+dl.entrenar_red(modelo, X, Y, 500, 0.05)
+
+var fwd = dl.forward(modelo, X)
+var preds = fwd["salida"]
+var aciertos = 0
+para i en rango(preds.longitud()) {
+    var pred = 0
+    si (preds[i][1] > preds[i][0]) { pred = 1 }
+    var real = 0
+    si (Y[i][1] > Y[i][0]) { real = 1 }
+    si (pred == real) { aciertos = aciertos + 1 }
+}
+imp "Exactitud: " + aTexto(aciertos * 100 / preds.longitud()) + "%"
+
+# Grafico: puntos coloreados por clase real
+imp ""
+imp "=== Generando frontera de decision ==="
+g.estilo("ocean")
+g.iniciar_grafico(0, 6, 0, 6)
+g.titulo("Frontera de decision - Circulos concentricos")
+g.etiquetas("X", "Y")
+
+# Cuadricula de prediccion (frontera) — dibujar debajo
+var res = 20
+para i en rango(res) {
+    para j en rango(res) {
+        var px = 6 * i / (res - 1)
+        var py = 6 * j / (res - 1)
+        var pred = dl.forward(modelo, [[px, py]])
+        var prob_clase1 = pred["salida"][0][1]
+        var cr = 200 - prob_clase1 * 140
+        var cg = 100 + prob_clase1 * 50
+        var cb = 30 + prob_clase1 * 170
+        g.pintar_puntos([px], [py], cr, cg, cb, 12)
+    }
+}
+
+# Puntos clase 0 (rojo) — dibujar encima
+var x0 = []; var y0 = []
+para i en rango(X.longitud()) {
+    si (Y[i][0] == 1) { x0.agregar(X[i][0]); y0.agregar(X[i][1]) }
+}
+g.pintar_puntos(x0, y0, 200, 80, 60, 9)
+
+# Puntos clase 1 (azul) — dibujar encima
+var x1 = []; var y1 = []
+para i en rango(X.longitud()) {
+    si (Y[i][1] == 1) { x1.agregar(X[i][0]); y1.agregar(X[i][1]) }
+}
+g.pintar_puntos(x1, y1, 60, 100, 200, 9)
+g.guardar("ejemplos/graficos/frontera_decision_2d.png")
+imp "Guardado: graficos/frontera_decision_2d.png"
+
+imp ""
+imp "=== Visualizando pesos de la red ==="
+var capas = modelo["capas"]
+para idx_capa en rango(capas.longitud()) {
+    imp "Capa " + aTexto(idx_capa) + " (act: " + capas[idx_capa]["act"] + "):"
+    imp "  W: " + aTexto(capas[idx_capa]["W"])
+    imp "  b: " + aTexto(capas[idx_capa]["b"])
+}

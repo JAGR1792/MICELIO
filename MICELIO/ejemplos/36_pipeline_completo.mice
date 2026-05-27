@@ -1,0 +1,100 @@
+# Pipeline completo: datos -> modelo -> evaluacion -> graficas
+importar "../modulos_std/archivo.mice" como archivo
+importar "../modulos_std/ml.mice" como ml
+importar "../modulos_std/grafico.mice" como g
+importar "../modulos_std/math.mice" como math
+
+# 1. Generar datos sinteticos de ejemplo (1 feature)
+imp "=== 1. Generando datos ==="
+var X = []
+var Y = []
+var i = 0
+mientras (i < 50) {
+    var ingreso = 1000 + aleatorio() * 90000
+    var compra = 0
+    si (ingreso > 45000) { compra = 1 }
+    si (ingreso > 20000 y aleatorio() > 0.5) { compra = 1 }
+    X.agregar([ingreso])
+    Y.agregar(compra)
+    i = i + 1
+}
+
+# 2. Normalizar datos
+imp "=== 2. Normalizando ==="
+var suma_i = 0
+para x en X { suma_i = suma_i + x[0] }
+var media_ingreso = suma_i / X.longitud()
+var suma_var = 0
+para x en X { var d = x[0] - media_ingreso; suma_var = suma_var + d * d }
+var desvio = math.raiz(suma_var / X.longitud())
+var X_norm = []
+para x en X { X_norm.agregar((x[0] - media_ingreso) / desvio) }
+imp "Media: " + aTexto(media_ingreso) + "  Desvio: " + aTexto(desvio)
+
+# 3. Dividir en train (80%) y test (20%)
+imp "=== 3. Train/test split ==="
+var n_train = aEntero(X_norm.longitud() * 0.8)
+var X_train = []; var Y_train = []
+var X_test = []; var Y_test = []
+i = 0
+mientras (i < X_norm.longitud()) {
+    si (i < n_train) {
+        X_train.agregar(X_norm[i]); Y_train.agregar(Y[i])
+    } sino {
+        X_test.agregar(X_norm[i]); Y_test.agregar(Y[i])
+    }
+    i = i + 1
+}
+imp "Train: " + aTexto(X_train.longitud()) + " ej"
+imp "Test:  " + aTexto(X_test.longitud()) + " ej"
+
+# 4. Entrenar regresion logistica
+imp "=== 4. Entrenando ==="
+var modelo = ml.regresion_logistica(X_train, Y_train, 0.01, 500)
+imp "Pendiente: " + aTexto(modelo["pendiente"])
+imp "Sesgo: " + aTexto(modelo["intercepcion"])
+
+# 5. Evaluar en test
+imp "=== 5. Evaluando ==="
+var aciertos = 0
+var VP = 0; var FP = 0; var VN = 0; var FN = 0
+i = 0
+mientras (i < X_test.longitud()) {
+    var pred = ml.predecir_logistica(X_test[i], modelo)
+    var real = Y_test[i]
+    si (pred == real) { aciertos = aciertos + 1 }
+    si (real == 1 y pred == 1) { VP = VP + 1 }
+    si (real == 0 y pred == 1) { FP = FP + 1 }
+    si (real == 0 y pred == 0) { VN = VN + 1 }
+    si (real == 1 y pred == 0) { FN = FN + 1 }
+    i = i + 1
+}
+var exact = aciertos / X_test.longitud()
+imp "Exactitud: " + aTexto(exact * 100) + "%"
+imp "Matriz: VP=" + aTexto(VP) + " FP=" + aTexto(FP) + " VN=" + aTexto(VN) + " FN=" + aTexto(FN)
+var precision = VP / (VP + FP)
+var recall = VP / (VP + FN)
+imp "Precision: " + aTexto(precision) + "  Recall: " + aTexto(recall)
+imp "F1: " + aTexto(2 * precision * recall / (precision + recall))
+
+# 6. Graficar
+imp "=== 6. Graficando ==="
+g.estilo("claro")
+g.iniciar_grafico(1000, 91000, -0.1, 1.1)
+g.titulo("Compra vs Ingreso (regresion logistica)")
+g.etiquetas("Ingreso ($)", "Probabilidad de compra")
+var xs_reales = []
+para x en X { xs_reales.agregar(x[0]) }
+g.pintar_puntos(xs_reales, Y, 60, 130, 200, 8)
+var linea_x = [1000, 91000]
+funcion prob_logistica(x, modelo) {
+    var z = modelo["pendiente"] * x + modelo["intercepcion"]
+    regresa 1 / (1 + exp(-z))
+}
+var prob_1000 = (1000 - media_ingreso) / desvio
+var prob_91000 = (91000 - media_ingreso) / desvio
+var linea_y = [prob_logistica(prob_1000, modelo), prob_logistica(prob_91000, modelo)]
+g.color_linea(200, 60, 60)
+g.linea_sobre_grafico(linea_x, linea_y)
+g.guardar("ejemplos/graficos/pipeline_logistico.png")
+imp "Guardado: graficos/pipeline_logistico.png"
