@@ -1087,6 +1087,121 @@ flowchart TD
     }
 }</code></pre>
         <p>El par&aacute;metro <code>modelo</code> se modifica <strong>in-place</strong>: los pesos se actualizan directamente sobre la estructura del modelo, no se retorna un nuevo modelo.</p>
+
+        <h3>5.1 Ejemplo paso a paso: Perceptr&oacute;n AND</h3>
+        <p>La compuerta AND es el problema m&aacute;s simple para ver c&oacute;mo aprende una neurona. Usamos una sola neurona con sigmoide:</p>
+        <pre class="mice"><code>importar "ml.mice" como ml
+
+var X = [[0,0], [0,1], [1,0], [1,1]]
+var Y = [0, 0, 0, 1]
+
+var modelo = ml.regresion_logistica(X, Y, 0.1, 200)
+imp modelo["pesos"]
+imp modelo["sesgo"]</code></pre>
+
+        <p><strong>Paso a paso de lo que ocurre dentro de la funci&oacute;n:</strong></p>
+
+        <div class="info-note">
+            <span class="title">Iteraci&oacute;n 1 (primera &eacute;poca, primer ejemplo)</span>
+        </div>
+        <ol>
+            <li><strong>Inicializaci&oacute;n</strong>: los pesos empiezan en <code>[0.0, 0.0]</code> y el sesgo en <code>0.0</code></li>
+            <li><strong>Primer ejemplo</strong>: X[0] = <code>[0, 0]</code>, Y[0] = <code>0</code>
+                <br>z = sesgo + w<sub>0</sub>&middot;0 + w<sub>1</sub>&middot;0 = 0
+                <br>pred = sigmoid(0) = 0.5
+                <br>error = 0.5 &minus; 0 = 0.5
+                <br>Actualizaci&oacute;n: w<sub>0</sub> = 0 &minus; 0.1&middot;0.5&middot;0 = 0
+                <br>w<sub>1</sub> = 0 &minus; 0.1&middot;0.5&middot;0 = 0
+                <br>sesgo = 0 &minus; 0.1&middot;0.5 = &minus;0.05
+            </li>
+            <li><strong>Segundo ejemplo</strong>: X[1] = <code>[0, 1]</code>, Y[1] = <code>0</code>
+                <br>z = &minus;0.05 + 0&middot;0 + 0&middot;1 = &minus;0.05
+                <br>pred = sigmoid(&minus;0.05) = 0.4875
+                <br>error = 0.4875 &minus; 0 = 0.4875
+                <br>w<sub>0</sub> = 0 &minus; 0.1&middot;0.4875&middot;0 = 0
+                <br>w<sub>1</sub> = 0 &minus; 0.1&middot;0.4875&middot;1 = &minus;0.0488
+                <br>sesgo = &minus;0.05 &minus; 0.1&middot;0.4875 = &minus;0.0988
+            </li>
+            <li><strong>Tercer ejemplo</strong>: X[2] = <code>[1, 0]</code>, Y[2] = <code>0</code>
+                <br>z = &minus;0.0988 + 0&middot;1 + (&minus;0.0488)&middot;0 = &minus;0.0988
+                <br>pred = sigmoid(&minus;0.0988) = 0.4753
+                <br>error = 0.4753 &minus; 0 = 0.4753
+                <br>w<sub>0</sub> = 0 &minus; 0.1&middot;0.4753&middot;1 = &minus;0.0475
+                <br>w<sub>1</sub> = &minus;0.0488 &minus; 0.1&middot;0.4753&middot;0 = &minus;0.0488
+                <br>sesgo = &minus;0.0988 &minus; 0.1&middot;0.4753 = &minus;0.1463
+            </li>
+            <li><strong>Cuarto ejemplo</strong>: X[3] = <code>[1, 1]</code>, Y[3] = <code>1</code>
+                <br>z = &minus;0.1463 + (&minus;0.0475)&middot;1 + (&minus;0.0488)&middot;1 = &minus;0.2426
+                <br>pred = sigmoid(&minus;0.2426) = 0.4396
+                <br>error = 0.4396 &minus; 1 = &minus;0.5604
+                <br>w<sub>0</sub> = &minus;0.0475 &minus; 0.1&middot;(&minus;0.5604)&middot;1 = 0.0085
+                <br>w<sub>1</sub> = &minus;0.0488 &minus; 0.1&middot;(&minus;0.5604)&middot;1 = 0.0072
+                <br>sesgo = &minus;0.1463 &minus; 0.1&middot;(&minus;0.5604) = &minus;0.0902
+            </li>
+        </ol>
+        <p>Esto se repite durante 200 &eacute;pocas. Los pesos se ajustan gradualmente: <strong>w<sub>0</sub></strong> y <strong>w<sub>1</sub></strong> crecen hacia valores positivos (porque cuando ambos son 1, la salida debe ser 1), mientras el sesgo se mantiene negativo (para inclinar la sigmoide hacia 0 cuando las entradas son bajas).</p>
+
+        <div class="result-box">
+            <div class="label">Despu&eacute;s de 200 &eacute;pocas:</div>
+            <div class="value">pesos ~ [1.5, 1.5], sesgo ~ &minus;2.3</div>
+            <div class="label">(0,0) &rarr; sigmoid(&minus;2.3) = 0.09 &rarr; 0 ✓</div>
+            <div class="label">(1,1) &rarr; sigmoid(0.7) = 0.67 &rarr; 1 ✓</div>
+        </div>
+
+        <h3>5.2 Paso a paso: XOR con capa oculta</h3>
+        <p>El problema XOR no es linealmente separable, as&iacute; que necesitamos una red con una capa oculta. La arquitectura es <code>[2, 4, 2]</code>: 2 entradas, 4 neuronas ocultas (ReLU), 2 salidas (softmax).</p>
+
+        <p><strong>Flujo de datos en el forward pass (primera &eacute;poca):</strong></p>
+
+        <div class="info-note">
+            <span class="title">Dimensiones paso a paso</span>
+        </div>
+        <ol>
+            <li><strong>Entrada X</strong>: matriz de 4&times;2 (4 ejemplos, 2 caracter&iacute;sticas)
+                <br><code>[ [0,0], [0,1], [1,0], [1,1] ]</code></li>
+            <li><strong>Capa oculta</strong>: W<sub>h</sub> es 2&times;4 (2 entradas &rarr; 4 neuronas), b<sub>h</sub> es 1&times;4
+                <br>Z = X &middot; W<sub>h</sub> + b<sub>h</sub> = [4&times;2] &middot; [2&times;4] + [1&times;4] = <strong>[4&times;4]</strong>
+                <br>A = relu(Z) &rarr; activaciones de 4 neuronas para cada uno de los 4 ejemplos</li>
+            <li><strong>Capa de salida</strong>: W<sub>o</sub> es 4&times;2, b<sub>o</sub> es 1&times;2
+                <br>Z = A &middot; W<sub>o</sub> + b<sub>o</sub> = [4&times;4] &middot; [4&times;2] + [1&times;2] = <strong>[4&times;2]</strong>
+                <br>salida = softmax(Z) &rarr; probabilidades por clase para cada ejemplo</li>
+        </ol>
+
+        <p><strong>Qu&eacute; hace la softmax:</strong> toma un vector de 2 n&uacute;meros reales (los "puntajes" de cada clase) y los convierte en probabilidades que suman 1.</p>
+        <pre><code># Para el ejemplo (0,0), los puntajes Z podrian ser:
+Z = [-1.2, 0.8]
+exps = [exp(-1.2), exp(0.8)] = [0.30, 2.23]
+suma = 0.30 + 2.23 = 2.53
+softmax = [0.30/2.53, 2.23/2.53] = [0.12, 0.88]
+# La red predice clase 1 con 88% de confianza</code></pre>
+
+        <p><strong>Flujo del backpropagation (c&oacute;mo se ajustan los pesos):</strong></p>
+        <ol>
+            <li>Se compara <code>salida</code> vs <code>Y</code> (one-hot: <code>[1,0]</code> para clase 0, <code>[0,1]</code> para clase 1)</li>
+            <li>Se calcula <code>delta = salida &minus; Y</code> &mdash; el error en la &uacute;ltima capa
+                <br>Si la salida es <code>[0.12, 0.88]</code> y la clase real es 0 (<code>[1, 0]</code>):
+                <br>delta = [0.12 &minus; 1, 0.88 &minus; 0] = <strong>[&minus;0.88, 0.88]</strong></li>
+            <li>dW<sub>o</sub> = A<sub>h</sub><sup>T</sup> &middot; delta &rarr; gradiente para la capa de salida
+                <br>W<sub>o</sub> = W<sub>o</sub> &minus; lr &middot; dW<sub>o</sub> &rarr; pesos actualizados</li>
+            <li>El error se propaga hacia atr&aacute;s: error<sub>oculto</sub> = delta &middot; W<sub>o</sub><sup>T</sup>
+                <br>delta<sub>oculta</sub> = error<sub>oculto</sub> * relu_derivada(A<sub>h</sub>)</li>
+            <li>dW<sub>h</sub> = X<sup>T</sup> &middot; delta<sub>oculta</sub>
+                <br>W<sub>h</sub> = W<sub>h</sub> &minus; lr &middot; dW<sub>h</sub></li>
+        </ol>
+
+        <div class="result-box">
+            <div class="label">Despu&eacute;s de ~500 &eacute;pocas la red deber&iacute;a producir:</div>
+            <div class="value">(0,0) &rarr; [~0.99, 0.01] &rarr; clase 0</div>
+            <div class="value">(0,1) &rarr; [~0.01, 0.99] &rarr; clase 1</div>
+            <div class="value">(1,0) &rarr; [~0.01, 0.99] &rarr; clase 1</div>
+            <div class="value">(1,1) &rarr; [~0.99, 0.01] &rarr; clase 0</div>
+            <div class="label">Cada valor alto (~0.99) indica 99% de confianza en la predicci&oacute;n</div>
+        </div>
+
+        <div class="info-note">
+            <span class="title">Dato clave</span>
+            La capa oculta con ReLU transforma el espacio de entrada: los 4 puntos (0,0), (0,1), (1,0), (1,1) que no eran separables con una recta, se "reposicionan" en un espacio de 4 dimensiones donde s&iacute; son separables. La capa de salida aprende una recta en ese nuevo espacio. Ese es el poder de las capas ocultas.
+        </div>
     </section>
 
     <!-- ================================================================ -->
