@@ -2069,6 +2069,67 @@ def make_primitives() -> dict[str, Any]:
         """Convierte estructuras MICELIO a texto JSON."""
         return json.dumps(datos, ensure_ascii=False, indent=2)
 
+    # ─── Primitivas de álgebra lineal (rendimiento) ────────────────────
+    def _mat_ceros(filas: Any, columnas: Any) -> list[list[float]]:
+        return [[0.0] * int(columnas) for _ in range(int(filas))]
+
+    def _mat_suma(a: Any, b: Any) -> list[list[float]]:
+        return [[a[i][j] + b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
+
+    def _mat_resta(a: Any, b: Any) -> list[list[float]]:
+        return [[a[i][j] - b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
+
+    def _mat_escalar(m: Any, k: Any) -> list[list[float]]:
+        kf = float(k)
+        return [[v * kf for v in row] for row in m]
+
+    def _mat_transpuesta(m: Any) -> list[list[float]]:
+        return [list(col) for col in zip(*m)]
+
+    def _mat_mul(a: Any, b: Any) -> list[list[float]]:
+        b_t = list(zip(*b))
+        return [[sum(x * y for x, y in zip(row, col)) for col in b_t] for row in a]
+
+    def _mat_hadamard(a: Any, b: Any) -> list[list[float]]:
+        return [[a[i][j] * b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
+
+    def _sigmoide(m: Any) -> list[list[float]]:
+        return [[1.0 / (1.0 + _pymath.exp(-float(x))) for x in row] for row in m]
+
+    def _sigmoide_derivada(m: Any) -> list[list[float]]:
+        return [[float(v) * (1.0 - float(v)) for v in row] for row in m]
+
+    def _relu(m: Any) -> list[list[float]]:
+        return [[float(x) if x > 0 else 0.0 for x in row] for row in m]
+
+    def _relu_derivada(m: Any) -> list[list[float]]:
+        return [[1.0 if v > 0 else 0.0 for v in row] for row in m]
+
+    def _softmax(m: Any) -> list[list[float]]:
+        r = []
+        for row in m:
+            max_val = max(row)
+            exps = [_pymath.exp(float(x) - max_val) for x in row]
+            s = sum(exps)
+            r.append([e / s for e in exps])
+        return r
+
+    def _repfilas(fila: Any, n: Any) -> list[list[float]]:
+        """Repite una fila n veces (broadcasting para bias)."""
+        return [list(fila[0]) for _ in range(int(n))]
+
+    def _sumafilas(m: Any) -> list[float]:
+        """Suma todas las filas de una matriz en un solo vector."""
+        return [sum(row[j] for row in m) for j in range(len(m[0]))]
+
+    def _mse(y_true: Any, y_pred: Any) -> float:
+        """Error cuadrático medio entre dos matrices."""
+        n = len(y_true) * len(y_true[0])
+        s = sum((y_true[i][j] - y_pred[i][j]) ** 2
+                for i in range(len(y_true))
+                for j in range(len(y_true[0])))
+        return s / n
+
     return {
         # Conversiones base (requieren lógica Python compleja)
         '__a_numero': _a_numero,
@@ -2096,6 +2157,27 @@ def make_primitives() -> dict[str, Any]:
         '__directorio_crear': _directorio_crear,
         '__json_parse': _json_parse,
         '__json_stringify': _json_stringify,
+        
+        # Álgebra lineal (C-level speed via Python comprehensions)
+        '__mat_ceros': _mat_ceros,
+        '__mat_suma': _mat_suma,
+        '__mat_resta': _mat_resta,
+        '__mat_escalar': _mat_escalar,
+        '__mat_transpuesta': _mat_transpuesta,
+        '__mat_mul': _mat_mul,
+        '__mat_hadamard': _mat_hadamard,
+        
+        # Activaciones para DL (evita loops en MICELIO)
+        '__sigmoide': _sigmoide,
+        '__sigmoide_derivada': _sigmoide_derivada,
+        '__relu': _relu,
+        '__relu_derivada': _relu_derivada,
+        '__softmax': _softmax,
+        
+        # Operaciones auxiliares para DL
+        '__repfilas': _repfilas,
+        '__sumafilas': _sumafilas,
+        '__mse': _mse,
     }
 
 
