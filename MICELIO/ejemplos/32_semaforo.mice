@@ -1,5 +1,5 @@
-importar "../modulos_std/dl.mice" como dl
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/dl.mice" como dl
+importar "../stdlib/math.mice" como math
 
 # Datos: semaforo → accion
 # verde (1) → pasar (1)

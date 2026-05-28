@@ -130,6 +130,16 @@ funcion _fila_a_numeros(fila) {
     regresa nums
 }
 
+# Carga CSV numerico rapido (usa primitiva Python nativa)
+# Parametros:
+#   ruta       - ruta del archivo
+#   delimitador - caracter separador (por defecto ",")
+#   saltar_cabecera - verdadero/falso (por defecto falso)
+# Devuelve: lista de filas, cada fila es una lista de numeros
+funcion cargar_numeros_rapido(ruta, delimitador, saltar_cabecera) {
+    regresa __leer_csv_rapido(ruta, delimitador, saltar_cabecera)
+}
+
 # Carga CSV numerico: lee un archivo CSV y convierte todas las celdas a numeros
 # Parametros:
 #   ruta       - ruta del archivo

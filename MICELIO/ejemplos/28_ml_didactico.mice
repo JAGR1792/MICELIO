@@ -1,4 +1,4 @@
-importar "../modulos_std/ml.mice" como ml
+importar "../stdlib/ml.mice" como ml
 
 imp "-- Ejemplo 28: ML didactico --"
 

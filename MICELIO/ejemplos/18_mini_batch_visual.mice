@@ -1,6 +1,6 @@
-importar "../modulos_std/dl.mice" como dl
-importar "../modulos_std/grafico.mice" como graf
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/dl.mice" como dl
+importar "../stdlib/grafico.mice" como graf
+importar "../stdlib/math.mice" como math
 
 imp "-- Mini-batch demo con visualizacion (circulo) --"
 

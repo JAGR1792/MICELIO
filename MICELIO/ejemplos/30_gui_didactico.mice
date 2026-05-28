@@ -1,4 +1,4 @@
-importar "../modulos_std/gui.mice" como gui
+importar "../stdlib/gui.mice" como gui
 
 imp "-- Ejemplo 30: GUI didactico --"
 imp "estilo actual = " + aTexto(gui.estilo_actual())

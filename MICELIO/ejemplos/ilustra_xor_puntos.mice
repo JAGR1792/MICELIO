@@ -2,7 +2,7 @@
 #   Muestra los 4 puntos del XOR clasico coloreados por clase
 #   Demuestra que NO son linealmente separables
 # ────────────────────────────────────────────────────────────────────
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/grafico.mice" como g
 
 var xs = [0, 0, 1, 1]
 var ys = [0, 1, 0, 1]

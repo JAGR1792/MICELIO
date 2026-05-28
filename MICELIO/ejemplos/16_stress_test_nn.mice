@@ -1,6 +1,6 @@
 # Ejemplo 16: Stress Test Red Neuronal (100 registros)
-importar "../modulos_std/dl.mice" como dl
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/dl.mice" como dl
+importar "../stdlib/math.mice" como math
 
 imp "--- Generando Clasificacion No-Lineal (Circulo) ---"
 

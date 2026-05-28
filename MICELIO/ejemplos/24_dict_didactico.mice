@@ -1,4 +1,4 @@
-importar "../modulos_std/dict.mice" como dic
+importar "../stdlib/dict.mice" como dic
 
 imp "-- Ejemplo 24: Diccionario didactico --"
 

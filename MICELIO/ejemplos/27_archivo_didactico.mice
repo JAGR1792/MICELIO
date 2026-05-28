@@ -1,4 +1,4 @@
-importar "../modulos_std/archivo.mice" como arch
+importar "../stdlib/archivo.mice" como arch
 
 imp "-- Ejemplo 27: Archivo didactico --"
 

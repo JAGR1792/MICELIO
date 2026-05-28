@@ -1,4 +1,4 @@
-importar "../modulos_std/hifa.mice" como hifa
+importar "../stdlib/hifa.mice" como hifa
 
 imp "-- Ejemplo 31: Hifa didactico --"
 

@@ -15,7 +15,7 @@ En Micelio se usa via PyGObject (`gi.repository`) como backend de la capa GUI de
 
 ## Mini framework GUI en Micelio
 
-Ademas de `plot`, el modulo `modulos_std/gui.mice` ahora funciona como una capa reusable,
+Ademas de `plot`, el modulo `stdlib/gui.mice` ahora funciona como una capa reusable,
 tipo mini toolkit, construida por nosotros en Micelio y montada sobre primitivas del runtime.
 
 Componentes base disponibles:
@@ -33,8 +33,8 @@ manteniendo el frontend desacoplado de la logica de negocio.
 
 La API publica la consume el usuario desde modulos `.mice`:
 
-- `modulos_std/grafico.mice`
-- `modulos_std/gui.mice`
+- `stdlib/grafico.mice`
+- `stdlib/gui.mice`
 
 El runtime en Python expone primitivas internas (`__gui_*`, `__grafico_*`) y ejecuta la parte nativa de ventana.
 
@@ -94,8 +94,8 @@ Opcionales:
 - `MICELIO/runtime.py`: `_gtk_show_image_window`
 - `MICELIO/runtime.py`: `_plot_mostrar`
 - `MICELIO/runtime.py`: `_gui_alert`, `_gui_confirm`, `_gui_input`, `_gui_open_file`, `_gui_save_file`, `_gui_show_image`
-- `MICELIO/modulos_std/grafico.mice`: API de graficado y llamadas a runtime
-- `MICELIO/modulos_std/gui.mice`: API GUI de alto nivel
+- `MICELIO/stdlib/grafico.mice`: API de graficado y llamadas a runtime
+- `MICELIO/stdlib/gui.mice`: API GUI de alto nivel
 
 ## Ejemplo rapido
 

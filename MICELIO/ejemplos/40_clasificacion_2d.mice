@@ -1,8 +1,8 @@
 # Clasificacion 2D con frontera de decision visible
-importar "../modulos_std/dl.mice" como dl
-importar "../modulos_std/matriz.mice" como mat
-importar "../modulos_std/grafico.mice" como g
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/dl.mice" como dl
+importar "../stdlib/matriz.mice" como mat
+importar "../stdlib/grafico.mice" como g
+importar "../stdlib/math.mice" como math
 
 # Generar datos en 2D: dos circulos concentricos
 var X = []

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=64.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "micelio"
+version = "0.3.1"
+description = "Lenguaje de programación en español para enseñanza de IA"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Antonio"},
+]
+
+dependencies = [
+    "antlr4-python3-runtime>=4.13",
+]
+
+[project.scripts]
+micelio = "MICELIO.main:run_file"

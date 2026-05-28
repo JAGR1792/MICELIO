@@ -1,7 +1,7 @@
 # Visualizacion de metricas: MSE, MAE, RMSE, R2, accuracy, F1
-importar "../modulos_std/ml.mice" como ml
-importar "../modulos_std/grafico.mice" como g
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/ml.mice" como ml
+importar "../stdlib/grafico.mice" como g
+importar "../stdlib/math.mice" como math
 
 # Generar datos de prueba: reales vs predicciones
 var real = [3, -0.5, 2, 7, 4.2, 5, 6, 8, 1, 9]

@@ -1,5 +1,5 @@
 # Ejemplo 15: Big Data Regression (100 puntos)
-importar "../modulos_std/ml.mice" como ml
+importar "../stdlib/ml.mice" como ml
 
 imp "--- Generando Dataset Realista (100 puntos) ---"
 

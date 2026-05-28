@@ -1,4 +1,4 @@
-importar "../modulos_std/dl.mice" como dl
+importar "../stdlib/dl.mice" como dl
 
 funcion softmax_manual(vector) {
     var max = vector[0]

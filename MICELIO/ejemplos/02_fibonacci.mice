@@ -1,5 +1,5 @@
 # Ejemplo 02: Fibonacci en Micelio
-importar "../modulos_std/matriz.mice" como mat
+importar "../stdlib/matriz.mice" como mat
 
 # 1. Versión Recursiva Clásica
 funcion fibonacci_recursivo(n) {

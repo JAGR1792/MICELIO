@@ -1,4 +1,4 @@
-importar "../modulos_std/dl.mice" como dl
+importar "../stdlib/dl.mice" como dl
 
 imp "-- Ejemplo 29: Deep Learning didactico --"
 

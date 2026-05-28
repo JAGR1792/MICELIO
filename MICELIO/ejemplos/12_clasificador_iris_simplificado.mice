@@ -1,5 +1,5 @@
 # Ejemplo 12: Clasificacion Multiclase (Tipo Iris)
-importar "../modulos_std/dl.mice" como dl
+importar "../stdlib/dl.mice" como dl
 
 imp "--- Clasificador Multiclase con Softmax ---"
 

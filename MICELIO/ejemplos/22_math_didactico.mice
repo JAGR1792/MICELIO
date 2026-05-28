@@ -1,4 +1,4 @@
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/math.mice" como math
 
 imp "-- Ejemplo 22: Math didactico --"
 imp "PI = " + aTexto(math.PI)

@@ -1,4 +1,4 @@
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/grafico.mice" como g
 
 funcion relu(x) {
     si (x > 0) { regresa x }

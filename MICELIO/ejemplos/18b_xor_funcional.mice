@@ -1,9 +1,9 @@
 # Ejemplo 18: XOR como un solo pipeline con |>
 # CADA operación es un paso en la cadena: contexto |> paso1() |> paso2()
-importar "../modulos_std/dl.mice" como dl
-importar "../modulos_std/ml.mice" como ml
-importar "../modulos_std/matriz.mice" como mat
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/dl.mice" como dl
+importar "../stdlib/ml.mice" como ml
+importar "../stdlib/matriz.mice" como mat
+importar "../stdlib/math.mice" como math
 
 # ══════════════════════════════════════════════════════════════════════
 # 1.  FUNCIONES AUXILIARES

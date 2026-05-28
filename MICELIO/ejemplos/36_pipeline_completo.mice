@@ -1,8 +1,8 @@
 # Pipeline completo: datos -> modelo -> evaluacion -> graficas
-importar "../modulos_std/archivo.mice" como archivo
-importar "../modulos_std/ml.mice" como ml
-importar "../modulos_std/grafico.mice" como g
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/archivo.mice" como archivo
+importar "../stdlib/ml.mice" como ml
+importar "../stdlib/grafico.mice" como g
+importar "../stdlib/math.mice" como math
 
 # 1. Generar datos sinteticos de ejemplo (1 feature)
 imp "=== 1. Generando datos ==="

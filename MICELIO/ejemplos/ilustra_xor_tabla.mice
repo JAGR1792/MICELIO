@@ -2,7 +2,7 @@
 #   Compara: XOR clasico, XOR-2D actual, XOR-2D verdadero
 #   Genera scatter de los 4 centros con ambas etiquetas
 # ────────────────────────────────────────────────────────────────────
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/grafico.mice" como g
 
 # ── XOR clasico (1D) ──
 imp "╔══════════════════════════════════════════════════╗"

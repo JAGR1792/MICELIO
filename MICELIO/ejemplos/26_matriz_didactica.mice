@@ -1,4 +1,4 @@
-importar "../modulos_std/matriz.mice" como mat
+importar "../stdlib/matriz.mice" como mat
 
 imp "-- Ejemplo 26: Matriz didactica --"
 

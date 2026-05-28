@@ -899,7 +899,7 @@ MICELIO/
 ├── generado/
 │   └── gramatica/             # Lexer/Parser/Visitor generados por ANTLR
 │
-├── modulos_std/               # Biblioteca estándar en Micelio puro
+├── stdlib/               # Biblioteca estándar en Micelio puro
 │   ├── builtins.mice          #   Auto-cargado al inicio
 │   ├── math.mice              #   Matemáticas (Taylor, Newton-Raphson)
 │   ├── matriz.mice            #   Álgebra lineal

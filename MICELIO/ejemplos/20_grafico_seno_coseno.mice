@@ -1,7 +1,8 @@
-importar "../modulos_std/grafico.mice" como graf
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/grafico.mice" como graf
+importar "../stdlib/math.mice" como math
 
 imp "-- Ejemplo 20: Seno y coseno --"
+
 
 # 1. Crear el eje x en el rango [-pi, pi]
 var xs = []

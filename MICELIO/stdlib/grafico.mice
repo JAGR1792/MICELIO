@@ -1,4 +1,4 @@
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/math.mice" como math
 
 const _ANCHO = 800
 const _ALTO = 500

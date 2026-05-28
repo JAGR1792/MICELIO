@@ -198,7 +198,7 @@ leer a, b, c              # lee multiples valores de una linea
 ```mice
 importar "math.mice" como math
 importar "grafico.mice" como grafico
-importar "../modulos_std/dl.mice" como dl
+importar "../stdlib/dl.mice" como dl
 ```
 
 Las rutas son relativas al archivo que importa. Si el modulo ya fue cargado, se reutiliza la instancia en cache.

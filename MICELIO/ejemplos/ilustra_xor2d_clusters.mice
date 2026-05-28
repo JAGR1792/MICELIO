@@ -1,7 +1,7 @@
 # ─── Ilustracion: XOR-2D — Datos de la Joya de la Corona ──────────
 #   60 puntos en 4 clusters, 2 clases (patron XOR)
 # ────────────────────────────────────────────────────────────────────
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/grafico.mice" como g
 
 # Generar mismos datos que 23_joya_clasificacion.mice
 var X = []

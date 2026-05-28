@@ -2,9 +2,9 @@
 #  🏆 La Joya de la Corona — Clasificacion No-Lineal (XOR-2D)
 #     MICELIO: Red Neuronal 2->6->2 con frontera de decision
 # ═══════════════════════════════════════════════════════════════════════
-importar "../modulos_std/dl.mice" como dl
-importar "../modulos_std/ml.mice" como ml
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/dl.mice" como dl
+importar "../stdlib/ml.mice" como ml
+importar "../stdlib/grafico.mice" como g
 
 # ─── Utilerias ──────────────────────────────────────────────────────
 

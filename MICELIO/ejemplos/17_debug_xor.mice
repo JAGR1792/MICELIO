@@ -1,5 +1,5 @@
 # Benchmark XOR optimizado (sin visualización)
-importar "../modulos_std/dl.mice" como dl
+importar "../stdlib/dl.mice" como dl
 var X = [[0,0], [0,1], [1,0], [1,1]]
 var Y = [[1,0], [0,1], [0,1], [1,0]]
 var arq = [{"in":2, "out":8, "act":"relu"}, {"in":8, "out":2, "act":"softmax"}]

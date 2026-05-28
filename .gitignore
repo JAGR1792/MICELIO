@@ -1,17 +1,31 @@
-/__pycache__
-/Pruebas
+# Python
 **/__pycache__/
 *.pyc
-MICELIO.zip
-
-# Entorno virtual Python
+*.pyo
+.venv
 venv/
 env/
 ENV/
-.venv
 
-# PDFs de referencia
+# Rust (Fase 3+)
+target/
+Cargo.lock
+
+# Generated output (PNGs, compiled bytecode)
+output/
+graficos/
+
+# Build artifacts
+*.vsix
+MICELIO.zip
+
+# Docs
 /docs/*.pdf
 
-# Gráficos generados
-graficos/
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

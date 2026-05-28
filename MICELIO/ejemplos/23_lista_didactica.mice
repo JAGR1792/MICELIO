@@ -1,4 +1,4 @@
-importar "../modulos_std/lista.mice" como lst
+importar "../stdlib/lista.mice" como lst
 
 imp "-- Ejemplo 23: Lista didactica --"
 

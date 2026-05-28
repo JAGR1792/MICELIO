@@ -1,5 +1,5 @@
 # Ejemplo 10: Autoencoder (Reduccion de Dimensionalidad)
-importar "../modulos_std/dl.mice" como dl
+importar "../stdlib/dl.mice" como dl
 
 imp "--- Red Neuronal Autoencoder ---"
 

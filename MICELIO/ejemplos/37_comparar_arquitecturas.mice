@@ -1,7 +1,7 @@
 # Comparar arquitecturas de red en XOR
-importar "../modulos_std/dl.mice" como dl
-importar "../modulos_std/matriz.mice" como mat
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/dl.mice" como dl
+importar "../stdlib/matriz.mice" como mat
+importar "../stdlib/grafico.mice" como g
 
 var X = [[0,0], [0,1], [1,0], [1,1]]
 var Y = [[1,0], [0,1], [0,1], [1,0]]

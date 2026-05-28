@@ -1,6 +1,6 @@
 # Ejemplo 06: El Problema de Caperucita Roja (Multi-etiqueta)
 # Replicación del ejemplo del profesor usando Micelio DL
-importar "../modulos_std/dl.mice" como dl
+importar "../stdlib/dl.mice" como dl
 
 imp "--- Entrenamiento de Caperucita Roja ---"
 

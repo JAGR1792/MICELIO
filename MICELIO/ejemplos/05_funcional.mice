@@ -1,5 +1,5 @@
 # Ejemplo 05: El Poder de la Programación Funcional en Micelio
-importar "../modulos_std/math.mice" como math
+importar "../stdlib/math.mice" como math
 
 imp "--- Paradigma Funcional en Micelio ---"
 

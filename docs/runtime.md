@@ -40,7 +40,7 @@ Con soporte de scopes anidados (`parent`).
 
 ## Modulo grafico (desde cero)
 
-La logica publica de `grafico` ahora vive en `MICELIO/modulos_std/grafico.mice`.
+La logica publica de `grafico` ahora vive en `MICELIO/stdlib/grafico.mice`.
 El runtime solo aporta primitivas internas (prefijo `__grafico_`) para:
 
 - crear/reiniciar lienzo
@@ -65,7 +65,7 @@ Funciones disponibles:
 
 Archivo de referencia del modulo estandar:
 
-- `MICELIO/modulos_std/grafico.mice`
+- `MICELIO/stdlib/grafico.mice`
 
 ## REPL interactivo
 

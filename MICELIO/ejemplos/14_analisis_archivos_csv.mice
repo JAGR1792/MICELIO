@@ -1,6 +1,6 @@
 # Ejemplo 14: Procesamiento de Datos desde CSV
-importar "../modulos_std/archivo.mice" como arc
-importar "../modulos_std/ml.mice" como ml
+importar "../stdlib/archivo.mice" como arc
+importar "../stdlib/ml.mice" como ml
 
 imp "--- Cargando y Procesando Datos ---"
 

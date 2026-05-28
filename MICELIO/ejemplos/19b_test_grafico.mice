@@ -1,4 +1,4 @@
-importar "../modulos_std/grafico.mice" como graf
+importar "../stdlib/grafico.mice" como graf
 
 imp "-- Test grafico simple --"
 var xs = [0, 1, 2, 3, 4]

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from fractions import Fraction
 from functools import reduce as py_reduce
+import csv
 import json
 import mimetypes
 import os
@@ -1929,7 +1930,7 @@ def _hifa_generar_demo(path: Any = "hifa_demo") -> bool:
         "});\n"
     )
     app_mice = (
-        "importar \"../modulos_std/hifa.mice\" como hifa\n\n"
+        "importar \"../stdlib/hifa.mice\" como hifa\n\n"
         "var app = hifa.crear(\"mi_hifa\")\n"
         "hifa.plantillas(app, \"templates\")\n"
         "hifa.estaticos(app, \"static\")\n\n"
@@ -1957,7 +1958,7 @@ def make_primitives() -> dict[str, Any]:
     fácilmente en Micelio porque requieren acceso directo al OS o librerías Python.
     
     El resto de funciones globales (map, filter, tipo, longitud, etc.)
-    se definen en modulos_std/builtins.mice y se cargan al iniciar el intérprete.
+    se definen en stdlib/builtins.mice y se cargan al iniciar el intérprete.
     """
     import math as _pymath
     import random as _pyrandom
@@ -2023,6 +2024,32 @@ def make_primitives() -> dict[str, Any]:
                 f.write(str(contenido))
         except Exception as e:
             raise MicelioRuntimeError(f"Error escribiendo archivo: {e}")
+
+    def _leer_csv_rapido(ruta: Any, delimitador: Any, saltar_cabecera: Any) -> list:
+        """Lee CSV y devuelve lista de filas de numeros (rapido, en Python nativo)."""
+        import csv
+        try:
+            with open(str(ruta), 'r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                result = []
+                skip = bool(saltar_cabecera) if saltar_cabecera is not None else False
+                for row in reader:
+                    if skip:
+                        skip = False
+                        continue
+                    nums = []
+                    for val in row:
+                        val = val.strip().strip('"').strip("'")
+                        try:
+                            nums.append(float(val) if '.' in val else int(val))
+                        except ValueError:
+                            nums.append(None)
+                    result.append(nums)
+                return result
+        except FileNotFoundError:
+            raise MicelioRuntimeError(f"Archivo no encontrado: {ruta}")
+        except Exception as e:
+            raise MicelioRuntimeError(f"Error leyendo CSV: {e}")
     
     def _archivo_anexar(ruta: Any, contenido: Any) -> None:
         """Añade contenido al final de un archivo."""
@@ -2096,6 +2123,7 @@ def make_primitives() -> dict[str, Any]:
         '__directorio_crear': _directorio_crear,
         '__json_parse': _json_parse,
         '__json_stringify': _json_stringify,
+        '__leer_csv_rapido': _leer_csv_rapido,
     }
 
 

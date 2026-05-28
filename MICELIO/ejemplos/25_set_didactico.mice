@@ -1,4 +1,4 @@
-importar "../modulos_std/set.mice" como conjunto
+importar "../stdlib/set.mice" como conjunto
 
 imp "-- Ejemplo 25: Conjuntos didactico --"
 

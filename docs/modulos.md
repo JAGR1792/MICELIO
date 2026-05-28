@@ -228,7 +228,7 @@ importar "ml.mice" como ml
 Deep learning: perceptron multicapa con retropropagacion.
 
 ```
-importar "../modulos_std/dl.mice" como dl
+importar "../stdlib/dl.mice" como dl
 ```
 
 ### Activaciones

@@ -1,6 +1,6 @@
 # Ejemplo 22: Clustering K-Means con visualización mejorada
-importar "../modulos_std/ml.mice" como ml
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/ml.mice" como ml
+importar "../stdlib/grafico.mice" como g
 
 imp "--- Clustering K-Means Visual (3 clusters) ---"
 

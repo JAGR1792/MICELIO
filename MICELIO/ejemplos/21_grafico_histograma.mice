@@ -1,4 +1,4 @@
-importar "../modulos_std/grafico.mice" como graf
+importar "../stdlib/grafico.mice" como graf
 
 imp "-- Ejemplo 21: Histograma --"
 

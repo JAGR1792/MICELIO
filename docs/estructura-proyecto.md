@@ -12,7 +12,7 @@ MICELIO/
 │   │   ├── eval_visitor.py   # semantica de sentencias/expresiones
 │   │   └── runtime.py        # entorno, tipos, builtins
 │   ├── errores/              # errores pedagogicos
-│   ├── modulos_std/          # biblioteca estandar en .mice
+│   ├── stdlib/          # biblioteca estandar en .mice
 │   └── hifa_demo_test/       # demo web Hifa
 ├── docs/                     # documentacion
 ├── micelio-vscode/           # extension VS Code
@@ -82,7 +82,7 @@ Define:
 - Tipos nativos: Numero, Booleano, Texto, Lista, Set, Dict, Nulo
 - Representacion: `micelio_repr()` para salida con formato del lenguaje
 
-## MICELIO/modulos_std/ — Biblioteca estandar en MICELIO puro
+## MICELIO/stdlib/ — Biblioteca estandar en MICELIO puro
 
 Modulos implementados completamente en `.mice`:
 

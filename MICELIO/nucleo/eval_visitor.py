@@ -132,18 +132,18 @@ class EvalVisitor(MicelioVisitor):
 
     def _cargar_builtins_micelio(self):
         """
-        Carga automáticamente el archivo modulos_std/builtins.mice
+        Carga automáticamente el archivo stdlib/builtins.mice
         que contiene la definición de todas las funciones globales
         (map, filter, reduce, tipo, longitud, etc.) en Micelio puro.
         """
         # Resolver ruta al archivo builtins.mice
         ruta_base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        ruta = os.path.normpath(os.path.join(ruta_base, 'modulos_std', 'builtins.mice'))
+        ruta = os.path.normpath(os.path.join(ruta_base, 'stdlib', 'builtins.mice'))
         
         if not os.path.isfile(ruta):
             # No es crítico si no existe, pero advertir
             import warnings
-            warnings.warn(f'modulos_std/builtins.mice no encontrado en {ruta}')
+            warnings.warn(f'stdlib/builtins.mice no encontrado en {ruta}')
             return
         
         # Leer el código del archivo
@@ -192,7 +192,7 @@ class EvalVisitor(MicelioVisitor):
             candidates.append(requested)
         else:
             candidates.append(os.path.join(self.current_dir, requested))
-            candidates.append(os.path.join(self.current_dir, "modulos_std", requested))
+            candidates.append(os.path.join(self.current_dir, "stdlib", requested))
 
         expanded = []
         for cand in candidates:

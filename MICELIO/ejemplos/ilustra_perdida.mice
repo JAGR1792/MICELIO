@@ -2,7 +2,7 @@
 #   Genera una curva exponencial decreciente simulando el
 #   aprendizaje de una red neuronal (MSE vs epocas)
 # ────────────────────────────────────────────────────────────────────
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/grafico.mice" como g
 
 var epochs = 150
 var loss0 = 0.33   # perdida inicial tipica

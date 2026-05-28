@@ -1,0 +1,72 @@
+importar "../stdlib/archivo.mice" como archivo
+importar "../stdlib/ml.mice" como ml
+importar "../stdlib/grafico.mice" como g
+importar "../stdlib/math.mice" como math
+
+
+var filas = archivo.cargar_numeros_rapido("ejemplos/data.csv", ",", verdadero)
+imp "Leidas " + aTexto(filas.longitud()) + " filas"
+
+var edades = []
+var ingresos = []
+
+para fila en filas {
+    var edad = fila[1]
+    var ingreso = fila[3]
+    si (edad != nulo y ingreso != nulo) {
+        edades.agregar(edad)
+        ingresos.agregar(ingreso)
+    }
+}
+
+var n = edades.longitud()
+var suma_edad = 0
+para e en edades { suma_edad = suma_edad + e }
+
+var prom_edad = suma_edad / n
+
+var suma_ingreso = 0
+para ing en ingresos { suma_ingreso = suma_ingreso + ing }
+var prom_ingreso = suma_ingreso / n
+
+imp "=== Promedios ==="
+imp "Edad promedio: " + aTexto(prom_edad) + " anios"
+imp "Ingreso promedio: $" + aTexto(prom_ingreso)
+imp ""
+
+# === Regresion lineal (edad vs ingreso) ===
+
+var modelo = ml.regresion_lineal(edades, ingresos)
+var m = modelo["pendiente"]
+var b = modelo["intercepcion"]
+
+var pred_30 = m * 30 + b
+var pred_50 = m * 50 + b
+imp "Predicciones del modelo:"
+imp "  30 anios -> $" + aTexto(pred_30)
+imp "  50 anios -> $" + aTexto(pred_50)
+imp "  Diferencia por 20 anios: $" + aTexto(pred_50 - pred_30)
+imp ""
+
+# graficar
+var edades_m = []
+var ingresos_m = []
+var i = 0
+mientras (i < n) {
+    si (i % 5 == 0) {
+        edades_m.agregar(edades[i])
+        ingresos_m.agregar(ingresos[i])
+    }
+    i = i + 1
+}
+
+g.estilo("claro")
+g.iniciar_grafico(10, 100, 0, 65000)
+g.titulo("Ingreso vs Edad (" + aTexto(n) + " personas, data.csv)")
+g.etiquetas("Edad (anios)", "Ingreso mensual ($)")
+g.pintar_puntos(edades_m, ingresos_m, 60, 130, 200, 4)
+g.color_linea(200, 60, 60)
+var x_min = 10; var x_max = 100
+g.linea_sobre_grafico([x_min, x_max], [m*x_min+b, m*x_max+b])
+g.guardar("ejemplos/graficos/regresion_edad_ingreso.png")
+

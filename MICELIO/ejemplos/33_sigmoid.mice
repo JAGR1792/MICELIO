@@ -1,4 +1,4 @@
-importar "../modulos_std/grafico.mice" como g
+importar "../stdlib/grafico.mice" como g
 
 funcion sigmoide(x) {
     regresa 1 / (1 + exp(-x))
