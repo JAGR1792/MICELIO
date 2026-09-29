@@ -1,40 +1,35 @@
 //! Punto de entrada del binario `micesito`.
 //!
-//! Responsabilidades:
-//! - Exponer la interfaz de línea de comandos para ejecutar el banco de
-//!   pruebas de rendimiento de la vuelta (§4.6 del ROADMAP).
-//! - Demostrar el analizador léxico sin ANTLR sobre un programa representativo.
+//! Funciones:
+//! - Ejecución de programas `.mice` con el intérprete nativo de alto
+//!   rendimiento (`micesito programa.mice`).
+//! - Banco de pruebas de la vuelta §4.6 del ROADMAP (`--bench`).
+//! - Demostración del analizador léxico sin ANTLR (`--lexer`).
 //!
-//! El diseño prioriza la reproducibilidad de las mediciones: calentamiento
-//! previo, uso de `black_box` para evitar el plegado de constantes y selección
-//! del mejor tiempo entre varias pasadas.
+//! La medición de rendimiento utiliza calentamiento previo, barreras
+//! `black_box` contra el plegado de constantes y selección del mejor
+//! tiempo entre varias pasadas para reducir el ruido del sistema.
 
 use std::hint::black_box;
 use std::time::Instant;
 
-mod lexer;
-
-// Módulo de transición hacia la implementación completa del lenguaje.
-// Se permite código sin uso temporalmente hasta la integración del
-// analizador sintáctico y el intérprete en los próximos commits.
-#[allow(dead_code)]
 mod ast;
+mod interp;
+mod lexer;
+mod parser;
+mod valor;
 
 /// Suma el intervalo semiabierto `[inicio, fin)` mediante un iterador perezoso.
 ///
-/// Esta función es el equivalente nativo del programa MICELIO:
+/// Equivalente nativo del programa MICELIO:
 ///
 /// ```text
 /// var total = 0
 /// para i en rango(inicio, fin) { total = total + i }
 /// ```
 ///
-/// A diferencia de `rango()` en `builtins.mice`, que materializa una lista,
-/// aquí no se realiza ninguna asignación en el montículo. Con `opt-level=3`,
-/// LLVM reduce el bucle a la secuencia mínima de sumas, idéntica a la de C.
-///
-/// Se utiliza `wrapping_add` para definir el desbordamiento como aritmética
-/// modular, coherente con la semántica de enteros de 64 bits del lenguaje.
+/// A diferencia de `rango()` en `builtins.mice`, no materializa ninguna
+/// lista. Con `opt-level=3`, LLVM lo reduce a la secuencia mínima de sumas.
 #[inline(never)]
 fn vuelta_nativa(inicio: i64, fin: i64) -> i64 {
     let mut total: i64 = 0;
@@ -45,9 +40,6 @@ fn vuelta_nativa(inicio: i64, fin: i64) -> i64 {
 }
 
 /// Mide el mejor tiempo de `vuelta_nativa` entre cinco ejecuciones.
-///
-/// El calentamiento previo y la selección del mínimo reducen el ruido por
-/// frecuencia dinámica y planificación del sistema operativo.
 fn medir_vuelta(inicio: i64, fin: i64) -> (i64, f64) {
     let mut mejor = f64::MAX;
     let mut resultado = 0;
@@ -65,10 +57,19 @@ fn medir_vuelta(inicio: i64, fin: i64) -> (i64, f64) {
     (resultado, mejor)
 }
 
-/// Tokeniza el programa de la vuelta y reporta el número de tokens y el tiempo.
-///
-/// Cualquier error léxico se informa por salida estándar de errores sin
-/// interrumpir el resto del banco de pruebas.
+/// Ejecuta el banco de pruebas de rendimiento.
+fn bench() {
+    println!("MICELIO-rs, vuelta §4.6 | release -O3 + LTO + codegen-units=1");
+    demo_lexer();
+    let _ = vuelta_nativa(1, 1000);
+    for (a, b) in [(1, 10_000), (1, 1_000_000), (1, 10_000_000)] {
+        let (r, ms) = medir_vuelta(a, b);
+        println!("rango({a},{b}) -> total={r} en {ms:.3}ms");
+    }
+    println!("\nNota: rango(a,b) es un intervalo perezoso, sin lista intermedia.");
+}
+
+/// Tokeniza el programa de la vuelta y reporta el coste del análisis léxico.
 fn demo_lexer() {
     let fuente = "var total = 0\npara i en rango(1, 10000) {\n total = total + i\n}\nimp total\n";
     let t0 = Instant::now();
@@ -81,30 +82,48 @@ fn demo_lexer() {
                 us
             );
         }
+        Err(e) => eprintln!("[lexer] error en posición {}: {}", e.posicion, e.mensaje),
+    }
+}
+
+/// Ejecuta un archivo `.mice` y propaga el código de salida.
+fn ejecutar_archivo(ruta: &str) -> i32 {
+    let base = dir_de(ruta);
+    let mut it = interp::Interprete::new(base);
+    match it.ejecutar_archivo(ruta) {
+        Ok(_) => 0,
         Err(e) => {
-            eprintln!("[lexer] error en posición {}: {}", e.posicion, e.mensaje);
+            eprintln!("Error de ejecución: {e}");
+            1
         }
     }
 }
 
+fn dir_de(ruta: &str) -> String {
+    match ruta.rfind('/') {
+        Some(i) => ruta[..i].to_string(),
+        None => ".".to_string(),
+    }
+}
+
+fn ayuda() {
+    println!("Uso: micesito [opciones] [programa.mice]");
+    println!("  programa.mice   Ejecuta un programa MICELIO");
+    println!("  --bench         Banco de pruebas de la vuelta §4.6");
+    println!("  --lexer         Demostración del analizador léxico");
+    println!("  --help, -h      Esta ayuda");
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() > 1 && args[1] == "--lexer" {
-        demo_lexer();
+    if args.len() == 1 {
+        bench();
         return;
     }
-
-    println!("MICELIO-rs, vuelta §4.6 | release -O3 + LTO + codegen-units=1");
-    demo_lexer();
-
-    // Calentamiento para estabilizar la frecuencia del procesador.
-    let _ = vuelta_nativa(1, 1000);
-
-    let casos = [(1, 10_000), (1, 1_000_000), (1, 10_000_000)];
-    for (a, b) in casos {
-        let (r, ms) = medir_vuelta(a, b);
-        println!("rango({a},{b}) -> total={r} en {ms:.3}ms");
+    match args[1].as_str() {
+        "--bench" => bench(),
+        "--lexer" => demo_lexer(),
+        "--help" | "-h" => ayuda(),
+        ruta => std::process::exit(ejecutar_archivo(ruta)),
     }
-
-    println!("\nNota: rango(a,b) es un intervalo perezoso, sin lista intermedia.");
 }
