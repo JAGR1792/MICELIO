@@ -1,0 +1,32 @@
+[package]
+name = "micelio-rs"
+version = "0.2.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Implementación en Rust del lenguaje MICELIO (español, funcional, orientado a enseñanza de IA). Intérprete de alto rendimiento sin ANTLR."
+license = "MIT"
+repository = "https://github.com/JAGR1792/MICELIO"
+keywords = ["lenguaje", "interprete", "educacion", "ia"]
+categories = ["development-tools"]
+
+[[bin]]
+name = "micesito"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+overflow-checks = false
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[dependencies]
+# Intencionalmente sin dependencias externas para el núcleo.
+# El lexer, parser e intérprete están implementados con la biblioteca estándar,
+# lo que elimina el coste de arranque de ANTLR y facilita la distribución
+# como binario único. Futuras extensiones (CSV, JSON, gráficos, HTTP)
+# utilizarán crates dedicados según el ROADMAP (csv, serde_json, image, tiny_http).
