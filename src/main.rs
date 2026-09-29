@@ -14,6 +14,12 @@ use std::time::Instant;
 
 mod lexer;
 
+// Módulo de transición hacia la implementación completa del lenguaje.
+// Se permite código sin uso temporalmente hasta la integración del
+// analizador sintáctico y el intérprete en los próximos commits.
+#[allow(dead_code)]
+mod ast;
+
 /// Suma el intervalo semiabierto `[inicio, fin)` mediante un iterador perezoso.
 ///
 /// Esta función es el equivalente nativo del programa MICELIO:
