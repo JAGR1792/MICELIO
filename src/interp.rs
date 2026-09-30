@@ -161,6 +161,13 @@ impl Interprete {
         reg("producto", nativa_producto_lista);
         reg("promedio", nativa_promedio);
         reg("exp", nativa_exp);
+        reg("max_lista", nativa_max_lista);
+        reg("min_lista", nativa_min_lista);
+        reg("seno", nativa_seno);
+        reg("coseno", nativa_coseno);
+        reg("__leer_archivo", nativa_dummy_text);
+        reg("__escribir_archivo", nativa_dummy);
+        reg("__existe_archivo", nativa_existe_falso);
         // Compatibilidad para ejemplos gráficos/de red: implementaciones
         // mínimas sin dependencias externas. Permiten ejecutar la lógica
         // computacional aunque no generen artefactos visuales reales.
@@ -2034,6 +2041,68 @@ fn nativa_dummy_text(_: &[Valor]) -> Result<Valor, String> {
 
 fn nativa_leer_csv_dummy(_: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::Lista(Vec::new()))
+}
+
+fn nativa_existe_falso(_: &[Valor]) -> Result<Valor, String> {
+    Ok(Valor::Logico(false))
+}
+
+fn nativa_max_lista(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("max_lista() espera 1 argumento".to_string());
+    }
+    match &args[0] {
+        Valor::Lista(v) => {
+            if v.is_empty() {
+                return Err("max_lista() de lista vacía".to_string());
+            }
+            let mut m = v[0].a_numero()?;
+            for x in &v[1..] {
+                let f = x.a_numero()?;
+                if f > m {
+                    m = f;
+                }
+            }
+            Ok(Valor::Flotante(m))
+        }
+        _ => Err("max_lista() requiere una lista".to_string()),
+    }
+}
+
+fn nativa_min_lista(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("min_lista() espera 1 argumento".to_string());
+    }
+    match &args[0] {
+        Valor::Lista(v) => {
+            if v.is_empty() {
+                return Err("min_lista() de lista vacía".to_string());
+            }
+            let mut m = v[0].a_numero()?;
+            for x in &v[1..] {
+                let f = x.a_numero()?;
+                if f < m {
+                    m = f;
+                }
+            }
+            Ok(Valor::Flotante(m))
+        }
+        _ => Err("min_lista() requiere una lista".to_string()),
+    }
+}
+
+fn nativa_seno(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("seno() espera 1 argumento".to_string());
+    }
+    Ok(Valor::Flotante(args[0].a_numero()?.sin()))
+}
+
+fn nativa_coseno(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("coseno() espera 1 argumento".to_string());
+    }
+    Ok(Valor::Flotante(args[0].a_numero()?.cos()))
 }
 
 fn nativa_exp(args: &[Valor]) -> Result<Valor, String> {
