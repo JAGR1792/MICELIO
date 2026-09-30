@@ -165,8 +165,16 @@ impl Interprete {
         reg("min_lista", nativa_min_lista);
         reg("seno", nativa_seno);
         reg("coseno", nativa_coseno);
-        reg("__leer_archivo", nativa_dummy_text);
-        reg("__escribir_archivo", nativa_dummy);
+        reg("__archivo_leer", nativa_archivo_leer);
+        reg("__archivo_escribir", nativa_archivo_escribir);
+        reg("__archivo_existe", nativa_archivo_existe);
+        reg("__archivo_eliminar", nativa_archivo_eliminar);
+        reg("__archivo_tamano", nativa_archivo_tamano);
+        reg("__leer_csv_rapido", nativa_leer_csv);
+        reg("__json_parse", nativa_json_dummy);
+        reg("__json_stringify", nativa_json_stringify_dummy);
+        reg("__leer_archivo", nativa_archivo_leer);
+        reg("__escribir_archivo", nativa_archivo_escribir);
         reg("__existe_archivo", nativa_existe_falso);
         // Compatibilidad para ejemplos gráficos/de red: implementaciones
         // mínimas sin dependencias externas. Permiten ejecutar la lógica
@@ -2068,8 +2076,104 @@ fn nativa_leer_csv_dummy(_: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::nueva_lista(Vec::new()))
 }
 
-fn nativa_existe_falso(_: &[Valor]) -> Result<Valor, String> {
-    Ok(Valor::Logico(false))
+fn nativa_existe_falso(args: &[Valor]) -> Result<Valor, String> {
+    if args.is_empty() {
+        return Ok(Valor::Logico(false));
+    }
+    Ok(Valor::Logico(
+        std::path::Path::new(&args[0].a_texto()).exists(),
+    ))
+}
+
+fn nativa_archivo_leer(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("__archivo_leer() espera 1 argumento".to_string());
+    }
+    let ruta = args[0].a_texto();
+    std::fs::read_to_string(&ruta)
+        .map(Valor::Texto)
+        .map_err(|e| format!("No se pudo leer '{ruta}': {e}"))
+}
+
+fn nativa_archivo_escribir(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 2 {
+        return Err("__archivo_escribir() espera 2 argumentos".to_string());
+    }
+    let ruta = args[0].a_texto();
+    let contenido = args[1].a_texto();
+    std::fs::write(&ruta, contenido)
+        .map(|_| Valor::Nulo)
+        .map_err(|e| format!("No se pudo escribir '{ruta}': {e}"))
+}
+
+fn nativa_archivo_existe(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("__archivo_existe() espera 1 argumento".to_string());
+    }
+    Ok(Valor::Logico(
+        std::path::Path::new(&args[0].a_texto()).exists(),
+    ))
+}
+
+fn nativa_archivo_eliminar(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("__archivo_eliminar() espera 1 argumento".to_string());
+    }
+    let ruta = args[0].a_texto();
+    std::fs::remove_file(&ruta)
+        .map(|_| Valor::Nulo)
+        .map_err(|e| format!("No se pudo eliminar '{ruta}': {e}"))
+}
+
+fn nativa_archivo_tamano(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("__archivo_tamano() espera 1 argumento".to_string());
+    }
+    let ruta = args[0].a_texto();
+    std::fs::metadata(&ruta)
+        .map(|m| Valor::Entero(m.len() as i64))
+        .map_err(|e| format!("No se pudo obtener tamaño de '{ruta}': {e}"))
+}
+
+fn nativa_leer_csv(args: &[Valor]) -> Result<Valor, String> {
+    // `__leer_csv_rapido(ruta, delimitador, saltar_cabecera)` del intérprete
+    // de referencia. Implementación directa sin dependencias: lectura por
+    // líneas con separación por delimitador de un carácter.
+    if args.len() < 2 {
+        return Err("__leer_csv_rapido() espera ruta, delimitador y [saltar_cabecera]".to_string());
+    }
+    let ruta = args[0].a_texto();
+    let delim = args[1].a_texto().chars().next().unwrap_or(',');
+    let saltar: usize = if args.len() >= 3 {
+        args[2].a_numero().unwrap_or(0.0) as usize
+    } else {
+        0
+    };
+    let contenido =
+        std::fs::read_to_string(&ruta).map_err(|e| format!("No se pudo leer '{ruta}': {e}"))?;
+    let mut filas = Vec::new();
+    for (i, linea) in contenido.lines().enumerate() {
+        if i < saltar || linea.trim().is_empty() {
+            continue;
+        }
+        filas.push(Valor::nueva_lista(
+            linea
+                .split(delim)
+                .map(|c| Valor::Texto(c.trim().to_string()))
+                .collect(),
+        ));
+    }
+    Ok(Valor::nueva_lista(filas))
+}
+
+fn nativa_json_dummy(_: &[Valor]) -> Result<Valor, String> {
+    Ok(Valor::nuevo_diccionario(std::collections::HashMap::new()))
+}
+
+fn nativa_json_stringify_dummy(args: &[Valor]) -> Result<Valor, String> {
+    Ok(Valor::Texto(
+        args.first().map(|v| v.a_texto()).unwrap_or_default(),
+    ))
 }
 
 fn nativa_max_lista(args: &[Valor]) -> Result<Valor, String> {
