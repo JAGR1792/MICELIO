@@ -695,7 +695,7 @@ impl Interprete {
                 mapa.insert(k.clone(), v.clone());
             }
         }
-        let v = Valor::Diccionario(mapa);
+        let v = Valor::nuevo_diccionario(mapa);
         self.modulos.insert(ruta.to_string(), v.clone());
         Ok(v)
     }
@@ -742,7 +742,7 @@ impl Interprete {
                         }
                     }
                 }
-                Ok(Valor::Lista(out))
+                Ok(Valor::nueva_lista(out))
             }
             Expr::Dicc(pares) => {
                 let mut m = HashMap::new();
@@ -750,20 +750,21 @@ impl Interprete {
                     let ck = self.evaluar(k, env)?.a_texto();
                     m.insert(ck, self.evaluar(v, env)?);
                 }
-                Ok(Valor::Diccionario(m))
+                Ok(Valor::nuevo_diccionario(m))
             }
             Expr::Conjunto(items) => {
                 let mut out = Vec::new();
                 for x in items {
                     out.push(self.evaluar(x, env)?);
                 }
-                Ok(Valor::Lista(out))
+                Ok(Valor::nueva_lista(out))
             }
             Expr::Matriz(inner) => {
                 let v = self.evaluar(inner, env)?;
                 // La validación rectangular se realiza aquí para fallar pronto.
                 if let Valor::Lista(rows) = &v {
-                    for r in rows {
+                    let rows = rows.borrow();
+                    for r in rows.iter() {
                         if !matches!(r, Valor::Lista(_)) {
                             return Err(error("matriz requiere lista de listas"));
                         }
@@ -900,6 +901,7 @@ impl Interprete {
             }
             // Método definido en diccionario/módulo.
             if let Valor::Diccionario(m) = &b {
+                let m = m.borrow();
                 if let Some(Valor::Funcion(f)) = m.get(campo) {
                     let f = Rc::clone(f);
                     return self.llamar_funcion(&f, pos, nom);
@@ -921,9 +923,10 @@ impl Interprete {
         match f {
             Valor::Funcion(fd) => self.llamar_funcion(&fd, pos, nom),
             Valor::Nativa(_, g) => g(&pos).map_err(error),
-            Valor::Diccionario(m) if pos.is_empty() && nom.is_empty() => {
-                Err(error(format!("Diccionario no invocable ({})", m.len())))
-            }
+            Valor::Diccionario(m) if pos.is_empty() && nom.is_empty() => Err(error(format!(
+                "Diccionario no invocable ({})",
+                m.borrow().len()
+            ))),
             _ => Err(error("Valor no invocable")),
         }
     }
@@ -959,7 +962,7 @@ impl Interprete {
                 Self::definir(env, n, item.clone(), false)?;
             }
         }
-        Ok(Valor::Lista(
+        Ok(Valor::nueva_lista(
             nombres
                 .iter()
                 .map(|n| Self::obtener(env, n).unwrap_or(Valor::Nulo))
@@ -997,7 +1000,7 @@ impl Interprete {
                 Self::definir(env, n, v, false)?;
             }
         }
-        Ok(Valor::Lista(out))
+        Ok(Valor::nueva_lista(out))
     }
 
     /// Funcionales de orden superior con acceso al intérprete.
@@ -1019,7 +1022,7 @@ impl Interprete {
                 for x in items {
                     out.push(self.aplicar_unario(&f, x)?);
                 }
-                Ok(Valor::Lista(out))
+                Ok(Valor::nueva_lista(out))
             }
             "filter" => {
                 if pos.len() != 2 {
@@ -1033,7 +1036,7 @@ impl Interprete {
                         out.push(x);
                     }
                 }
-                Ok(Valor::Lista(out))
+                Ok(Valor::nueva_lista(out))
             }
             "reduce" => {
                 if pos.len() != 3 {
@@ -1133,7 +1136,7 @@ impl Interprete {
                 if pos.len() != 1 {
                     return Err(error("agregar() espera 1 argumento"));
                 }
-                lista.push(pos[0].clone());
+                lista.borrow_mut().push(pos[0].clone());
                 Ok(Some(Valor::Nulo))
             }
             "extender" => {
@@ -1141,7 +1144,7 @@ impl Interprete {
                     return Err(error("extender() espera 1 argumento"));
                 }
                 let extra = pos[0].materializar().map_err(error)?;
-                lista.extend(extra);
+                lista.borrow_mut().extend(extra);
                 Ok(Some(Valor::Nulo))
             }
             "quitar" => {
@@ -1149,15 +1152,15 @@ impl Interprete {
                     return Err(error("quitar() espera 0 o 1 argumento"));
                 }
                 if pos.is_empty() {
-                    lista.pop();
+                    lista.borrow_mut().pop();
                 } else {
                     let i = pos[0].a_numero().map_err(error)? as i64;
-                    let n = lista.len() as i64;
+                    let n = lista.borrow().len() as i64;
                     let j = if i < 0 { n + i } else { i };
                     if j < 0 || j >= n {
                         return Err(error("Índice fuera de rango"));
                     }
-                    lista.remove(j as usize);
+                    lista.borrow_mut().remove(j as usize);
                 }
                 Ok(Some(Valor::Nulo))
             }
@@ -1166,9 +1169,9 @@ impl Interprete {
                     return Err(error("insertar() espera 2 argumentos"));
                 }
                 let i = pos[0].a_numero().map_err(error)? as i64;
-                let n = lista.len() as i64;
+                let n = lista.borrow().len() as i64;
                 let j = (if i < 0 { n + i } else { i }).clamp(0, n) as usize;
-                lista.insert(j, pos[1].clone());
+                lista.borrow_mut().insert(j, pos[1].clone());
                 Ok(Some(Valor::Nulo))
             }
             _ => Ok(None),
@@ -1214,14 +1217,14 @@ impl Interprete {
                     local
                         .borrow_mut()
                         .valores
-                        .insert(p.nombre.clone(), Valor::Lista(resto));
+                        .insert(p.nombre.clone(), Valor::nueva_lista(resto));
                     i = pos.len();
                 }
                 TipoParam::Kwargs => {
                     local
                         .borrow_mut()
                         .valores
-                        .insert(p.nombre.clone(), Valor::Diccionario(nom.clone()));
+                        .insert(p.nombre.clone(), Valor::nuevo_diccionario(nom.clone()));
                 }
             }
         }
@@ -1234,7 +1237,7 @@ impl Interprete {
             local
                 .borrow_mut()
                 .valores
-                .insert(a.clone(), Valor::Lista(resto));
+                .insert(a.clone(), Valor::nueva_lista(resto));
         } else if i < pos.len() {
             return Err(error("Demasiados argumentos posicionales"));
         }
@@ -1331,10 +1334,12 @@ fn igualdad(a: &Valor, b: &Valor) -> Exito<bool> {
         (Valor::Flotante(x), Valor::Entero(y)) => Ok(*x == *y as f64),
         (Valor::Texto(x), Valor::Texto(y)) => Ok(x == y),
         (Valor::Lista(x), Valor::Lista(y)) => {
-            if x.len() != y.len() {
+            let xb = x.borrow();
+            let yb = y.borrow();
+            if xb.len() != yb.len() {
                 return Ok(false);
             }
-            for (u, v) in x.iter().zip(y.iter()) {
+            for (u, v) in xb.iter().zip(yb.iter()) {
                 if !igualdad(u, v)? {
                     return Ok(false);
                 }
@@ -1369,9 +1374,9 @@ fn suma(x: &Valor, y: &Valor) -> Exito<Valor> {
         (Valor::Texto(a), b) => Ok(Valor::Texto(format!("{a}{}", b.a_texto()))),
         (a, Valor::Texto(b)) => Ok(Valor::Texto(format!("{}{b}", a.a_texto()))),
         (Valor::Lista(a), Valor::Lista(b)) => {
-            let mut o = a.clone();
-            o.extend(b.clone());
-            Ok(Valor::Lista(o))
+            let mut o = a.borrow().clone();
+            o.extend(b.borrow().clone());
+            Ok(Valor::nueva_lista(o))
         }
         _ => {
             let a = x.a_numero().map_err(error)?;
@@ -1445,21 +1450,24 @@ fn aritmetica(op: OpBin, x: &Valor, y: &Valor) -> Exito<Valor> {
     }
 }
 
-fn es_matriz(rows: &[Valor]) -> bool {
-    !rows.is_empty() && rows.iter().all(|r| matches!(r, Valor::Lista(_)))
+fn es_matriz(rows: &crate::valor::ListaRef) -> bool {
+    let r = rows.borrow();
+    !r.is_empty() && r.iter().all(|x| matches!(x, Valor::Lista(_)))
 }
 
 /// Multiplicación de matrices con orden de bucles `i-k-j` para mejorar
 /// la localidad de caché frente al orden ingenuo `i-j-k`.
-fn multiplicar_matrices(a: &[Valor], b: &[Valor]) -> Exito<Valor> {
-    let ar = a.len();
-    let ac = match &a[0] {
-        Valor::Lista(r) => r.len(),
+fn multiplicar_matrices(a: &crate::valor::ListaRef, b: &crate::valor::ListaRef) -> Exito<Valor> {
+    let ab = a.borrow();
+    let bb = b.borrow();
+    let ar = ab.len();
+    let ac = match &ab[0] {
+        Valor::Lista(r) => r.borrow().len(),
         _ => return Err(error("Matriz inválida")),
     };
-    let br = b.len();
-    let bc = match &b[0] {
-        Valor::Lista(r) => r.len(),
+    let br = bb.len();
+    let bc = match &bb[0] {
+        Valor::Lista(r) => r.borrow().len(),
         _ => return Err(error("Matriz inválida")),
     };
     if ac != br {
@@ -1468,8 +1476,8 @@ fn multiplicar_matrices(a: &[Valor], b: &[Valor]) -> Exito<Valor> {
     // Copia `b` traspuesta para acceso secuencial en el bucle interno.
     let mut bt = vec![vec![0.0; br]; bc];
     for i in 0..br {
-        let row = match &b[i] {
-            Valor::Lista(r) => r,
+        let row = match &bb[i] {
+            Valor::Lista(r) => r.borrow().clone(),
             _ => return Err(error("Matriz inválida")),
         };
         for j in 0..bc {
@@ -1478,8 +1486,8 @@ fn multiplicar_matrices(a: &[Valor], b: &[Valor]) -> Exito<Valor> {
     }
     let mut out = Vec::with_capacity(ar);
     for i in 0..ar {
-        let row = match &a[i] {
-            Valor::Lista(r) => r,
+        let row = match &ab[i] {
+            Valor::Lista(r) => r.borrow().clone(),
             _ => return Err(error("Matriz inválida")),
         };
         let mut orow = Vec::with_capacity(bc);
@@ -1490,23 +1498,25 @@ fn multiplicar_matrices(a: &[Valor], b: &[Valor]) -> Exito<Valor> {
             }
             orow.push(Valor::Flotante(acc));
         }
-        out.push(Valor::Lista(orow));
+        out.push(Valor::nueva_lista(orow));
     }
-    Ok(Valor::Lista(out))
+    Ok(Valor::nueva_lista(out))
 }
 
 fn producto_punto(x: &Valor, y: &Valor) -> Exito<Valor> {
     match (x, y) {
         (Valor::Entero(a), Valor::Entero(b)) => Ok(Valor::Entero(a.wrapping_mul(*b))),
         (Valor::Lista(a), Valor::Lista(b)) => {
-            if a.len() != b.len() {
+            let ab = a.borrow();
+            let bb = b.borrow();
+            if ab.len() != bb.len() {
                 return Err(error("Producto elemento a elemento requiere mismo tamano"));
             }
-            let mut out = Vec::with_capacity(a.len());
-            for (u, v) in a.iter().zip(b.iter()) {
+            let mut out = Vec::with_capacity(ab.len());
+            for (u, v) in ab.iter().zip(bb.iter()) {
                 out.push(producto_punto(u, v)?);
             }
-            Ok(Valor::Lista(out))
+            Ok(Valor::nueva_lista(out))
         }
         _ => {
             let a = x.a_numero().map_err(error)?;
@@ -1543,7 +1553,8 @@ fn comparacion(op: OpBin, x: &Valor, y: &Valor) -> Exito<Valor> {
 fn pertenencia(x: &Valor, y: &Valor) -> Exito<Valor> {
     match y {
         Valor::Lista(v) => {
-            for item in v {
+            let vb = v.borrow();
+            for item in vb.iter() {
                 if igualdad(x, item)? {
                     return Ok(Valor::Logico(true));
                 }
@@ -1551,7 +1562,7 @@ fn pertenencia(x: &Valor, y: &Valor) -> Exito<Valor> {
             Ok(Valor::Logico(false))
         }
         Valor::Texto(t) => Ok(Valor::Logico(t.contains(&x.a_texto()))),
-        Valor::Diccionario(m) => Ok(Valor::Logico(m.contains_key(&x.a_texto()))),
+        Valor::Diccionario(m) => Ok(Valor::Logico(m.borrow().contains_key(&x.a_texto()))),
         Valor::Rango { .. } => {
             let items = y.materializar().map_err(error)?;
             for item in items {
@@ -1568,13 +1579,14 @@ fn pertenencia(x: &Valor, y: &Valor) -> Exito<Valor> {
 fn indizar(base: &Valor, indice: &Valor) -> Exito<Valor> {
     match base {
         Valor::Lista(v) => {
+            let vb = v.borrow();
             let i = indice.a_numero().map_err(error)? as i64;
-            let n = v.len() as i64;
+            let n = vb.len() as i64;
             let j = if i < 0 { n + i } else { i };
             if j < 0 || j >= n {
                 return Err(error("Índice fuera de rango"));
             }
-            Ok(v[j as usize].clone())
+            Ok(vb[j as usize].clone())
         }
         Valor::Texto(s) => {
             let i = indice.a_numero().map_err(error)? as i64;
@@ -1588,13 +1600,14 @@ fn indizar(base: &Valor, indice: &Valor) -> Exito<Valor> {
         }
         Valor::Diccionario(m) => {
             let k = indice.a_texto();
-            m.get(&k)
+            m.borrow()
+                .get(&k)
                 .cloned()
                 .ok_or_else(|| error(format!("Clave '{k}' no encontrada")))
         }
         Valor::Rango { .. } => {
             let items = base.materializar().map_err(error)?;
-            indizar(&Valor::Lista(items), indice)
+            indizar(&Valor::nueva_lista(items), indice)
         }
         _ => Err(error("Indexación no soportada para este tipo")),
     }
@@ -1603,6 +1616,7 @@ fn indizar(base: &Valor, indice: &Valor) -> Exito<Valor> {
 fn acceso(base: Valor, campo: &str) -> Exito<Valor> {
     match &base {
         Valor::Diccionario(m) => m
+            .borrow()
             .get(campo)
             .cloned()
             .ok_or_else(|| error(format!("Campo '{campo}' no encontrado"))),
@@ -1629,7 +1643,7 @@ fn metodo_nativo(
                 if !pos.is_empty() {
                     return Err(error("longitud() no recibe argumentos"));
                 }
-                Ok(Some(Valor::Entero(v.len() as i64)))
+                Ok(Some(Valor::Entero(v.borrow().len() as i64)))
             }
             // `agregar`, `quitar`, `insertar` y `extender` mutan por valor
             // semántico de lista del lenguaje; el intérprete reasigna el
@@ -1655,26 +1669,27 @@ fn asignar_en(cont: Valor, indices: &[Valor], valor: Valor) -> Exito<Valor> {
         return Ok(valor);
     }
     match cont {
-        Valor::Lista(mut v) => {
+        Valor::Lista(v) => {
             let i = indices[0].a_numero().map_err(error)? as i64;
-            let n = v.len() as i64;
+            let n = v.borrow().len() as i64;
             let j = if i < 0 { n + i } else { i };
             if j < 0 || j >= n {
                 return Err(error("Índice fuera de rango"));
             }
             if indices.len() == 1 {
-                v[j as usize] = valor;
+                v.borrow_mut()[j as usize] = valor;
             } else {
-                let sub = v[j as usize].clone();
-                v[j as usize] = asignar_en(sub, &indices[1..], valor)?;
+                let sub = v.borrow()[j as usize].clone();
+                let nv = asignar_en(sub, &indices[1..], valor)?;
+                v.borrow_mut()[j as usize] = nv;
             }
             Ok(Valor::Lista(v))
         }
-        Valor::Diccionario(mut m) => {
+        Valor::Diccionario(m) => {
             if indices.len() != 1 {
                 return Err(error("Asignación anidada en diccionario no soportada"));
             }
-            m.insert(indices[0].a_texto(), valor);
+            m.borrow_mut().insert(indices[0].a_texto(), valor);
             Ok(Valor::Diccionario(m))
         }
         _ => Err(error("Asignación indexada no soportada para este tipo")),
@@ -1851,13 +1866,13 @@ fn nativa_ordenar(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => {
-            let mut o = v.clone();
+            let mut o = v.borrow().clone();
             o.sort_by(|a, b| {
                 let x = a.a_numero().unwrap_or(0.0);
                 let y = b.a_numero().unwrap_or(0.0);
                 x.partial_cmp(&y).unwrap_or(std::cmp::Ordering::Equal)
             });
-            Ok(Valor::Lista(o))
+            Ok(Valor::nueva_lista(o))
         }
         _ => Err("ordenar() requiere una lista".to_string()),
     }
@@ -1869,9 +1884,10 @@ fn nativa_claves(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Diccionario(m) => {
-            let mut ks: Vec<Valor> = m.keys().cloned().map(Valor::Texto).collect();
+            let mb = m.borrow();
+            let mut ks: Vec<Valor> = mb.keys().cloned().map(Valor::Texto).collect();
             ks.sort_by(|a, b| a.a_texto().cmp(&b.a_texto()));
-            Ok(Valor::Lista(ks))
+            Ok(Valor::nueva_lista(ks))
         }
         _ => Err("claves() requiere un diccionario".to_string()),
     }
@@ -1883,9 +1899,12 @@ fn nativa_valores(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Diccionario(m) => {
-            let mut ks: Vec<&String> = m.keys().collect();
+            let mb = m.borrow();
+            let mut ks: Vec<String> = mb.keys().cloned().collect();
             ks.sort();
-            Ok(Valor::Lista(ks.into_iter().map(|k| m[k].clone()).collect()))
+            Ok(Valor::nueva_lista(
+                ks.into_iter().map(|k| mb[&k].clone()).collect(),
+            ))
         }
         _ => Err("valores() requiere un diccionario".to_string()),
     }
@@ -1897,11 +1916,12 @@ fn nativa_items(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Diccionario(m) => {
-            let mut ks: Vec<&String> = m.keys().collect();
+            let mb = m.borrow();
+            let mut ks: Vec<String> = mb.keys().cloned().collect();
             ks.sort();
-            Ok(Valor::Lista(
+            Ok(Valor::nueva_lista(
                 ks.into_iter()
-                    .map(|k| Valor::Lista(vec![Valor::Texto(k.clone()), m[k].clone()]))
+                    .map(|k| Valor::nueva_lista(vec![Valor::Texto(k.clone()), mb[&k].clone()]))
                     .collect(),
             ))
         }
@@ -1915,6 +1935,7 @@ fn nativa_primero(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => v
+            .borrow()
             .first()
             .cloned()
             .ok_or_else(|| "primero() de lista vacía".to_string()),
@@ -1928,6 +1949,7 @@ fn nativa_ultimo(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => v
+            .borrow()
             .last()
             .cloned()
             .ok_or_else(|| "ultimo() de lista vacía".to_string()),
@@ -1941,9 +1963,9 @@ fn nativa_invertir(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => {
-            let mut o = v.clone();
+            let mut o = v.borrow().clone();
             o.reverse();
-            Ok(Valor::Lista(o))
+            Ok(Valor::nueva_lista(o))
         }
         _ => Err("invertir() requiere una lista".to_string()),
     }
@@ -1955,9 +1977,9 @@ fn nativa_concatenar(args: &[Valor]) -> Result<Valor, String> {
     }
     match (&args[0], &args[1]) {
         (Valor::Lista(a), Valor::Lista(b)) => {
-            let mut o = a.clone();
-            o.extend(b.clone());
-            Ok(Valor::Lista(o))
+            let mut o = a.borrow().clone();
+            o.extend(b.borrow().clone());
+            Ok(Valor::nueva_lista(o))
         }
         _ => Err("concatenar() requiere dos listas".to_string()),
     }
@@ -1969,10 +1991,11 @@ fn nativa_suma_lista(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => {
+            let vb = v.borrow();
             let mut acc = 0.0;
             let mut entero = true;
             let mut ai: i64 = 0;
-            for x in v {
+            for x in vb.iter() {
                 match x {
                     Valor::Entero(i) => ai = ai.wrapping_add(*i),
                     _ => {
@@ -1984,7 +2007,7 @@ fn nativa_suma_lista(args: &[Valor]) -> Result<Valor, String> {
             if entero {
                 Ok(Valor::Entero(ai))
             } else {
-                for x in v {
+                for x in vb.iter() {
                     if matches!(x, Valor::Entero(_)) {
                         acc += x.a_numero()?;
                     }
@@ -2002,8 +2025,9 @@ fn nativa_producto_lista(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => {
+            let vb = v.borrow();
             let mut acc = 1.0;
-            for x in v {
+            for x in vb.iter() {
                 acc *= x.a_numero()?;
             }
             Ok(Valor::Flotante(acc))
@@ -2018,14 +2042,15 @@ fn nativa_promedio(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => {
-            if v.is_empty() {
+            let vb = v.borrow();
+            if vb.is_empty() {
                 return Err("promedio() requiere una lista no vacía".to_string());
             }
             let mut acc = 0.0;
-            for x in v {
+            for x in vb.iter() {
                 acc += x.a_numero()?;
             }
-            Ok(Valor::Flotante(acc / v.len() as f64))
+            Ok(Valor::Flotante(acc / vb.len() as f64))
         }
         _ => Err("promedio() requiere una lista".to_string()),
     }
@@ -2040,7 +2065,7 @@ fn nativa_dummy_text(_: &[Valor]) -> Result<Valor, String> {
 }
 
 fn nativa_leer_csv_dummy(_: &[Valor]) -> Result<Valor, String> {
-    Ok(Valor::Lista(Vec::new()))
+    Ok(Valor::nueva_lista(Vec::new()))
 }
 
 fn nativa_existe_falso(_: &[Valor]) -> Result<Valor, String> {
@@ -2053,11 +2078,12 @@ fn nativa_max_lista(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => {
-            if v.is_empty() {
+            let vb = v.borrow();
+            if vb.is_empty() {
                 return Err("max_lista() de lista vacía".to_string());
             }
-            let mut m = v[0].a_numero()?;
-            for x in &v[1..] {
+            let mut m = vb[0].a_numero()?;
+            for x in &vb[1..] {
                 let f = x.a_numero()?;
                 if f > m {
                     m = f;
@@ -2075,11 +2101,12 @@ fn nativa_min_lista(args: &[Valor]) -> Result<Valor, String> {
     }
     match &args[0] {
         Valor::Lista(v) => {
-            if v.is_empty() {
+            let vb = v.borrow();
+            if vb.is_empty() {
                 return Err("min_lista() de lista vacía".to_string());
             }
-            let mut m = v[0].a_numero()?;
-            for x in &v[1..] {
+            let mut m = vb[0].a_numero()?;
+            for x in &vb[1..] {
                 let f = x.a_numero()?;
                 if f < m {
                     m = f;

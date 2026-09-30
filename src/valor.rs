@@ -50,6 +50,14 @@ impl Entorno {
     }
 }
 
+/// Contenedor de lista con semántica por referencia (como Python).
+/// `Rc<RefCell<..>>` permite que múltiples variables y cierres compartan
+/// la misma lista y que el entrenamiento de redes neuronales mute pesos
+/// in-place sin copias defensivas.
+pub type ListaRef = std::rc::Rc<std::cell::RefCell<Vec<Valor>>>;
+/// Contenedor de diccionario con semántica por referencia.
+pub type DiccRef = std::rc::Rc<std::cell::RefCell<std::collections::HashMap<String, Valor>>>;
+
 /// Valor del lenguaje.
 #[derive(Debug, Clone)]
 pub enum Valor {
@@ -58,7 +66,7 @@ pub enum Valor {
     Entero(i64),
     Flotante(f64),
     Texto(String),
-    Lista(Vec<Valor>),
+    Lista(ListaRef),
     /// Rango perezoso `[inicio, fin)` con paso. Equivale a `rango()` sin
     /// materializar la lista, lo que permite bucles de millones de
     /// iteraciones con memoria `O(1)`.
@@ -67,7 +75,7 @@ pub enum Valor {
         fin: i64,
         paso: i64,
     },
-    Diccionario(HashMap<String, Valor>),
+    Diccionario(DiccRef),
     Funcion(Rc<FuncionDef>),
     /// Función nativa implementada en Rust. El `&'static str` identifica
     /// la primitiva para mensajes de error estables.
@@ -75,6 +83,16 @@ pub enum Valor {
 }
 
 impl Valor {
+    /// Crea una lista con semántica por referencia.
+    pub fn nueva_lista(v: Vec<Valor>) -> Self {
+        Valor::Lista(std::rc::Rc::new(std::cell::RefCell::new(v)))
+    }
+
+    /// Crea un diccionario con semántica por referencia.
+    pub fn nuevo_diccionario(m: std::collections::HashMap<String, Valor>) -> Self {
+        Valor::Diccionario(std::rc::Rc::new(std::cell::RefCell::new(m)))
+    }
+
     /// Nombre del tipo en español, coherente con `tipo()` del lenguaje.
     pub fn nombre_tipo(&self) -> &'static str {
         match self {
@@ -97,7 +115,7 @@ impl Valor {
             Valor::Entero(i) => *i != 0,
             Valor::Flotante(f) => *f != 0.0,
             Valor::Texto(s) => !s.is_empty(),
-            Valor::Lista(v) => !v.is_empty(),
+            Valor::Lista(v) => !v.borrow().is_empty(),
             Valor::Rango { inicio, fin, paso } => {
                 if *paso > 0 {
                     inicio < fin
@@ -105,7 +123,7 @@ impl Valor {
                     inicio > fin
                 }
             }
-            Valor::Diccionario(m) => !m.is_empty(),
+            Valor::Diccionario(m) => !m.borrow().is_empty(),
             Valor::Funcion(_) | Valor::Nativa(_, _) => true,
         }
     }
@@ -160,14 +178,15 @@ impl Valor {
             }
             Valor::Texto(s) => s.clone(),
             Valor::Lista(v) => {
-                let inner: Vec<String> = v.iter().map(|x| x.repr()).collect();
+                let inner: Vec<String> = v.borrow().iter().map(|x| x.repr()).collect();
                 format!("[{}]", inner.join(", "))
             }
             Valor::Rango { inicio, fin, paso } => {
                 format!("rango({inicio}, {fin}, {paso})")
             }
             Valor::Diccionario(m) => {
-                let mut pares: Vec<String> = m
+                let mref = m.borrow();
+                let mut pares: Vec<String> = mref
                     .iter()
                     .map(|(k, v)| format!("{k}: {}", v.repr()))
                     .collect();
@@ -191,7 +210,7 @@ impl Valor {
     pub fn longitud(&self) -> Result<i64, String> {
         match self {
             Valor::Texto(s) => Ok(s.chars().count() as i64),
-            Valor::Lista(v) => Ok(v.len() as i64),
+            Valor::Lista(v) => Ok(v.borrow().len() as i64),
             Valor::Rango { inicio, fin, paso } => {
                 if *paso == 0 {
                     return Err("Rango con paso 0".to_string());
@@ -202,7 +221,7 @@ impl Valor {
                     Ok((fin - inicio + paso - paso.signum()) / paso)
                 }
             }
-            Valor::Diccionario(m) => Ok(m.len() as i64),
+            Valor::Diccionario(m) => Ok(m.borrow().len() as i64),
             v => Err(format!("longitud() no soporta {}", v.nombre_tipo())),
         }
     }
@@ -213,10 +232,10 @@ impl Valor {
     /// directamente sin materializar.
     pub fn materializar(&self) -> Result<Vec<Valor>, String> {
         match self {
-            Valor::Lista(v) => Ok(v.clone()),
+            Valor::Lista(v) => Ok(v.borrow().clone()),
             Valor::Texto(s) => Ok(s.chars().map(|c| Valor::Texto(c.to_string())).collect()),
             Valor::Diccionario(m) => {
-                let mut ks: Vec<String> = m.keys().cloned().collect();
+                let mut ks: Vec<String> = m.borrow().keys().cloned().collect();
                 ks.sort();
                 Ok(ks.into_iter().map(Valor::Texto).collect())
             }
