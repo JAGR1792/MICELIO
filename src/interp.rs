@@ -2101,6 +2101,11 @@ fn nativa_archivo_escribir(args: &[Valor]) -> Result<Valor, String> {
     }
     let ruta = args[0].a_texto();
     let contenido = args[1].a_texto();
+    if let Some(padre) = std::path::Path::new(&ruta).parent() {
+        if !padre.as_os_str().is_empty() {
+            let _ = std::fs::create_dir_all(padre);
+        }
+    }
     std::fs::write(&ruta, contenido)
         .map(|_| Valor::Nulo)
         .map_err(|e| format!("No se pudo escribir '{ruta}': {e}"))
