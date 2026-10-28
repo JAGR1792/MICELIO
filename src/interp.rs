@@ -209,21 +209,19 @@ impl Interprete {
         reg("__leer_archivo", nativa_archivo_leer);
         reg("__escribir_archivo", nativa_archivo_escribir);
         reg("__existe_archivo", nativa_existe_falso);
-        // Compatibilidad para ejemplos gráficos/de red: implementaciones
-        // mínimas sin dependencias externas. Permiten ejecutar la lógica
-        // computacional aunque no generen artefactos visuales reales.
-        reg("__grafico_reset", nativa_dummy);
-        reg("__grafico_set_pixel", nativa_dummy);
-        reg("__grafico_draw_axes", nativa_dummy);
-        reg("__grafico_guardar", nativa_dummy_text);
-        reg("__grafico_last_path", nativa_dummy_text);
-        reg("__grafico_mostrar", nativa_dummy);
-        reg("__grafico_linea", nativa_dummy);
-        reg("__grafico_rectangulo", nativa_dummy);
-        reg("__grafico_circulo", nativa_dummy);
-        reg("__grafico_texto", nativa_dummy);
-        reg("__grafico_poligono", nativa_dummy);
-        reg("__grafico_limpiar", nativa_dummy);
+        // Motor de gráficos real (crate `image`).
+        reg("__grafico_reset", grafico_reset);
+        reg("__grafico_set_pixel", grafico_set_pixel);
+        reg("__grafico_linea", grafico_linea);
+        reg("__grafico_rectangulo", grafico_rectangulo);
+        reg("__grafico_circulo", grafico_circulo);
+        reg("__grafico_texto", grafico_texto);
+        reg("__grafico_poligono", grafico_poligono);
+        reg("__grafico_guardar", grafico_guardar);
+        reg("__grafico_last_path", grafico_last_path);
+        reg("__grafico_mostrar", grafico_mostrar);
+        reg("__grafico_limpiar", grafico_limpiar);
+        reg("__grafico_draw_axes", grafico_draw_axes);
         // GUI y web (GTK/Flask) como stubs para ejecución de la lógica.
         for _name in [
             "__gui_alert",
@@ -959,6 +957,12 @@ impl Interprete {
     }
 
     fn llamada(&mut self, callee: &Expr, args: &[ArgLlamada], env: &EntornoRef) -> Exito<Valor> {
+        if let Expr::Acceso { base, campo } = callee {
+            let _ = campo;
+            if let Expr::Variable(v) = base.as_ref() {
+                if v == "g" {}
+            }
+        }
         // Formas internas y funcionales de orden superior. Requieren acceso
         // al intérprete para invocar funciones, por lo que se interceptan
         // antes de la evaluación general.
@@ -980,8 +984,10 @@ impl Interprete {
         // variables (`lista.agregar`, etc.) se aplican directamente sobre
         // el entorno para conservar la semántica por referencia del lenguaje.
         if let Expr::Acceso { base, campo } = callee {
+            let _ = campo;
             if let Expr::Variable(nombre_var) = base.as_ref() {
-                if let Some(v) = self.metodo_mutante(nombre_var, campo, args, env)? {
+                let mm = self.metodo_mutante(nombre_var, campo, args, env)?;
+                if let Some(v) = mm {
                     return Ok(v);
                 }
             }
@@ -1001,8 +1007,8 @@ impl Interprete {
             }
             // Método definido en diccionario/módulo.
             if let Valor::Diccionario(m) = &b {
-                let m = m.borrow();
-                if let Some(Valor::Funcion(f)) = m.get(campo) {
+                let mb = m.borrow();
+                if let Some(Valor::Funcion(f)) = mb.get(campo) {
                     let f = Rc::clone(f);
                     return self.llamar_funcion(&f, pos, nom);
                 }
@@ -1808,18 +1814,8 @@ fn metodo_nativo(
     // Métodos gráficos y de E/S del intérprete de referencia se
     // implementan como stubs que devuelven nulo, permitiendo ejecutar la
     // lógica computacional de los ejemplos sin dependencias externas.
-    if campo.starts_with("set_")
-        || campo.starts_with("pintar_")
-        || campo == "scatter"
-        || campo == "mostrar"
-        || campo == "guardar"
-        || campo == "titulo"
-        || campo == "etiquetas"
-        || campo == "color_linea"
-        || campo == "linea_sobre_grafico"
-        || campo == "iniciar_grafico"
-        || campo == "estilo"
-    {
+    // Stubs mínimos solo para métodos sin implementación Micelio equivalente.
+    if campo == "scatter" || campo == "mostrar" {
         return Ok(Some(Valor::Nulo));
     }
     match base {
@@ -2277,6 +2273,43 @@ fn nativa_promedio(args: &[Valor]) -> Result<Valor, String> {
         }
         _ => Err("promedio() requiere una lista".to_string()),
     }
+}
+
+fn grafico_reset(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::reset(args)
+}
+fn grafico_set_pixel(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::set_pixel(args)
+}
+fn grafico_linea(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::linea(args)
+}
+fn grafico_rectangulo(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::rectangulo(args)
+}
+fn grafico_circulo(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::circulo(args)
+}
+fn grafico_texto(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::texto(args)
+}
+fn grafico_poligono(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::poligono(args)
+}
+fn grafico_guardar(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::guardar(args)
+}
+fn grafico_last_path(_args: &[Valor]) -> Result<Valor, String> {
+    Ok(Valor::Texto(String::new()))
+}
+fn grafico_mostrar(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::mostrar(args)
+}
+fn grafico_limpiar(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::limpiar(args)
+}
+fn grafico_draw_axes(args: &[Valor]) -> Result<Valor, String> {
+    crate::grafico::draw_axes(args)
 }
 
 fn nativa_dummy(_: &[Valor]) -> Result<Valor, String> {
