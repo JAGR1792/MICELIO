@@ -118,6 +118,11 @@ fn ayuda() {
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() == 1 {
+        // Sin argumentos: modo REPL interactivo.
+        repl();
+        return;
+    }
+    if args.len() == 2 && (args[1] == "--bench" || args[1] == "-b") {
         bench();
         return;
     }
@@ -126,5 +131,117 @@ fn main() {
         "--lexer" => demo_lexer(),
         "--help" | "-h" => ayuda(),
         ruta => std::process::exit(ejecutar_archivo(ruta)),
+    }
+}
+
+/// Modo REPL interactivo.
+fn repl() {
+    use std::io::{self, BufRead, Write};
+    let stdin = io::stdin();
+    // `_` siempre existe para continuación de pipe.
+    let mut visitor_env = interp::Interprete::new(".".to_string());
+    visitor_env
+        .global
+        .borrow_mut()
+        .valores
+        .insert("_".to_string(), crate::valor::Valor::Nulo);
+
+    println!("Micelio REPL (escribe 'salir' para terminar, ':ayuda' para ayuda)");
+    let mut buffer = String::new();
+    let mut brace_depth: i32 = 0;
+
+    for line in stdin.lock().lines() {
+        let line = match line {
+            Ok(l) => l,
+            Err(_) => break,
+        };
+        let trimmed = line.trim();
+
+        if trimmed.is_empty() && brace_depth == 0 {
+            continue;
+        }
+
+        if trimmed == "salir" || trimmed == "exit" || trimmed == "quit" {
+            break;
+        }
+
+        // Comandos del sistema.
+        if trimmed == ":ayuda" || trimmed == ":help" {
+            println!("Comandos:");
+            println!("  :ayuda, :help     Muestra esta ayuda");
+            println!("  :vars             Lista las variables globales");
+            println!("  :salir, salir     Termina el REPL");
+            println!("  :guardar <archivo> Guarda el historial");
+            println!("  :cargar <archivo>  Carga y ejecuta un archivo");
+            continue;
+        }
+        if trimmed == ":vars" {
+            let env = visitor_env.global.borrow();
+            println!("--- Variables Globales ---");
+            for (k, v) in &env.valores {
+                if !k.starts_with("__") {
+                    println!("  {} = {}", k, v);
+                }
+            }
+            println!("--------------------------");
+            continue;
+        }
+        if let Some(rest) = trimmed.strip_prefix(":cargar ") {
+            let ruta = rest.trim();
+            match visitor_env.ejecutar_archivo(ruta) {
+                Ok(_) => println!("Archivo '{}' ejecutado.", ruta),
+                Err(e) => eprintln!("Error: {}", e),
+            }
+            continue;
+        }
+        if let Some(rest) = trimmed.strip_prefix(":guardar ") {
+            let ruta = rest.trim();
+            // Guarda el buffer acumulado.
+            if std::fs::write(ruta, &buffer).is_ok() {
+                println!("Guardado en '{}'.", ruta);
+            } else {
+                eprintln!("No se pudo guardar '{}'.", ruta);
+            }
+            continue;
+        }
+
+        // Acumula líneas para bloques multilínea.
+        buffer.push_str(&line);
+        buffer.push('\n');
+        for ch in line.chars() {
+            match ch {
+                '{' => brace_depth += 1,
+                '}' => brace_depth -= 1,
+                _ => {}
+            }
+        }
+
+        if brace_depth > 0 {
+            print!("... ");
+            let _ = io::stdout().flush();
+            continue;
+        }
+
+        // Continuación de pipe: línea que empieza con |>
+        let mut codigo = buffer.clone();
+        if codigo.trim_start().starts_with("|>") {
+            codigo = format!("_ {}", codigo.trim_start());
+        }
+
+        match visitor_env.ejecutar_fuente(&codigo) {
+            Ok(v) => {
+                if !matches!(v, crate::valor::Valor::Nulo) {
+                    println!("{}", v);
+                    visitor_env
+                        .global
+                        .borrow_mut()
+                        .valores
+                        .insert("_".to_string(), v);
+                }
+            }
+            Err(e) => eprintln!("Error: {}", e),
+        }
+        buffer.clear();
+        brace_depth = 0;
     }
 }
