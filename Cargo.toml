@@ -28,6 +28,7 @@ debug = true
 image = "0.25"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
+fontdue = "0.9"
 tiny_http = "0.12"
 # El lexer, parser e intérprete están implementados con la biblioteca estándar,
 # lo que elimina el coste de arranque de ANTLR y facilita la distribución
