@@ -72,39 +72,101 @@ pub fn poner_pixel(img: &mut RgbImage, x: i32, y: i32, c: Rgb<u8>) {
     }
 }
 
-pub fn linea_bresenham(
-    img: &mut RgbImage,
-    x0: i32,
-    y0: i32,
-    x1: i32,
-    y1: i32,
-    c: Rgb<u8>,
-    grosor: i32,
-) {
-    let dx = (x1 - x0).abs();
-    let dy = (y1 - y0).abs();
-    let sx = if x0 < x1 { 1 } else { -1 };
-    let sy = if y0 < y1 { 1 } else { -1 };
-    let mut err = dx - dy;
-    let mut x = x0;
-    let mut y = y0;
-    loop {
-        for gy in -grosor..=grosor {
-            for gx in -grosor..=grosor {
-                poner_pixel(img, x + gx, y + gy, c);
-            }
+fn poner_pixel_alpha(img: &mut RgbImage, x: i32, y: i32, c: Rgb<u8>, alpha: f64) {
+    if x < 0 || y < 0 || x as u32 >= img.width() || y as u32 >= img.height() {
+        return;
+    }
+    let a = (alpha * 255.0).clamp(0.0, 255.0) as u32;
+    if a == 0 {
+        return;
+    }
+    let existing = img.get_pixel(x as u32, y as u32);
+    let blend =
+        |comp: u8, txt: u8| -> u8 { ((comp as u32 * (255 - a) + txt as u32 * a) / 255) as u8 };
+    img.put_pixel(
+        x as u32,
+        y as u32,
+        Rgb([
+            blend(existing[0], c[0]),
+            blend(existing[1], c[1]),
+            blend(existing[2], c[2]),
+        ]),
+    );
+}
+
+pub fn linea_wu(img: &mut RgbImage, x0: f64, y0: f64, x1: f64, y1: f64, c: Rgb<u8>, grosor: f64) {
+    let dx = x1 - x0;
+    let dy = y1 - y0;
+    let steep = dy.abs() > dx.abs();
+
+    let (x0, y0, x1, y1) = if steep {
+        (y0, x0, y1, x1)
+    } else {
+        (x0, y0, x1, y1)
+    };
+
+    let (x0, x1, y0, y1) = if x0 > x1 {
+        (x1, x0, y1, y0)
+    } else {
+        (x0, x1, y0, y1)
+    };
+
+    let dx = x1 - x0;
+    let dy = y1 - y0;
+    let grad = if dx != 0.0 { dy / dx } else { 0.0 };
+
+    let xend = x0.round();
+    let yend = y0 + grad * (xend - x0);
+    let xgap = 1.0 - (x0 + 0.5).fract();
+    let xpxl1 = xend as i32;
+    let ypxl1 = yend.floor() as i32;
+
+    if steep {
+        poner_pixel_alpha(img, ypxl1, xpxl1, c, (1.0 - yend.fract()) * xgap);
+        poner_pixel_alpha(img, ypxl1 + 1, xpxl1, c, yend.fract() * xgap);
+    } else {
+        poner_pixel_alpha(img, xpxl1, ypxl1, c, (1.0 - yend.fract()) * xgap);
+        poner_pixel_alpha(img, xpxl1, ypxl1 + 1, c, yend.fract() * xgap);
+    }
+
+    let mut intery = yend + grad;
+
+    let xend = x1.round();
+    let yend = y1 + grad * (xend - x1);
+    let xgap = (x1 + 0.5).fract();
+    let xpxl2 = xend as i32;
+    let ypxl2 = yend.floor() as i32;
+
+    if steep {
+        poner_pixel_alpha(img, ypxl2, xpxl2, c, (1.0 - yend.fract()) * xgap);
+        poner_pixel_alpha(img, ypxl2 + 1, xpxl2, c, yend.fract() * xgap);
+    } else {
+        poner_pixel_alpha(img, xpxl2, ypxl2, c, (1.0 - yend.fract()) * xgap);
+        poner_pixel_alpha(img, xpxl2, ypxl2 + 1, c, yend.fract() * xgap);
+    }
+
+    if steep {
+        for x in (xpxl1 + 1)..xpxl2 {
+            let y = intery.floor() as i32;
+            let frac = intery.fract();
+            poner_pixel_alpha(img, y, x, c, 1.0 - frac);
+            poner_pixel_alpha(img, y + 1, x, c, frac);
+            intery += grad;
         }
-        if x == x1 && y == y1 {
-            break;
+    } else {
+        for x in (xpxl1 + 1)..xpxl2 {
+            let y = intery.floor() as i32;
+            let frac = intery.fract();
+            poner_pixel_alpha(img, x, y, c, 1.0 - frac);
+            poner_pixel_alpha(img, x, y + 1, c, frac);
+            intery += grad;
         }
-        let e2 = 2 * err;
-        if e2 > -dy {
-            err -= dy;
-            x += sx;
-        }
-        if e2 < dx {
-            err += dx;
-            y += sy;
+    }
+
+    if grosor > 1.0 {
+        for g in 1..=(grosor as i32) {
+            linea_wu(img, x0 + g as f64, y0, x1 + g as f64, y1, c, 1.0);
+            linea_wu(img, x0 - g as f64, y0, x1 - g as f64, y1, c, 1.0);
         }
     }
 }
@@ -241,7 +303,6 @@ pub fn reset(args: &[crate::valor::Valor]) -> Result<crate::valor::Valor, String
     let margen = args[2].a_numero()? as u32;
     let img = ImageBuffer::from_pixel(ancho, alto, Rgb([255, 255, 255]));
     let mut g = ESTADO.lock().unwrap();
-    eprintln!("[reset] setting state ancho={} alto={}", ancho, alto);
     *g = Some(EstadoGrafico {
         ancho,
         alto,
@@ -289,7 +350,15 @@ pub fn linea(args: &[crate::valor::Valor]) -> Result<crate::valor::Valor, String
     let b = args[6].a_numero()? as i64;
     let grosor = args[7].a_numero()? as i32;
     con_estado(|e| {
-        linea_bresenham(&mut e.img, x0, y0, x1, y1, color(r, g, b), grosor);
+        linea_wu(
+            &mut e.img,
+            x0 as f64,
+            y0 as f64,
+            x1 as f64,
+            y1 as f64,
+            color(r, g, b),
+            grosor as f64,
+        );
     });
     Ok(Valor::Nulo)
 }
@@ -384,27 +453,27 @@ pub fn poligono(args: &[crate::valor::Valor]) -> Result<crate::valor::Valor, Str
     }
     con_estado(|e| {
         for w in puntos.windows(2) {
-            linea_bresenham(
+            linea_wu(
                 &mut e.img,
-                w[0].0,
-                w[0].1,
-                w[1].0,
-                w[1].1,
+                w[0].0 as f64,
+                w[0].1 as f64,
+                w[1].0 as f64,
+                w[1].1 as f64,
                 color(r, g, b),
-                1,
+                1.0,
             );
         }
         if puntos.len() > 2 {
             let first = puntos[0];
             let last = puntos[puntos.len() - 1];
-            linea_bresenham(
+            linea_wu(
                 &mut e.img,
-                last.0,
-                last.1,
-                first.0,
-                first.1,
+                last.0 as f64,
+                last.1 as f64,
+                first.0 as f64,
+                first.1 as f64,
                 color(r, g, b),
-                1,
+                1.0,
             );
         }
     });
@@ -437,8 +506,24 @@ pub fn guardar(args: &[crate::valor::Valor]) -> Result<crate::valor::Valor, Stri
         let right = e.ancho as i32 - e.margen as i32;
         let top = e.margen as i32;
         let bottom = e.alto as i32 - e.margen as i32;
-        linea_bresenham(&mut e.img, left, bottom, right, bottom, Rgb([0, 0, 0]), 2);
-        linea_bresenham(&mut e.img, left, top, left, bottom, Rgb([0, 0, 0]), 2);
+        linea_wu(
+            &mut e.img,
+            left as f64,
+            bottom as f64,
+            right as f64,
+            bottom as f64,
+            Rgb([0, 0, 0]),
+            2.0,
+        );
+        linea_wu(
+            &mut e.img,
+            left as f64,
+            top as f64,
+            left as f64,
+            bottom as f64,
+            Rgb([0, 0, 0]),
+            2.0,
+        );
     });
     // Guarda.
     let img = {
