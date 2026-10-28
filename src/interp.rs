@@ -78,6 +78,12 @@ fn error(mensaje: impl Into<String>) -> ErrorEjecucion {
     }
 }
 
+use std::sync::Mutex as StdMutex;
+
+/// Tema GUI activo (estado global simple).
+static TEMA_GUI: std::sync::LazyLock<StdMutex<String>> =
+    std::sync::LazyLock::new(|| StdMutex::new(String::from("caelestia")));
+
 /// Intérprete con entorno global, directorio base para `importar` y
 /// acumulador de salida para pruebas deterministas.
 pub struct Interprete {
@@ -262,9 +268,9 @@ impl Interprete {
         reg("__gui_show_image", nativa_dummy);
         reg("__gui_file_copy", nativa_dummy);
         reg("__gui_calc_window", nativa_dummy);
-        reg("__gui_set_theme", nativa_dummy);
-        reg("__gui_get_theme", nativa_dummy_text);
-        reg("__gui_list_themes", nativa_dummy_lista);
+        reg("__gui_set_theme", nativa_gui_set_theme);
+        reg("__gui_get_theme", nativa_gui_get_theme);
+        reg("__gui_list_themes", nativa_gui_list_themes);
         reg("__flask_disponible", nativa_dummy_false);
         reg("__flask_demo", nativa_dummy);
         reg("__flask_generar_demo", nativa_dummy);
@@ -2410,6 +2416,31 @@ fn nativa_hifa_listar_rutas(args: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::nueva_lista(Vec::new()))
 }
 
+fn nativa_gui_set_theme(args: &[Valor]) -> Result<Valor, String> {
+    if args.is_empty() {
+        return Err("__gui_set_theme requiere 1 argumento".to_string());
+    }
+    let nombre = args[0].a_texto();
+    let mut g = TEMA_GUI.lock().unwrap();
+    *g = nombre;
+    Ok(Valor::Nulo)
+}
+
+fn nativa_gui_get_theme(_: &[Valor]) -> Result<Valor, String> {
+    let g = TEMA_GUI.lock().unwrap();
+    Ok(Valor::Texto(g.clone()))
+}
+
+fn nativa_gui_list_themes(_: &[Valor]) -> Result<Valor, String> {
+    Ok(Valor::nueva_lista(vec![
+        Valor::Texto("caelestia".to_string()),
+        Valor::Texto("ocean".to_string()),
+        Valor::Texto("forest".to_string()),
+        Valor::Texto("sunset".to_string()),
+        Valor::Texto("mono".to_string()),
+    ]))
+}
+
 fn nativa_dummy(_: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::Nulo)
 }
@@ -2424,10 +2455,6 @@ fn nativa_dummy_text_bool(_: &[Valor]) -> Result<Valor, String> {
 
 fn nativa_dummy_false(_: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::Logico(false))
-}
-
-fn nativa_dummy_lista(_: &[Valor]) -> Result<Valor, String> {
-    Ok(Valor::nueva_lista(Vec::new()))
 }
 
 fn nativa_existe_falso(args: &[Valor]) -> Result<Valor, String> {
