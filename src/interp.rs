@@ -268,17 +268,17 @@ impl Interprete {
         reg("__flask_disponible", nativa_dummy_false);
         reg("__flask_demo", nativa_dummy);
         reg("__flask_generar_demo", nativa_dummy);
-        reg("__hifa_crear", nativa_dummy_hifa);
+        reg("__hifa_crear", nativa_hifa_crear);
         reg("__hifa_estaticos", nativa_dummy);
         reg("__hifa_plantillas", nativa_dummy);
-        reg("__hifa_ruta_texto", nativa_dummy);
-        reg("__hifa_ruta_json", nativa_dummy);
+        reg("__hifa_ruta_texto", nativa_hifa_ruta_texto);
+        reg("__hifa_ruta_json", nativa_hifa_ruta_json);
         reg("__hifa_ruta_template", nativa_dummy);
         reg("__hifa_ruta_archivo", nativa_dummy);
         reg("__hifa_ruta_redirect", nativa_dummy);
         reg("__hifa_not_found_text", nativa_dummy);
-        reg("__hifa_not_found_json", nativa_dummy);
-        reg("__hifa_listar_rutas", nativa_dummy_lista);
+        reg("__hifa_not_found_json", nativa_hifa_not_found_json);
+        reg("__hifa_listar_rutas", nativa_hifa_listar_rutas);
         reg("__hifa_iniciar", nativa_dummy);
         reg("__hifa_generar_demo", nativa_dummy);
     }
@@ -2312,6 +2312,104 @@ fn grafico_draw_axes(args: &[Valor]) -> Result<Valor, String> {
     crate::grafico::draw_axes(args)
 }
 
+fn nativa_hifa_crear(args: &[Valor]) -> Result<Valor, String> {
+    let nombre = args.first().map(|v| v.a_texto()).unwrap_or_default();
+    let mut m = std::collections::HashMap::new();
+    m.insert("nombre".to_string(), Valor::Texto(nombre));
+    m.insert(
+        "rutas".to_string(),
+        Valor::nuevo_diccionario(std::collections::HashMap::new()),
+    );
+    m.insert("not_found".to_string(), Valor::Nulo);
+    Ok(Valor::nuevo_diccionario(m))
+}
+
+fn nativa_hifa_ruta_texto(args: &[Valor]) -> Result<Valor, String> {
+    // (app, metodo, ruta, contenido, content_type, estado)
+    if args.len() < 6 {
+        return Err("__hifa_ruta_texto requiere 6 argumentos".to_string());
+    }
+    let app = &args[0];
+    let metodo = args[1].a_texto();
+    let ruta = args[2].a_texto();
+    let contenido = args[3].a_texto();
+    let ct = args[4].a_texto();
+    let estado = args[5].a_numero()? as i64;
+    if let Valor::Diccionario(m) = app {
+        let mb = m.borrow_mut();
+        let rutas = mb.get("rutas").cloned();
+        if let Some(Valor::Diccionario(rm)) = rutas {
+            let mut rr = rm.borrow_mut();
+            let mut info = std::collections::HashMap::new();
+            info.insert("metodo".to_string(), Valor::Texto(metodo));
+            info.insert("tipo".to_string(), Valor::Texto("text".to_string()));
+            info.insert("contenido".to_string(), Valor::Texto(contenido));
+            info.insert("content_type".to_string(), Valor::Texto(ct));
+            info.insert("estado".to_string(), Valor::Entero(estado));
+            rr.insert(ruta, Valor::nuevo_diccionario(info));
+        }
+    }
+    Ok(Valor::Nulo)
+}
+
+fn nativa_hifa_ruta_json(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() < 5 {
+        return Err("__hifa_ruta_json requiere 5 argumentos".to_string());
+    }
+    let app = &args[0];
+    let metodo = args[1].a_texto();
+    let ruta = args[2].a_texto();
+    let datos = &args[3];
+    let estado = args[4].a_numero()? as i64;
+    if let Valor::Diccionario(m) = app {
+        let mb = m.borrow_mut();
+        let rutas = mb.get("rutas").cloned();
+        if let Some(Valor::Diccionario(rm)) = rutas {
+            let mut rr = rm.borrow_mut();
+            let mut info = std::collections::HashMap::new();
+            info.insert("metodo".to_string(), Valor::Texto(metodo));
+            info.insert("tipo".to_string(), Valor::Texto("json".to_string()));
+            info.insert("datos".to_string(), datos.clone());
+            info.insert("estado".to_string(), Valor::Entero(estado));
+            rr.insert(ruta, Valor::nuevo_diccionario(info));
+        }
+    }
+    Ok(Valor::Nulo)
+}
+
+fn nativa_hifa_not_found_json(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() < 2 {
+        return Err("__hifa_not_found_json requiere 2 argumentos".to_string());
+    }
+    let app = &args[0];
+    let datos = &args[1];
+    if let Valor::Diccionario(m) = app {
+        let mut mb = m.borrow_mut();
+        mb.insert("not_found".to_string(), datos.clone());
+        mb.insert(
+            "not_found_type".to_string(),
+            Valor::Texto("json".to_string()),
+        );
+    }
+    Ok(Valor::Nulo)
+}
+
+fn nativa_hifa_listar_rutas(args: &[Valor]) -> Result<Valor, String> {
+    if args.is_empty() {
+        return Err("__hifa_listar_rutas requiere 1 argumento".to_string());
+    }
+    if let Valor::Diccionario(m) = &args[0] {
+        let mb = m.borrow();
+        if let Some(Valor::Diccionario(rm)) = mb.get("rutas") {
+            let rmb = rm.borrow();
+            let mut keys: Vec<Valor> = rmb.keys().cloned().map(Valor::Texto).collect();
+            keys.sort_by_key(|a| a.a_texto());
+            return Ok(Valor::nueva_lista(keys));
+        }
+    }
+    Ok(Valor::nueva_lista(Vec::new()))
+}
+
 fn nativa_dummy(_: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::Nulo)
 }
@@ -2330,10 +2428,6 @@ fn nativa_dummy_false(_: &[Valor]) -> Result<Valor, String> {
 
 fn nativa_dummy_lista(_: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::nueva_lista(Vec::new()))
-}
-
-fn nativa_dummy_hifa(_: &[Valor]) -> Result<Valor, String> {
-    Ok(Valor::nuevo_diccionario(std::collections::HashMap::new()))
 }
 
 fn nativa_existe_falso(args: &[Valor]) -> Result<Valor, String> {
