@@ -204,8 +204,8 @@ impl Interprete {
         reg("__archivo_eliminar", nativa_archivo_eliminar);
         reg("__archivo_tamano", nativa_archivo_tamano);
         reg("__leer_csv_rapido", nativa_leer_csv);
-        reg("__json_parse", nativa_json_dummy);
-        reg("__json_stringify", nativa_json_stringify_dummy);
+        reg("__json_parse", nativa_json_parse);
+        reg("__json_stringify", nativa_json_stringify);
         reg("__leer_archivo", nativa_archivo_leer);
         reg("__escribir_archivo", nativa_archivo_escribir);
         reg("__existe_archivo", nativa_existe_falso);
@@ -1815,7 +1815,7 @@ fn metodo_nativo(
     // implementan como stubs que devuelven nulo, permitiendo ejecutar la
     // lógica computacional de los ejemplos sin dependencias externas.
     // Stubs mínimos solo para métodos sin implementación Micelio equivalente.
-    if campo == "scatter" || campo == "mostrar" {
+    if campo == "scatter" || campo == "mostrar" || campo == "set_titulo" {
         return Ok(Some(Valor::Nulo));
     }
     match base {
@@ -2436,14 +2436,68 @@ fn nativa_leer_csv(args: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::nueva_lista(filas))
 }
 
-fn nativa_json_dummy(_: &[Valor]) -> Result<Valor, String> {
-    Ok(Valor::nuevo_diccionario(std::collections::HashMap::new()))
+fn nativa_json_parse(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("__json_parse() espera 1 argumento".to_string());
+    }
+    let texto = args[0].a_texto();
+    let j: serde_json::Value =
+        serde_json::from_str(&texto).map_err(|e| format!("JSON invalido: {e}"))?;
+    Ok(json_a_valor(&j))
 }
 
-fn nativa_json_stringify_dummy(args: &[Valor]) -> Result<Valor, String> {
-    Ok(Valor::Texto(
-        args.first().map(|v| v.a_texto()).unwrap_or_default(),
-    ))
+fn nativa_json_stringify(args: &[Valor]) -> Result<Valor, String> {
+    if args.len() != 1 {
+        return Err("__json_stringify() espera 1 argumento".to_string());
+    }
+    let j = valor_a_json(&args[0]);
+    let texto = serde_json::to_string(&j).map_err(|e| format!("Error JSON: {e}"))?;
+    Ok(Valor::Texto(texto))
+}
+
+fn json_a_valor(j: &serde_json::Value) -> Valor {
+    match j {
+        serde_json::Value::Null => Valor::Nulo,
+        serde_json::Value::Bool(b) => Valor::Logico(*b),
+        serde_json::Value::Number(n) => {
+            if let Some(i) = n.as_i64() {
+                Valor::Entero(i)
+            } else {
+                Valor::Flotante(n.as_f64().unwrap_or(0.0))
+            }
+        }
+        serde_json::Value::String(s) => Valor::Texto(s.clone()),
+        serde_json::Value::Array(arr) => Valor::nueva_lista(arr.iter().map(json_a_valor).collect()),
+        serde_json::Value::Object(obj) => {
+            let mut m = std::collections::HashMap::new();
+            for (k, v) in obj {
+                m.insert(k.clone(), json_a_valor(v));
+            }
+            Valor::nuevo_diccionario(m)
+        }
+    }
+}
+
+fn valor_a_json(v: &Valor) -> serde_json::Value {
+    match v {
+        Valor::Nulo => serde_json::Value::Null,
+        Valor::Logico(b) => serde_json::Value::Bool(*b),
+        Valor::Entero(i) => serde_json::json!(*i),
+        Valor::Flotante(f) => serde_json::json!(*f),
+        Valor::Texto(s) => serde_json::Value::String(s.clone()),
+        Valor::Lista(l) => serde_json::Value::Array(l.borrow().iter().map(valor_a_json).collect()),
+        Valor::Diccionario(d) => {
+            let mut obj = serde_json::Map::new();
+            for (k, v) in d.borrow().iter() {
+                obj.insert(k.clone(), valor_a_json(v));
+            }
+            serde_json::Value::Object(obj)
+        }
+        Valor::Rango { inicio, fin, paso } => {
+            serde_json::json!({"inicio": inicio, "fin": fin, "paso": paso})
+        }
+        Valor::Funcion(_) | Valor::Nativa(_, _) => serde_json::Value::Null,
+    }
 }
 
 fn nativa_max_lista(args: &[Valor]) -> Result<Valor, String> {
