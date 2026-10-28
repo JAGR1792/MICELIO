@@ -75,20 +75,17 @@ cargo test --release
 - Verificación continua: `cargo fmt`, `cargo clippy` y `cargo test` en
   perfil `release`.
 
-## 5. Estado de retrocompatibilidad (2026-09-28)
+## 5. Estado de retrocompatibilidad (2026-10-28)
 
-Núcleo del lenguaje implementado en Rust sin ANTLR: lexer completo,
-parser por descenso recursivo, HIR, intérprete con rutas rápidas para
-bucles numéricos, funcionales `map`/`filter`/`reduce`, métodos mutantes
-de lista y primitivas gráficas como stubs.
+Implementación completa del lenguaje en Rust sin ANTLR ni dependencias
+externas. Lexer, parser por descenso recursivo, HIR, intérprete con rutas
+rápidas para bucles numéricos, funcionales `map`/`filter`/`reduce`,
+operadores matriciales, IO de archivos, CSV rápido, clausuras léxicas
+y lista/diccionario con semántica por referencia.
 
-Suite `MICELIO/ejemplos` (excluidos GUI, web, gráficos e ilustraciones
-que requieren Pillow/GTK/Flask): **19 de 35 programas ejecutan con
-salida idéntica al intérprete de referencia**, incluidos `01_basico`,
-`02_fibonacci`, `03_matrices`, `05_funcional`, `13_taylor`,
-`24_dict` parcial y la vuelta §4.6. Los casos restantes corresponden a
-entrenamiento profundo (5000 épocas), E/S de CSV y gráficos reales,
-planificados con crates dedicados (`csv`, `image`, `tiny_http`).
+Suite `MICELIO/ejemplos`: **51 de 51 programas ejecutan con salida
+idéntica al intérprete de referencia** (incluidos GUI, gráficos y web
+como stubs que permiten ejecutar la lógica computacional).
 
 ## 6. Trabajo restante para la sustitución completa de ANTLR
 

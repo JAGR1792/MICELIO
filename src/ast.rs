@@ -14,6 +14,7 @@ pub struct Programa {
 
 /// Sentencia del lenguaje. Corresponde a `statement` en `Micelio.g4`.
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub enum Sent {
     /// `var a, b = 1, 2`. `valores` puede estar vacío (declaración sin inicializar).
     DeclVar {
@@ -177,6 +178,7 @@ pub enum ArgLlamada {
 
 /// Operador binario.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum OpBin {
     Suma,
     Resta,

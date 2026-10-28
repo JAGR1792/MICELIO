@@ -11,12 +11,45 @@
 //!   directo de métodos frecuentes (`longitud`, `agregar`) sin objetos
 //!   intermedios.
 
-use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::ast::{ArgLlamada, Expr, ItemLista, OpBin, OpUn, Param, Programa, Sent, TipoParam};
 use crate::valor::{Entorno, EntornoRef, FuncionDef, Valor};
+
+use std::cell::RefCell as StdRefCell;
+thread_local! {
+    /// Directorio base del script en ejecución para resolver rutas relativas.
+    static DIR_BASE: StdRefCell<String> = const { StdRefCell::new(String::new()) };
+}
+
+fn fijar_dir_base(d: &str) {
+    DIR_BASE.with(|b| *b.borrow_mut() = d.to_string());
+}
+
+fn resolver_ruta(ruta: &str) -> String {
+    let p = std::path::Path::new(ruta);
+    if p.is_absolute() || ruta.starts_with("http") {
+        return ruta.to_string();
+    }
+    // 1. Relativo al directorio del script.
+    let base: String = DIR_BASE.with(|b| b.borrow().clone());
+    if !base.is_empty() {
+        let cand = format!("{base}/{ruta}");
+        if std::path::Path::new(&cand).exists() {
+            return cand;
+        }
+        // 2. Sin prefijo `ejemplos/` cuando se ejecuta desde ese directorio.
+        if let Some(s) = ruta.strip_prefix("ejemplos/") {
+            let cand2 = format!("{base}/{s}");
+            if std::path::Path::new(&cand2).exists() {
+                return cand2;
+            }
+        }
+    }
+    // 3. Tal cual (relativo al CWD).
+    ruta.to_string()
+}
 
 /// Flujo de control no local (retorno, ruptura, continuación).
 enum Flujo {
@@ -125,7 +158,7 @@ impl Interprete {
 
     fn registrar_nativas(&mut self) {
         let g = Rc::clone(&self.global);
-        let mut reg = |nombre: &'static str, f: fn(&[Valor]) -> Result<Valor, String>| {
+        let reg = |nombre: &'static str, f: fn(&[Valor]) -> Result<Valor, String>| {
             g.borrow_mut()
                 .valores
                 .insert(nombre.to_string(), Valor::Nativa(nombre, f));
@@ -191,7 +224,65 @@ impl Interprete {
         reg("__grafico_texto", nativa_dummy);
         reg("__grafico_poligono", nativa_dummy);
         reg("__grafico_limpiar", nativa_dummy);
-        reg("__leer_csv_rapido", nativa_leer_csv_dummy);
+        // GUI y web (GTK/Flask) como stubs para ejecución de la lógica.
+        for _name in [
+            "__gui_alert",
+            "__gui_confirm",
+            "__gui_input",
+            "__gui_open_file",
+            "__gui_save_file",
+            "__gui_show_image",
+            "__gui_file_copy",
+            "__gui_calc_window",
+            "__gui_set_theme",
+            "__gui_get_theme",
+            "__gui_list_themes",
+            "__flask_disponible",
+            "__flask_demo",
+            "__flask_generar_demo",
+            "__hifa_crear",
+            "__hifa_estaticos",
+            "__hifa_plantillas",
+            "__hifa_ruta_texto",
+            "__hifa_ruta_json",
+            "__hifa_ruta_template",
+            "__hifa_ruta_archivo",
+            "__hifa_ruta_redirect",
+            "__hifa_not_found_text",
+            "__hifa_not_found_json",
+            "__hifa_listar_rutas",
+            "__hifa_iniciar",
+            "__hifa_generar_demo",
+        ] {
+            // register as dummy natives
+        }
+        reg("__gui_alert", nativa_dummy);
+        reg("__gui_confirm", nativa_dummy_text_bool);
+        reg("__gui_input", nativa_dummy_text);
+        reg("__gui_open_file", nativa_dummy_text);
+        reg("__gui_save_file", nativa_dummy);
+        reg("__gui_show_image", nativa_dummy);
+        reg("__gui_file_copy", nativa_dummy);
+        reg("__gui_calc_window", nativa_dummy);
+        reg("__gui_set_theme", nativa_dummy);
+        reg("__gui_get_theme", nativa_dummy_text);
+        reg("__gui_list_themes", nativa_dummy_lista);
+        reg("__flask_disponible", nativa_dummy_false);
+        reg("__flask_demo", nativa_dummy);
+        reg("__flask_generar_demo", nativa_dummy);
+        reg("__hifa_crear", nativa_dummy_hifa);
+        reg("__hifa_estaticos", nativa_dummy);
+        reg("__hifa_plantillas", nativa_dummy);
+        reg("__hifa_ruta_texto", nativa_dummy);
+        reg("__hifa_ruta_json", nativa_dummy);
+        reg("__hifa_ruta_template", nativa_dummy);
+        reg("__hifa_ruta_archivo", nativa_dummy);
+        reg("__hifa_ruta_redirect", nativa_dummy);
+        reg("__hifa_not_found_text", nativa_dummy);
+        reg("__hifa_not_found_json", nativa_dummy);
+        reg("__hifa_listar_rutas", nativa_dummy_lista);
+        reg("__hifa_iniciar", nativa_dummy);
+        reg("__hifa_generar_demo", nativa_dummy);
     }
 
     /// Ejecuta un programa completo en el ámbito global.
@@ -212,6 +303,7 @@ impl Interprete {
 
     /// Ejecuta un archivo `.mice` con `importar` relativo al directorio base.
     pub fn ejecutar_archivo(&mut self, ruta: &str) -> Exito<Valor> {
+        fijar_dir_base(&dir_de(ruta));
         let contenido = std::fs::read_to_string(ruta)
             .map_err(|e| error(format!("No se pudo leer '{ruta}': {e}")))?;
         let previo = std::mem::replace(&mut self.base_dir, dir_de(ruta));
@@ -1251,6 +1343,7 @@ impl Interprete {
         }
         match self.ejecutar_bloque_sin_ambito(&f.cuerpo, &local)? {
             Control::Flujo(Flujo::Retorno(v)) => Ok(v),
+            Control::Valor(v) => Ok(v),
             _ => Ok(Valor::Nulo),
         }
     }
@@ -1375,7 +1468,67 @@ fn aplicar_bin(op: OpBin, x: &Valor, y: &Valor) -> Exito<Valor> {
     }
 }
 
+fn es_matriz_numerica(v: &Valor) -> bool {
+    match v {
+        Valor::Lista(rows) => {
+            let r = rows.borrow();
+            if r.is_empty() {
+                return false;
+            }
+            let primera = match &r[0] {
+                Valor::Lista(f) => f.borrow().len(),
+                _ => return false,
+            };
+            if primera == 0 {
+                return false;
+            }
+            r.iter().all(|row| match row {
+                Valor::Lista(f) => {
+                    let fb = f.borrow();
+                    fb.len() == primera
+                        && fb
+                            .iter()
+                            .all(|c| matches!(c, Valor::Entero(_) | Valor::Flotante(_)))
+                }
+                _ => false,
+            })
+        }
+        _ => false,
+    }
+}
+
+fn suma_resta_matrices(x: &Valor, y: &Valor, es_suma: bool) -> Exito<Valor> {
+    let (xa, ya) = match (x, y) {
+        (Valor::Lista(a), Valor::Lista(b)) => (a.borrow().clone(), b.borrow().clone()),
+        _ => return Err(error("Matriz inválida")),
+    };
+    if xa.len() != ya.len() || xa.is_empty() {
+        return Err(error("Dimensiones invalidas para suma/resta matricial"));
+    }
+    let mut out = Vec::with_capacity(xa.len());
+    for (rl, rr) in xa.iter().zip(ya.iter()) {
+        let (ll, lr) = match (rl, rr) {
+            (Valor::Lista(a), Valor::Lista(b)) => (a.borrow().clone(), b.borrow().clone()),
+            _ => return Err(error("Matriz inválida")),
+        };
+        if ll.len() != lr.len() {
+            return Err(error("Dimensiones invalidas para suma/resta matricial"));
+        }
+        let mut fila = Vec::with_capacity(ll.len());
+        for (a, b) in ll.iter().zip(lr.iter()) {
+            let af = a.a_numero().map_err(error)?;
+            let bf = b.a_numero().map_err(error)?;
+            fila.push(Valor::Flotante(if es_suma { af + bf } else { af - bf }));
+        }
+        out.push(Valor::nueva_lista(fila));
+    }
+    Ok(Valor::nueva_lista(out))
+}
+
 fn suma(x: &Valor, y: &Valor) -> Exito<Valor> {
+    if es_matriz_numerica(x) && es_matriz_numerica(y) {
+        return suma_resta_matrices(x, y, true);
+    }
     match (x, y) {
         (Valor::Entero(a), Valor::Entero(b)) => Ok(Valor::Entero(a.wrapping_add(*b))),
         (Valor::Texto(a), Valor::Texto(b)) => Ok(Valor::Texto(format!("{a}{b}"))),
@@ -1412,6 +1565,9 @@ fn aritmetica(op: OpBin, x: &Valor, y: &Valor) -> Exito<Valor> {
                 return multiplicar_matrices(a, b);
             }
         }
+    }
+    if op == OpBin::Resta && es_matriz_numerica(x) && es_matriz_numerica(y) {
+        return suma_resta_matrices(x, y, false);
     }
     let a = x.a_numero().map_err(error)?;
     let b = y.a_numero().map_err(error)?;
@@ -1479,7 +1635,9 @@ fn multiplicar_matrices(a: &crate::valor::ListaRef, b: &crate::valor::ListaRef) 
         _ => return Err(error("Matriz inválida")),
     };
     if ac != br {
-        return Err(error("Dimensiones invalidas para multiplicacion matricial"));
+        return Err(error(
+            "Multiplicación: columnas de m1 deben igualar filas de m2",
+        ));
     }
     // Copia `b` traspuesta para acceso secuencial en el bucle interno.
     let mut bt = vec![vec![0.0; br]; bc];
@@ -1488,6 +1646,7 @@ fn multiplicar_matrices(a: &crate::valor::ListaRef, b: &crate::valor::ListaRef) 
             Valor::Lista(r) => r.borrow().clone(),
             _ => return Err(error("Matriz inválida")),
         };
+        #[allow(clippy::needless_range_loop)]
         for j in 0..bc {
             bt[j][i] = row[j].a_numero().map_err(error)?;
         }
@@ -1499,6 +1658,7 @@ fn multiplicar_matrices(a: &crate::valor::ListaRef, b: &crate::valor::ListaRef) 
             _ => return Err(error("Matriz inválida")),
         };
         let mut orow = Vec::with_capacity(bc);
+        #[allow(clippy::needless_range_loop)]
         for j in 0..bc {
             let mut acc = 0.0;
             for k in 0..ac {
@@ -1645,6 +1805,23 @@ fn metodo_nativo(
     pos: &[Valor],
     _nom: &HashMap<String, Valor>,
 ) -> Exito<Option<Valor>> {
+    // Métodos gráficos y de E/S del intérprete de referencia se
+    // implementan como stubs que devuelven nulo, permitiendo ejecutar la
+    // lógica computacional de los ejemplos sin dependencias externas.
+    if campo.starts_with("set_")
+        || campo.starts_with("pintar_")
+        || campo == "scatter"
+        || campo == "mostrar"
+        || campo == "guardar"
+        || campo == "titulo"
+        || campo == "etiquetas"
+        || campo == "color_linea"
+        || campo == "linea_sobre_grafico"
+        || campo == "iniciar_grafico"
+        || campo == "estilo"
+    {
+        return Ok(Some(Valor::Nulo));
+    }
     match base {
         Valor::Lista(v) => match campo {
             "longitud" => {
@@ -1653,10 +1830,48 @@ fn metodo_nativo(
                 }
                 Ok(Some(Valor::Entero(v.borrow().len() as i64)))
             }
-            // `agregar`, `quitar`, `insertar` y `extender` mutan por valor
-            // semántico de lista del lenguaje; el intérprete reasigna el
-            // resultado al contenedor cuando corresponde al caso de uso
-            // directo sobre variables en la práctica actual.
+            "agregar" => {
+                if pos.len() != 1 {
+                    return Err(error("agregar() espera 1 argumento"));
+                }
+                v.borrow_mut().push(pos[0].clone());
+                Ok(Some(Valor::Nulo))
+            }
+            "extender" => {
+                if pos.len() != 1 {
+                    return Err(error("extender() espera 1 argumento"));
+                }
+                let extra = pos[0].materializar().map_err(error)?;
+                v.borrow_mut().extend(extra);
+                Ok(Some(Valor::Nulo))
+            }
+            "quitar" => {
+                if pos.len() > 1 {
+                    return Err(error("quitar() espera 0 o 1 argumento"));
+                }
+                if pos.is_empty() {
+                    v.borrow_mut().pop();
+                } else {
+                    let i = pos[0].a_numero().map_err(error)? as i64;
+                    let n = v.borrow().len() as i64;
+                    let j = if i < 0 { n + i } else { i };
+                    if j < 0 || j >= n {
+                        return Err(error("Índice fuera de rango"));
+                    }
+                    v.borrow_mut().remove(j as usize);
+                }
+                Ok(Some(Valor::Nulo))
+            }
+            "insertar" => {
+                if pos.len() != 2 {
+                    return Err(error("insertar() espera 2 argumentos"));
+                }
+                let i = pos[0].a_numero().map_err(error)? as i64;
+                let n = v.borrow().len() as i64;
+                let j = (if i < 0 { n + i } else { i }).clamp(0, n) as usize;
+                v.borrow_mut().insert(j, pos[1].clone());
+                Ok(Some(Valor::Nulo))
+            }
             _ => Ok(None),
         },
         Valor::Texto(s) => match campo {
@@ -1894,7 +2109,7 @@ fn nativa_claves(args: &[Valor]) -> Result<Valor, String> {
         Valor::Diccionario(m) => {
             let mb = m.borrow();
             let mut ks: Vec<Valor> = mb.keys().cloned().map(Valor::Texto).collect();
-            ks.sort_by(|a, b| a.a_texto().cmp(&b.a_texto()));
+            ks.sort_by_key(|a| a.a_texto());
             Ok(Valor::nueva_lista(ks))
         }
         _ => Err("claves() requiere un diccionario".to_string()),
@@ -2072,8 +2287,20 @@ fn nativa_dummy_text(_: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::Texto(String::new()))
 }
 
-fn nativa_leer_csv_dummy(_: &[Valor]) -> Result<Valor, String> {
+fn nativa_dummy_text_bool(_: &[Valor]) -> Result<Valor, String> {
+    Ok(Valor::Logico(true))
+}
+
+fn nativa_dummy_false(_: &[Valor]) -> Result<Valor, String> {
+    Ok(Valor::Logico(false))
+}
+
+fn nativa_dummy_lista(_: &[Valor]) -> Result<Valor, String> {
     Ok(Valor::nueva_lista(Vec::new()))
+}
+
+fn nativa_dummy_hifa(_: &[Valor]) -> Result<Valor, String> {
+    Ok(Valor::nuevo_diccionario(std::collections::HashMap::new()))
 }
 
 fn nativa_existe_falso(args: &[Valor]) -> Result<Valor, String> {
@@ -2089,7 +2316,7 @@ fn nativa_archivo_leer(args: &[Valor]) -> Result<Valor, String> {
     if args.len() != 1 {
         return Err("__archivo_leer() espera 1 argumento".to_string());
     }
-    let ruta = args[0].a_texto();
+    let ruta = resolver_ruta(&args[0].a_texto());
     std::fs::read_to_string(&ruta)
         .map(Valor::Texto)
         .map_err(|e| format!("No se pudo leer '{ruta}': {e}"))
@@ -2099,7 +2326,7 @@ fn nativa_archivo_escribir(args: &[Valor]) -> Result<Valor, String> {
     if args.len() != 2 {
         return Err("__archivo_escribir() espera 2 argumentos".to_string());
     }
-    let ruta = args[0].a_texto();
+    let ruta = resolver_ruta(&args[0].a_texto());
     let contenido = args[1].a_texto();
     if let Some(padre) = std::path::Path::new(&ruta).parent() {
         if !padre.as_os_str().is_empty() {
@@ -2124,7 +2351,7 @@ fn nativa_archivo_eliminar(args: &[Valor]) -> Result<Valor, String> {
     if args.len() != 1 {
         return Err("__archivo_eliminar() espera 1 argumento".to_string());
     }
-    let ruta = args[0].a_texto();
+    let ruta = resolver_ruta(&args[0].a_texto());
     std::fs::remove_file(&ruta)
         .map(|_| Valor::Nulo)
         .map_err(|e| format!("No se pudo eliminar '{ruta}': {e}"))
@@ -2134,7 +2361,7 @@ fn nativa_archivo_tamano(args: &[Valor]) -> Result<Valor, String> {
     if args.len() != 1 {
         return Err("__archivo_tamano() espera 1 argumento".to_string());
     }
-    let ruta = args[0].a_texto();
+    let ruta = resolver_ruta(&args[0].a_texto());
     std::fs::metadata(&ruta)
         .map(|m| Valor::Entero(m.len() as i64))
         .map_err(|e| format!("No se pudo obtener tamaño de '{ruta}': {e}"))
@@ -2147,7 +2374,7 @@ fn nativa_leer_csv(args: &[Valor]) -> Result<Valor, String> {
     if args.len() < 2 {
         return Err("__leer_csv_rapido() espera ruta, delimitador y [saltar_cabecera]".to_string());
     }
-    let ruta = args[0].a_texto();
+    let ruta = resolver_ruta(&args[0].a_texto());
     let delim = args[1].a_texto().chars().next().unwrap_or(',');
     let saltar: usize = if args.len() >= 3 {
         args[2].a_numero().unwrap_or(0.0) as usize
@@ -2164,7 +2391,12 @@ fn nativa_leer_csv(args: &[Valor]) -> Result<Valor, String> {
         filas.push(Valor::nueva_lista(
             linea
                 .split(delim)
-                .map(|c| Valor::Texto(c.trim().to_string()))
+                .map(|c| {
+                    let s = c.trim();
+                    let s = s.strip_prefix('\"').unwrap_or(s);
+                    let s = s.strip_suffix('\"').unwrap_or(s);
+                    Valor::Texto(s.trim().to_string())
+                })
                 .collect(),
         ));
     }

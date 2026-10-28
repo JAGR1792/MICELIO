@@ -32,16 +32,14 @@ impl Parser {
     }
 
     fn peek(&self) -> &Token {
-        &self
-            .toks
+        self.toks
             .get(self.pos)
             .map(|t| &t.token)
             .unwrap_or(&Token::Fin)
     }
 
     fn peek2(&self) -> &Token {
-        &self
-            .toks
+        self.toks
             .get(self.pos + 1)
             .map(|t| &t.token)
             .unwrap_or(&Token::Fin)

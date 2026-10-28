@@ -222,6 +222,7 @@ impl Valor {
                 }
             }
             Valor::Diccionario(m) => Ok(m.borrow().len() as i64),
+            Valor::Nulo => Ok(0),
             v => Err(format!("longitud() no soporta {}", v.nombre_tipo())),
         }
     }
