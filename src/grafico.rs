@@ -194,27 +194,38 @@ const FONT_5X7: &str = "\
 ";
 
 pub fn dibujar_texto(img: &mut RgbImage, x: i32, y: i32, texto: &str, c: Rgb<u8>, escala: i32) {
-    // Renderizado mínimo: cada carácter es un bloque 6x8 con glifo simplificado.
-    // Se usa un patrón genérico para mantener el binario autocontenido.
+    // Usa fontdue con DejaVu Sans para renderizado de texto de alta calidad.
+    static FONT_DATA: &[u8] = include_bytes!("/usr/share/fonts/TTF/DejaVuSans.ttf");
+    let font = fontdue::Font::from_bytes(FONT_DATA, fontdue::FontSettings::default())
+        .expect("No se pudo cargar la fuente");
+    let font_size = (escala as f32 * 2.5).max(8.0);
     let mut cx = x;
     for ch in texto.chars() {
-        // Glifo básico: dibuja el carácter como un rectángulo pequeño
-        // con el código ASCII para distinguir caracteres.
-        let code = ch as i32;
-        // Patrón simple basado en el código del carácter.
-        for dy in 0..7 {
-            for dx in 0..5 {
-                let bit = (code >> (dy * 5 + dx)) & 1;
-                if bit == 1 || (dx == 2 && dy == 3) {
-                    for sy in 0..escala {
-                        for sx in 0..escala {
-                            poner_pixel(img, cx + dx * escala + sx, y + dy * escala + sy, c);
-                        }
-                    }
+        let (metrics, bitmap) = font.rasterize(ch, font_size);
+        for (i, &alpha) in bitmap.iter().enumerate() {
+            if alpha > 0 {
+                let px = i % metrics.width;
+                let py = i / metrics.width;
+                let a = alpha as u32;
+                // Mezcla alfa con el color del texto.
+                let ix = cx + px as i32;
+                let iy = y + py as i32;
+                if ix < 0 || iy < 0 || ix as u32 >= img.width() || iy as u32 >= img.height() {
+                    continue;
                 }
+                let existing = img.get_pixel(ix as u32, iy as u32);
+                let blend = |comp: u8, txt: u8| -> u8 {
+                    ((comp as u32 * (255 - a) + txt as u32 * a) / 255) as u8
+                };
+                let blended = Rgb([
+                    blend(existing[0], c[0]),
+                    blend(existing[1], c[1]),
+                    blend(existing[2], c[2]),
+                ]);
+                poner_pixel(img, ix, iy, blended);
             }
         }
-        cx += 6 * escala;
+        cx += metrics.advance_width as i32;
     }
 }
 
