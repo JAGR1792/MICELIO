@@ -25,7 +25,7 @@ opt-level = 0
 debug = true
 
 [dependencies]
-# Intencionalmente sin dependencias externas para el núcleo.
+image = "0.25"
 # El lexer, parser e intérprete están implementados con la biblioteca estándar,
 # lo que elimina el coste de arranque de ANTLR y facilita la distribución
 # como binario único. Futuras extensiones (CSV, JSON, gráficos, HTTP)

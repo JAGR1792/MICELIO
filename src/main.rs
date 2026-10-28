@@ -14,6 +14,7 @@ use std::hint::black_box;
 use std::time::Instant;
 
 mod ast;
+mod grafico;
 mod interp;
 mod lexer;
 mod parser;
